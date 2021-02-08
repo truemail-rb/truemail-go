@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: golangci/golangci-lint:v1.33-alpine
+    steps:
+      - checkout
+      - run: golangci-lint run
+  test:
+    docker:
+      - image: golang:1.15
+    working_directory: /go/src/github.com/truemail-rb/truemail-go
+    steps:
+      - checkout
+      - run: go test -v -race ./...
+
+workflows:
+  build:
+    jobs:
+      - lint
+      - test
