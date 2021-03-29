@@ -69,17 +69,17 @@ func TestAvailableValidationTypes(t *testing.T) {
 	})
 }
 
-func TestValidateDefaultValidationTypeContext(t *testing.T) {
+func TestValidateValidationTypeDefaultContext(t *testing.T) {
 	for _, validType := range availableValidationTypes() {
 		t.Run("valid validation type", func(t *testing.T) {
-			assert.NoError(t, validateDefaultValidationTypeContext(validType))
+			assert.NoError(t, validateValidationTypeDefaultContext(validType))
 		})
 	}
 
 	t.Run("invalid validation type", func(t *testing.T) {
 		invalidType := "invalid type"
 		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx smtp]", invalidType)
-		assert.EqualError(t, validateDefaultValidationTypeContext(invalidType), errorMessage)
+		assert.EqualError(t, validateValidationTypeDefaultContext(invalidType), errorMessage)
 	})
 }
 

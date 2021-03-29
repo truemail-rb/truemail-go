@@ -8,7 +8,7 @@ import (
 // Configuration structure
 type Configuration struct {
 	ctx                                                                  context.Context
-	VerifierEmail, VerifierDomain, DefaultValidationType                 string
+	VerifierEmail, VerifierDomain, ValidationTypeDefault                 string
 	ConnectionTimeout, ResponseTimeout, ConnectionAttempts               int
 	WhitelistedDomains, BlacklistedDomains, DNS                          []string
 	ValidationTypeByDomain                                               map[string]string
@@ -19,7 +19,7 @@ type Configuration struct {
 // ConfigurationAttr kwargs for configuration builder
 type ConfigurationAttr struct {
 	ctx                                                                                      context.Context
-	verifierEmail, verifierDomain, defaultValidationType, emailPattern, smtpErrorBodyPattern string
+	verifierEmail, verifierDomain, ValidationTypeDefault, emailPattern, smtpErrorBodyPattern string
 	connectionTimeout, responseTimeout, connectionAttempts                                   int
 	whitelistedDomains, blacklistedDomains, dns                                              []string
 	validationTypeByDomain                                                                   map[string]string
@@ -31,7 +31,10 @@ const (
 	DefaultConnectionTimeout     = 2
 	DefaultResponseTimeout       = 2
 	DefaultConnectionAttempts    = 2
-	DefaultValidationType        = "smtp"
+	ValidationTypeRegex          = "regex"
+	ValidationTypeMx             = "mx"
+	ValidationTypeSMTP           = "smtp"
+	ValidationTypeDefault        = ValidationTypeSMTP
 	DomainCharsSize              = `\A.{4,255}\z`
 	EmailCharsSize               = `\A.{6,255}\z`
 	RegexDomainPattern           = `(?i)[\p{L}0-9]+([\-.]{1}[\p{L}0-9]+)*\.\p{L}{2,63}`
@@ -45,8 +48,8 @@ const (
 // NewConfiguration builder
 func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
 	// assign fileds default values
-	if config.defaultValidationType == "" {
-		config.defaultValidationType = DefaultValidationType
+	if config.ValidationTypeDefault == "" {
+		config.ValidationTypeDefault = ValidationTypeDefault
 	}
 	if config.emailPattern == "" {
 		config.emailPattern = RegexEmailPattern
@@ -75,7 +78,7 @@ func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
 		return nil, err
 	}
 
-	err = validateDefaultValidationTypeContext(config.defaultValidationType)
+	err = validateValidationTypeDefaultContext(config.ValidationTypeDefault)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +133,7 @@ func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
 		ctx:                    config.ctx,
 		VerifierEmail:          config.verifierEmail,
 		VerifierDomain:         config.verifierDomain,
-		DefaultValidationType:  config.defaultValidationType,
+		ValidationTypeDefault:  config.ValidationTypeDefault,
 		ConnectionTimeout:      config.connectionTimeout,
 		ResponseTimeout:        config.responseTimeout,
 		ConnectionAttempts:     config.connectionAttempts,
