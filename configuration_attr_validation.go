@@ -29,16 +29,16 @@ func buildVerifierDomain(verifierEmail, verifierDomain string) (string, error) {
 }
 
 func availableValidationTypes() []string {
-	return []string{"regex", "mx", "smtp"}
+	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP}
 }
 
-func validateDefaultValidationTypeContext(defaultValidationType string) error {
-	if included(availableValidationTypes(), defaultValidationType) {
+func validateValidationTypeDefaultContext(ValidationTypeDefault string) error {
+	if included(availableValidationTypes(), ValidationTypeDefault) {
 		return nil
 	}
 	return fmt.Errorf(
 		"%s is invalid default validation type, use one of these: %s",
-		defaultValidationType,
+		ValidationTypeDefault,
 		availableValidationTypes(),
 	)
 }
@@ -92,7 +92,7 @@ func validateTypeByDomainContext(typesByDomains map[string]string) error {
 			return err
 		}
 
-		err = validateDefaultValidationTypeContext(validationType)
+		err = validateValidationTypeDefaultContext(validationType)
 		if err != nil {
 			return err
 		}
