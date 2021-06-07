@@ -196,15 +196,15 @@ func TestValidateTypeByDomainContext(t *testing.T) {
 	})
 }
 
-func TestIncluded(t *testing.T) {
+func TestIsIncluded(t *testing.T) {
 	t.Run("item found in slice", func(t *testing.T) {
 		var item string
 		slice := []string{item}
-		assert.True(t, included(slice, item))
+		assert.True(t, isIncluded(slice, item))
 	})
 
 	t.Run("item not found in slice", func(t *testing.T) {
-		assert.False(t, included([]string{}, ""))
+		assert.False(t, isIncluded([]string{}, ""))
 	})
 }
 

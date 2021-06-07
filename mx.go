@@ -1,5 +1,5 @@
 package truemail
 
-func validateMx(validatorResult *ValidatorResult) *ValidatorResult {
+func validateMx(validatorResult *validatorResult) *validatorResult {
 	return validatorResult
 }

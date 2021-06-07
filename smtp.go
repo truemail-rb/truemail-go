@@ -1,5 +1,5 @@
 package truemail
 
-func validateSMTP(validatorResult *ValidatorResult) *ValidatorResult {
+func validateSMTP(validatorResult *validatorResult) *validatorResult {
 	return validatorResult
 }
