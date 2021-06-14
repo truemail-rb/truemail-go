@@ -33,7 +33,7 @@ func availableValidationTypes() []string {
 }
 
 func validateValidationTypeDefaultContext(ValidationTypeDefault string) error {
-	if included(availableValidationTypes(), ValidationTypeDefault) {
+	if isIncluded(availableValidationTypes(), ValidationTypeDefault) {
 		return nil
 	}
 	return fmt.Errorf(
@@ -100,7 +100,7 @@ func validateTypeByDomainContext(typesByDomains map[string]string) error {
 	return nil
 }
 
-func included(slice []string, target string) bool {
+func isIncluded(slice []string, target string) bool {
 	for _, item := range slice {
 		if item == target {
 			return true

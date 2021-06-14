@@ -2,39 +2,58 @@ package truemail
 
 import "fmt"
 
-// ValidatorResult structure
-type ValidatorResult struct {
-	Success, SMTPDebug bool
-	Email, Domain      string
-	MailServers        []string
-	Errors             map[string]string
-	Configuration      *Configuration
+// validatorResult structure
+type validatorResult struct {
+	Success, SMTPDebug            bool
+	Email, Domain, ValidationType string
+	MailServers                   []string
+	Errors                        map[string]string
+	Configuration                 *configuration
+	isPassFromDomainListMatch     bool
 }
 
-func Validate(email string, configuration *Configuration, validationType string) (*ValidatorResult, error) {
-	err := validateValidationTypeContext(validationType)
+// ValidationAttr kwargs for validator enrty point
+type ValidationAttr struct {
+	email, validationType string
+	configuration         *configuration
+}
+
+func Validate(validationAttr ValidationAttr) (*validatorResult, error) {
+	validationType, validationConfiguration := &validationAttr.validationType, validationAttr.configuration
+
+	if *validationType == "" {
+		*validationType = ValidationTypeDefault
+	}
+
+	err := validateValidationTypeContext(*validationType)
 	if err != nil {
 		return nil, err
 	}
 
-	validatorResult := newValidatorResult(email, configuration)
+	validatorResult := newValidatorResult(validationAttr.email, validationConfiguration, *validationType)
 
 	// define validationType flow
 
-	switch validationType {
-	case ValidationTypeRegex:
-		validateRegex(validatorResult)
-	case ValidationTypeMx:
-		validateMx(validateRegex(validatorResult))
-	case ValidationTypeSMTP:
-		validateSMTP(validateMx(validateRegex(validatorResult)))
+	// Whitelist/Blacklist validation
+	validateDomainListMatch(validatorResult)
+	if !validatorResult.Success || !validatorResult.isPassFromDomainListMatch {
+		return validatorResult, err
 	}
+
+	// switch validationType {
+	// case ValidationTypeRegex:
+	// 	validateRegex(validatorResult)
+	// case ValidationTypeMx:
+	// 	validateMx(validateRegex(validatorResult))
+	// case ValidationTypeSMTP:
+	// 	validateSMTP(validateMx(validateRegex(validatorResult)))
+	// }
 
 	return validatorResult, err
 }
 
 func validateValidationTypeContext(validationType string) error {
-	if included(availableValidationTypes(), validationType) {
+	if isIncluded(availableValidationTypes(), validationType) {
 		return nil
 	}
 	return fmt.Errorf(
@@ -44,6 +63,14 @@ func validateValidationTypeContext(validationType string) error {
 	)
 }
 
-func newValidatorResult(email string, configuration *Configuration) *ValidatorResult {
-	return &ValidatorResult{Email: email, Configuration: configuration}
+func newValidatorResult(email string, configuration *configuration, validationType string) *validatorResult {
+	return &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
+}
+
+func addError(validatorResult *validatorResult, key, value string) *validatorResult {
+	if validatorResult.Errors == nil {
+		validatorResult.Errors = map[string]string{}
+	}
+	validatorResult.Errors[key] = value
+	return validatorResult
 }

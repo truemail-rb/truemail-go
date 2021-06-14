@@ -5,8 +5,8 @@ import (
 	"regexp"
 )
 
-// Configuration structure
-type Configuration struct {
+// configuration structure
+type configuration struct {
 	ctx                                                                  context.Context
 	VerifierEmail, VerifierDomain, ValidationTypeDefault                 string
 	ConnectionTimeout, ResponseTimeout, ConnectionAttempts               int
@@ -46,7 +46,7 @@ const (
 )
 
 // NewConfiguration builder
-func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
+func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 	// assign fileds default values
 	if config.ValidationTypeDefault == "" {
 		config.ValidationTypeDefault = ValidationTypeDefault
@@ -128,8 +128,8 @@ func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
 		return nil, err
 	}
 
-	// create new Configuration
-	newConfiguration := Configuration{
+	// create new configuration
+	newConfiguration := configuration{
 		ctx:                    config.ctx,
 		VerifierEmail:          config.verifierEmail,
 		VerifierDomain:         config.verifierDomain,

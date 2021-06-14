@@ -8,7 +8,7 @@ import (
 
 func TestValidateSMTP(t *testing.T) {
 	t.Run("SMTP validation layer", func(t *testing.T) {
-		validatorResult := new(ValidatorResult)
+		validatorResult := new(validatorResult)
 		assert.Equal(t, validateSMTP(validatorResult), validatorResult)
 	})
 }
