@@ -42,7 +42,7 @@ func TestNewConfiguration(t *testing.T) {
 			ctx:                    context.TODO(),
 			verifierEmail:          validVerifierEmail,
 			verifierDomain:         "another_domain.com",
-			ValidationTypeDefault:  "mx",
+			validationTypeDefault:  "mx",
 			emailPattern:           `\A.+@.+\z`,
 			smtpErrorBodyPattern:   `550{1}`,
 			connectionTimeout:      3,
@@ -64,7 +64,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, configurationAttr.ctx, configuration.ctx)
 		assert.Equal(t, configurationAttr.verifierEmail, configuration.VerifierEmail)
 		assert.Equal(t, configurationAttr.verifierDomain, configuration.VerifierDomain)
-		assert.Equal(t, configurationAttr.ValidationTypeDefault, configuration.ValidationTypeDefault)
+		assert.Equal(t, configurationAttr.validationTypeDefault, configuration.ValidationTypeDefault)
 		assert.Equal(t, configurationAttr.connectionTimeout, configuration.ConnectionTimeout)
 		assert.Equal(t, configurationAttr.responseTimeout, configuration.ResponseTimeout)
 		assert.Equal(t, configurationAttr.connectionAttempts, configuration.ConnectionAttempts)
@@ -97,9 +97,9 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid default validation type", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, ValidationTypeDefault: "invalid validation type"}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeDefault: "invalid validation type"}
 		configuration, err := NewConfiguration(configurationAttr)
-		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", configurationAttr.ValidationTypeDefault)
+		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", configurationAttr.validationTypeDefault)
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
