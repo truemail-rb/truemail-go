@@ -27,7 +27,6 @@ Also Truemail library allows performing an audit of the host in which runs.
 ## Features
 
 - Configurable validator, validate only what you need
-<!-- - Only one runtime dependency -->
 - Supporting of internationalized emails ([EAI](https://en.wikipedia.org/wiki/Email_address#Internationalization))
 - Whitelist/blacklist validation layers
 - Ability to configure different MX/SMTP validation flows
@@ -36,7 +35,6 @@ Also Truemail library allows performing an audit of the host in which runs.
 - Event logger
 - Host auditor tools (helps to detect common host problems interfering to proper email verification)
 - JSON serializers
-<!-- - Ability to use the library as independent stateless microservice ([Truemail Server](https://truemail-rb.org/truemail-rack)) -->
 
 ## Requirements
 
@@ -77,28 +75,28 @@ You can use global gem configuration or custom independent configuration. Availa
 - whitelisted domains
 - whitelist validation
 - blacklisted domains
-<!-- - blacklisted mx ip-addresses -->
+- blacklisted mx ip-addresses
 - custom DNS gateway(s)
 - RFC MX lookup flow
 - SMTP fail fast
 - SMTP safe check
-<!-- - event logger -->
 - JSON serializer
 
-#### Setting configuration
+#### Creating configuration
 
-To have an access for library features, you must create configuration struct first as in the example below:
+To have an access for library features, you must create configuration struct first. Please use `truemail.NewConfiguration()` built-in constructor to create a valid configuration as in the example below:
 
 ```go
 import "github.com/truemail-rb/truemail-go"
 
 configuration := truemail.NewConfiguration(
   ConfigurationAttr{
-    // Required parameter. Must be an existing email on behalf of which verification will be performed
+    // Required parameter. Must be an existing email on behalf of which verification will be
+    // performed
     verifierEmail: "verifier@example.com",
 
-    // Optional parameter. Must be an existing domain on behalf of which verification will be performed.
-    // By default verifier domain based on verifier email
+    // Optional parameter. Must be an existing domain on behalf of which verification will be
+    // performed. By default verifier domain based on verifier email
     verifierDomain: "somedomain.com",
 
     // Optional parameter. You can override default regex pattern
@@ -132,22 +130,22 @@ configuration := truemail.NewConfiguration(
     // All of validations for "somedomain.com" will be processed with regex validation only.
     // And all of validations for "otherdomain.com" will be processed with mx validation only.
     // It is equal to empty map of strings by default.
-    validationTypeByDomain: map[string]string{"somedomain.com": "regex", "otherdomain.com": "mx"}
+    validationTypeByDomain: map[string]string{"somedomain.com": "regex", "otherdomain.com": "mx"},
 
     // Optional parameter. Validation of email which contains whitelisted domain always will
-    // return true. Other validations will not processed even if it was defined in validationTypeByDomain
-    // It is equal to empty slice of strings by default.
+    // return true. Other validations will not processed even if it was defined in
+    // validationTypeByDomain. It is equal to empty slice of strings by default.
     whitelistedDomains: []string{"somedomain1.com", "somedomain2.com"},
 
     // Optional parameter. With this option Truemail will validate email which contains whitelisted
-    // domain only, i.e. if domain whitelisted, validation will passed to Regex, MX or SMTP validators.
-    // Validation of email which not contains whitelisted domain always will return false.
-    // It is equal false by default.
+    // domain only, i.e. if domain whitelisted, validation will passed to Regex, MX or SMTP
+    // validators. Validation of email which not contains whitelisted domain always will return
+    // false. It is equal false by default.
     whitelistValidation: true,
 
     // Optional parameter. Validation of email which contains blacklisted domain always will
-    // return false. Other validations will not processed even if it was defined in validationTypeByDomain
-    // It is equal to empty slice of strings by default.
+    // return false. Other validations will not processed even if it was defined in
+    // validationTypeByDomain. It is equal to empty slice of strings by default.
     blacklistedDomains: []string{"somedomain3.com", "somedomain4.com"},
 
     // Optional parameter. This option will provide to use custom DNS gateway when Truemail
