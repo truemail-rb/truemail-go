@@ -8,7 +8,7 @@ import (
 
 func TestValidateMx(t *testing.T) {
 	t.Run("DNS validation layer", func(t *testing.T) {
-		validatorResult := new(validatorResult)
+		validatorResult := createValidatorResult(createRandomEmail(), createConfiguration())
 		assert.Equal(t, validateMx(validatorResult), validatorResult)
 	})
 }

@@ -1,8 +1,6 @@
 package truemail
 
 func validateRegex(validatorResult *validatorResult) *validatorResult {
-	// if !validatorResult.Success {
-	// 	return validatorResult
-	// }
+	validatorResult.validator.addUsedValidationType(ValidationTypeRegex)
 	return validatorResult
 }

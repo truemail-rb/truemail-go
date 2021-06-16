@@ -21,7 +21,7 @@ func validateDomainListMatch(validatorResult *validatorResult) *validatorResult 
 	// Handle flow for processing validatorResult via next validation level
 	if (isWhitelistValidation(validatorResult) && isWhitelistedDomain(validatorResult)) ||
 		(!isBlacklistedDomain(validatorResult) && !isWhitelistedDomain(validatorResult)) {
-		validatorResult.isPassFromDomainListMatch = true
+		validatorResult.validator.isPassFromDomainListMatch = true
 	}
 
 	return validatorResult
