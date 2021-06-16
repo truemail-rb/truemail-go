@@ -19,7 +19,7 @@ type configuration struct {
 // ConfigurationAttr kwargs for configuration builder
 type ConfigurationAttr struct {
 	ctx                                                                                      context.Context
-	verifierEmail, verifierDomain, ValidationTypeDefault, emailPattern, smtpErrorBodyPattern string
+	verifierEmail, verifierDomain, validationTypeDefault, emailPattern, smtpErrorBodyPattern string
 	connectionTimeout, responseTimeout, connectionAttempts                                   int
 	whitelistedDomains, blacklistedDomains, dns                                              []string
 	validationTypeByDomain                                                                   map[string]string
@@ -48,8 +48,8 @@ const (
 // NewConfiguration builder
 func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 	// assign fileds default values
-	if config.ValidationTypeDefault == "" {
-		config.ValidationTypeDefault = ValidationTypeDefault
+	if config.validationTypeDefault == "" {
+		config.validationTypeDefault = ValidationTypeDefault
 	}
 	if config.emailPattern == "" {
 		config.emailPattern = RegexEmailPattern
@@ -78,7 +78,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		return nil, err
 	}
 
-	err = validateValidationTypeDefaultContext(config.ValidationTypeDefault)
+	err = validateValidationTypeDefaultContext(config.validationTypeDefault)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		ctx:                    config.ctx,
 		VerifierEmail:          config.verifierEmail,
 		VerifierDomain:         config.verifierDomain,
-		ValidationTypeDefault:  config.ValidationTypeDefault,
+		ValidationTypeDefault:  config.validationTypeDefault,
 		ConnectionTimeout:      config.connectionTimeout,
 		ResponseTimeout:        config.responseTimeout,
 		ConnectionAttempts:     config.connectionAttempts,
