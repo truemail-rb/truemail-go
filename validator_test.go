@@ -73,6 +73,29 @@ func TestValidate(t *testing.T) {
 	})
 }
 
+func TestVariadicValidationType(t *testing.T) {
+	t.Run("without validation type", func(t *testing.T) {
+		result, err := variadicValidationType([]string{})
+		assert.NoError(t, err)
+		assert.Equal(t, ValidationTypeDefault, result)
+	})
+
+	t.Run("valid validation type", func(t *testing.T) {
+		validationType := createRandomValidationType()
+		result, err := variadicValidationType([]string{validationType})
+		assert.NoError(t, err)
+		assert.Equal(t, validationType, result)
+	})
+
+	t.Run("invalid validation type", func(t *testing.T) {
+		invalidValidationType := "invalid type"
+		result, err := variadicValidationType([]string{invalidValidationType})
+		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx smtp]", invalidValidationType)
+		assert.EqualError(t, err, errorMessage)
+		assert.Equal(t, invalidValidationType, result)
+	})
+}
+
 func TestValidateValidationTypeContext(t *testing.T) {
 	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
 		t.Run("valid validation type", func(t *testing.T) {
