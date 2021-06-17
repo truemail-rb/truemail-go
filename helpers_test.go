@@ -26,11 +26,9 @@ func createConfiguration() *configuration {
 	return configuration
 }
 
-func createValidatorResult(email string, configuration *configuration, validationType ...string) *validatorResult {
-	if len(validationType) == 0 {
-		validationType = append(validationType, ValidationTypeDefault)
-	}
-	validatorResult := &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType[0]}
+func createValidatorResult(email string, configuration *configuration, options ...string) *validatorResult {
+	validationType, _ := variadicValidationType(options)
+	validatorResult := &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
 	validatorResult.validator = &validator{result: validatorResult}
 	return validatorResult
 }
