@@ -9,14 +9,10 @@ import (
 
 func TestValidate(t *testing.T) {
 	// TODO: change to integration tests when .validateMx() will be implemented
-	for _, validValidationType := range []string{"", ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
-		t.Run(validValidationType+"valid validation type", func(t *testing.T) {
-			if validValidationType == "" {
-				validValidationType = ValidationTypeDefault
-			}
+	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
+		t.Run(validValidationType+" valid validation type", func(t *testing.T) {
 			email, configuration := createRandomEmail(), createConfiguration()
-			validationAttr := ValidationAttr{email: email, configuration: configuration, validationType: validValidationType}
-			validatorResult, err := Validate(validationAttr)
+			validatorResult, err := Validate(email, configuration, validValidationType)
 			assert.NoError(t, err)
 			assert.Equal(t, email, validatorResult.Email)
 			assert.Equal(t, configuration, validatorResult.Configuration)
@@ -27,10 +23,9 @@ func TestValidate(t *testing.T) {
 	}
 
 	t.Run("invalid validation type", func(t *testing.T) {
-		invalidType := "invalid type"
-		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx smtp]", invalidType)
-		validationAttr := ValidationAttr{email: createRandomEmail(), configuration: createConfiguration(), validationType: invalidType}
-		_, err := Validate(validationAttr)
+		invalidValidationType := "invalid type"
+		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx smtp]", invalidValidationType)
+		_, err := Validate(createRandomEmail(), createConfiguration(), invalidValidationType)
 		assert.EqualError(t, err, errorMessage)
 	})
 
@@ -42,7 +37,7 @@ func TestValidate(t *testing.T) {
 				whitelistedDomains: []string{domain},
 			},
 		)
-		validatorResult, _ := Validate(ValidationAttr{email: email, configuration: configuration})
+		validatorResult, _ := Validate(email, configuration)
 		assert.True(t, validatorResult.Success)
 		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
 		assert.Empty(t, validatorResult.validator.usedValidations)
@@ -57,7 +52,7 @@ func TestValidate(t *testing.T) {
 				whitelistValidation: true,
 			},
 		)
-		validatorResult, _ := Validate(ValidationAttr{email: email, configuration: configuration})
+		validatorResult, _ := Validate(email, configuration)
 		assert.True(t, validatorResult.Success)
 		assert.True(t, validatorResult.validator.isPassFromDomainListMatch)
 		assert.Equal(t, usedValidationsByType(ValidationTypeDefault), validatorResult.validator.usedValidations)
@@ -71,7 +66,7 @@ func TestValidate(t *testing.T) {
 				blacklistedDomains: []string{domain},
 			},
 		)
-		validatorResult, _ := Validate(ValidationAttr{email: email, configuration: configuration})
+		validatorResult, _ := Validate(email, configuration)
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
 		assert.Empty(t, validatorResult.validator.usedValidations)

@@ -2,25 +2,14 @@ package truemail
 
 import "fmt"
 
-func Validate(validationAttr ValidationAttr) (*validatorResult, error) {
-	validationType, validationConfiguration := validationAttr.validationType, validationAttr.configuration
+func Validate(email string, configuration *configuration, options ...string) (*validatorResult, error) {
+	validationType, err := variadicValidationType(options)
 
-	if validationType == "" {
-		validationType = ValidationTypeDefault
-	}
-
-	err := validateValidationTypeContext(validationType)
 	if err != nil {
 		return nil, err
 	}
 
-	return newValidator(validationAttr.email, validationType, validationConfiguration).run(), err
-}
-
-// ValidationAttr kwargs for validator enrty point
-type ValidationAttr struct {
-	email, validationType string
-	configuration         *configuration
+	return newValidator(email, validationType, configuration).run(), err
 }
 
 // validatorResult structure
@@ -38,6 +27,15 @@ type validator struct {
 	result                    *validatorResult
 	usedValidations           []string
 	isPassFromDomainListMatch bool
+}
+
+func variadicValidationType(options []string) (string, error) {
+	if len(options) == 0 {
+		return ValidationTypeDefault, nil
+	}
+
+	validationType := options[0]
+	return validationType, validateValidationTypeContext(validationType)
 }
 
 func validateValidationTypeContext(validationType string) error {
