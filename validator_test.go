@@ -11,7 +11,7 @@ func TestValidate(t *testing.T) {
 	// TODO: change to integration tests when .validateMx() will be implemented
 	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
 		t.Run(validValidationType+" valid validation type", func(t *testing.T) {
-			email, configuration := createRandomEmail(), createConfiguration()
+			email, configuration := randomEmail(), createConfiguration()
 			validatorResult, err := Validate(email, configuration, validValidationType)
 			assert.NoError(t, err)
 			assert.Equal(t, email, validatorResult.Email)
@@ -25,15 +25,15 @@ func TestValidate(t *testing.T) {
 	t.Run("invalid validation type", func(t *testing.T) {
 		invalidValidationType := "invalid type"
 		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx smtp]", invalidValidationType)
-		_, err := Validate(createRandomEmail(), createConfiguration(), invalidValidationType)
+		_, err := Validate(randomEmail(), createConfiguration(), invalidValidationType)
 		assert.EqualError(t, err, errorMessage)
 	})
 
 	t.Run("Whitelist/Blacklist validation successful", func(t *testing.T) {
-		email, domain := createPairRandomEmailDomain()
+		email, domain := pairRandomEmailDomain()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      createRandomEmail(),
+				verifierEmail:      randomEmail(),
 				whitelistedDomains: []string{domain},
 			},
 		)
@@ -44,10 +44,10 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("Whitelist/Blacklist validation passes to next validation level", func(t *testing.T) {
-		email, domain := createPairRandomEmailDomain()
+		email, domain := pairRandomEmailDomain()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       createRandomEmail(),
+				verifierEmail:       randomEmail(),
 				whitelistedDomains:  []string{domain},
 				whitelistValidation: true,
 			},
@@ -59,10 +59,10 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("Whitelist/Blacklist validation fails", func(t *testing.T) {
-		email, domain := createPairRandomEmailDomain()
+		email, domain := pairRandomEmailDomain()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      createRandomEmail(),
+				verifierEmail:      randomEmail(),
 				blacklistedDomains: []string{domain},
 			},
 		)
@@ -71,6 +71,19 @@ func TestValidate(t *testing.T) {
 		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
 		assert.Empty(t, validatorResult.validator.usedValidations)
 	})
+
+	// t.Run("Mx blacklist validation fails", func(t *testing.T) { // TODO: update after layer implementation
+	// 	email, ipAddress := randomEmail(), randomIpAddress()
+	// 	configuration, _ := NewConfiguration(
+	// 		ConfigurationAttr{
+	// 			verifierEmail:            randomEmail(),
+	// 			blacklistedMxIpAddresses: []string{ipAddress},
+	// 		},
+	// 	)
+	// 	validatorResult, _ := Validate(email, configuration)
+	// 	assert.False(t, validatorResult.Success)
+	// 	assert.Equal(t, usedValidationsByType(ValidationTypeMx), validatorResult.validator.usedValidations)
+	// })
 }
 
 func TestVariadicValidationType(t *testing.T) {
@@ -112,7 +125,7 @@ func TestValidateValidationTypeContext(t *testing.T) {
 
 func TestNewValidator(t *testing.T) {
 	t.Run("creates validator", func(t *testing.T) {
-		email, validationType, configuration := createRandomEmail(), createRandomValidationType(), createConfiguration()
+		email, validationType, configuration := randomEmail(), createRandomValidationType(), createConfiguration()
 		validator := newValidator(email, validationType, configuration)
 		validatorResult := validator.result
 		assert.Equal(t, email, validatorResult.Email)

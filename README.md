@@ -148,6 +148,11 @@ configuration := truemail.NewConfiguration(
     // validationTypeByDomain. It is equal to empty slice of strings by default.
     blacklistedDomains: []string{"somedomain3.com", "somedomain4.com"},
 
+    // Optional parameter. With this option Truemail will filter out unwanted mx servers via
+    // predefined list of ip addresses. It can be used as a part of DEA (disposable email
+    // address) validations. It is equal to empty slice of strings by default.
+    blacklistedMxIpAddresses: []string{"1.1.1.1", "2.2.2.2"},
+
     // Optional parameter. This option will provide to use custom DNS gateway when Truemail
     // interacts with DNS. Valid port numbers are in the range 1-65535. If you won't specify
     // nameserver's ports Truemail will use default DNS TCP/UDP port 53. By default Truemail

@@ -71,6 +71,20 @@ func validateDomainsContext(domains []string) error {
 	return nil
 }
 
+func validateIpAddressContext(ipAddress string) error {
+	return validateStringContext(ipAddress, RegexIpAddressPattern, "ip address")
+}
+
+func validateIpAddressesContext(ipAddresses []string) error {
+	for _, ipAddress := range ipAddresses {
+		err := validateIpAddressContext(ipAddress)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func validateDNSServerContext(dnsServer string) error {
 	return validateStringContext(dnsServer, RegexDNSServerAddressPattern, "dns server")
 }
