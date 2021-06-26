@@ -4,25 +4,30 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
-func createRandomEmail() string {
+func randomEmail() string {
 	gofakeit.Seed(0)
 	return gofakeit.Email()
 }
 
-func createRandomDomain() string {
+func randomDomain() string {
 	gofakeit.Seed(0)
 	return gofakeit.DomainName()
 }
 
-func createPairRandomEmailDomain() (string, string) {
+func pairRandomEmailDomain() (string, string) {
 	gofakeit.Seed(0)
-	domain := createRandomDomain()
+	domain := randomDomain()
 	email := gofakeit.Username() + "@" + domain
 	return email, domain
 }
 
+func randomIpAddress() string {
+	gofakeit.Seed(0)
+	return gofakeit.IPv4Address()
+}
+
 func createConfiguration() *configuration {
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: createRandomEmail()})
+	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail()})
 	return configuration
 }
 

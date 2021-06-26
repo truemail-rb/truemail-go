@@ -38,8 +38,7 @@ func TestValidateVerifierDomain(t *testing.T) {
 }
 
 func TestBuildVerifierDomain(t *testing.T) {
-	expectedDomain := "domain.com"
-	verifierEmail := "some@" + expectedDomain
+	verifierEmail, expectedDomain := pairRandomEmailDomain()
 
 	t.Run("valid verifier domain", func(t *testing.T) {
 		validDomain := "mañana.es"
@@ -97,7 +96,7 @@ func TestValidateIntegerPositive(t *testing.T) {
 
 func TestValidateDomainContext(t *testing.T) {
 	t.Run("valid domain", func(t *testing.T) {
-		assert.NoError(t, validateDomainContext("example.com"))
+		assert.NoError(t, validateDomainContext(randomDomain()))
 	})
 
 	t.Run("invalid domain", func(t *testing.T) {
@@ -113,24 +112,56 @@ func TestValidateDomainsContext(t *testing.T) {
 	})
 
 	t.Run("valid domains", func(t *testing.T) {
-		assert.NoError(t, validateDomainsContext([]string{"example.com", "mañana.es"}))
+		assert.NoError(t, validateDomainsContext([]string{randomDomain(), "mañana.es"}))
 	})
 
 	t.Run("included invalid domain", func(t *testing.T) {
 		invalidDomain := "wrong.d"
-		domains := []string{invalidDomain, "wrong.d2"}
+		domains := []string{randomDomain(), invalidDomain, "wrong.d2"}
 		errorMessage := fmt.Sprintf("%s is invalid domain name", invalidDomain)
 		assert.EqualError(t, validateDomainsContext(domains), errorMessage)
 	})
 }
 
+func TestValidateIpAddressContext(t *testing.T) {
+	t.Run("valid ip address", func(t *testing.T) {
+		assert.NoError(t, validateIpAddressContext(randomIpAddress()))
+	})
+
+	invalidIpAddresses := []string{"10.300.0.256", "11.287.0.1", "172.1600.0.0", "-0.1.1.1", "8.08.8.8", "192.168.0.255a", "0.00.0.42"}
+
+	for _, invalidIpAddress := range invalidIpAddresses {
+		t.Run("invalid ip address", func(t *testing.T) {
+			errorMessage := fmt.Sprintf("%s is invalid ip address", invalidIpAddress)
+			assert.EqualError(t, validateIpAddressContext(invalidIpAddress), errorMessage)
+		})
+	}
+}
+
+func TestValidateIpAddressesContext(t *testing.T) {
+	t.Run("empty ip addresses", func(t *testing.T) {
+		assert.NoError(t, validateIpAddressesContext([]string{}))
+	})
+
+	t.Run("valid ip addresses", func(t *testing.T) {
+		assert.NoError(t, validateDNSServersContext([]string{randomIpAddress(), randomIpAddress()}))
+	})
+
+	t.Run("included invalid ip addresses", func(t *testing.T) {
+		invalidIpAddress := "not_ip_address"
+		ipAddresses := []string{randomIpAddress(), invalidIpAddress}
+		errorMessage := fmt.Sprintf("%s is invalid ip address", invalidIpAddress)
+		assert.EqualError(t, validateIpAddressesContext(ipAddresses), errorMessage)
+	})
+}
+
 func TestValidateDNSServerContext(t *testing.T) {
 	t.Run("valid dns server ip without port number", func(t *testing.T) {
-		assert.NoError(t, validateDNSServerContext("1.1.1.1"))
+		assert.NoError(t, validateDNSServerContext(randomIpAddress()))
 	})
 
 	t.Run("valid dns server ip with port number", func(t *testing.T) {
-		assert.NoError(t, validateDNSServerContext("1.1.1.1:54"))
+		assert.NoError(t, validateDNSServerContext(randomIpAddress()+":65507"))
 	})
 
 	t.Run("invalid dns server ip without port number", func(t *testing.T) {
@@ -158,12 +189,12 @@ func TestValidateDNSServersContext(t *testing.T) {
 	})
 
 	t.Run("valid dns servers", func(t *testing.T) {
-		assert.NoError(t, validateDNSServersContext([]string{"1.1.1.1", "2.2.2.2:54"}))
+		assert.NoError(t, validateDNSServersContext([]string{randomIpAddress(), randomIpAddress() + ":54"}))
 	})
 
 	t.Run("included invalid dns servers", func(t *testing.T) {
 		invalidDNSServer := "not_ip_address"
-		domains := []string{invalidDNSServer, "1.1.1.1:0"}
+		domains := []string{randomIpAddress(), invalidDNSServer, "1.1.1.1:0"}
 		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
 		assert.EqualError(t, validateDNSServersContext(domains), errorMessage)
 	})
@@ -175,7 +206,7 @@ func TestValidateTypeByDomainContext(t *testing.T) {
 	})
 
 	t.Run("valid dictionary", func(t *testing.T) {
-		validTypesByDomains := map[string]string{"a.com": "regex", "b.com": "mx", "c.com": "smtp"}
+		validTypesByDomains := map[string]string{randomDomain(): "regex", randomDomain(): "mx", randomDomain(): "smtp"}
 		assert.NoError(t, validateTypeByDomainContext(validTypesByDomains))
 	})
 
@@ -190,7 +221,7 @@ func TestValidateTypeByDomainContext(t *testing.T) {
 
 	t.Run("included invalid validation type", func(t *testing.T) {
 		wrongType := "wrong validation type"
-		typesByDomains := map[string]string{"example.com": wrongType}
+		typesByDomains := map[string]string{randomDomain(): wrongType}
 		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx smtp]", wrongType)
 		assert.EqualError(t, validateTypeByDomainContext(typesByDomains), errorMessage)
 	})

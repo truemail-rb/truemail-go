@@ -1,7 +1,7 @@
 package truemail
 
 func validateSMTP(validatorResult *validatorResult) *validatorResult {
-	if !validateMx(validatorResult).Success {
+	if !validateMxBlacklist(validatorResult).Success {
 		return validatorResult
 	}
 

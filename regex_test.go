@@ -8,7 +8,7 @@ import (
 
 func TestValidateRegex(t *testing.T) {
 	t.Run("Regex validation layer", func(t *testing.T) {
-		validatorResult := createValidatorResult(createRandomEmail(), createConfiguration())
+		validatorResult := createValidatorResult(randomEmail(), createConfiguration())
 		assert.Equal(t, validateRegex(validatorResult), validatorResult)
 	})
 }
