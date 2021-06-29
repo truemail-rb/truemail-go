@@ -1,7 +1,7 @@
 package truemail
 
 // Whitelist/Blacklist validation, zero validation level
-func validateDomainListMatch(validatorResult *validatorResult) *validatorResult {
+func (validation *validation) domainListMatch(validatorResult *validatorResult) *validatorResult {
 	// Failure scenario
 	if isBlacklistedDomain(validatorResult) ||
 		(isWhitelistValidation(validatorResult) && !isWhitelistedDomain(validatorResult)) {

@@ -12,6 +12,13 @@ func Validate(email string, configuration *configuration, options ...string) (*v
 	return newValidator(email, validationType, configuration).run(), err
 }
 
+type validate interface {
+	domainListMatch(validatorResult *validatorResult) *validatorResult
+	regex(validatorResult *validatorResult) *validatorResult
+	mx(validatorResult *validatorResult) *validatorResult
+	smtp(validatorResult *validatorResult) *validatorResult
+}
+
 // validatorResult structure
 type validatorResult struct {
 	Success, SMTPDebug            bool
@@ -22,11 +29,15 @@ type validatorResult struct {
 	validator                     *validator
 }
 
+// validation structure with bunch of methods
+type validation struct{}
+
 // validator, structure with behaviour
 type validator struct {
 	result                    *validatorResult
 	usedValidations           []string
 	isPassFromDomainListMatch bool
+	validate
 }
 
 func variadicValidationType(options []string) (string, error) {
@@ -56,6 +67,7 @@ func newValidator(email, validationType string, configuration *configuration) *v
 			Configuration:  configuration,
 			ValidationType: validationType,
 		},
+		validate: &validation{},
 	}
 
 	validator.result.validator = validator
@@ -73,16 +85,20 @@ func addError(validatorResult *validatorResult, key, value string) *validatorRes
 
 // validator methods
 
+func (validator *validator) validateDomainListMatch() {
+	validator.validate.domainListMatch(validator.result)
+}
+
 func (validator *validator) validateRegex() {
-	validateRegex(validator.result)
+	validator.validate.regex(validator.result)
 }
 
 func (validator *validator) validateMx() {
-	validateMx(validator.result)
+	validator.validate.mx(validator.result)
 }
 
 func (validator *validator) validateSMTP() {
-	validateSMTP(validator.result)
+	validator.validate.smtp(validator.result)
 }
 
 func (validator *validator) run() *validatorResult {
@@ -90,13 +106,13 @@ func (validator *validator) run() *validatorResult {
 	validator.usedValidations = []string{}
 
 	// Whitelist/Blacklist validation
-	result := validator.result
-	validateDomainListMatch(result)
-	if !result.Success || !validator.isPassFromDomainListMatch {
-		return result
+	validatorResult := validator.result
+	validator.validateDomainListMatch()
+	if !validatorResult.Success || !validator.isPassFromDomainListMatch {
+		return validatorResult
 	}
 	// define validation flow
-	switch result.ValidationType {
+	switch validatorResult.ValidationType {
 	case ValidationTypeRegex:
 		validator.validateRegex()
 	case ValidationTypeMx:
@@ -104,7 +120,7 @@ func (validator *validator) run() *validatorResult {
 	case ValidationTypeSMTP:
 		validator.validateSMTP()
 	}
-	return result
+	return validatorResult
 }
 
 func (validator *validator) addUsedValidationType(validationType string) {

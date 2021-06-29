@@ -17,6 +17,7 @@ func TestNewConfiguration(t *testing.T) {
 		smtpErrorBodyRegex, _ := newRegex(RegexSMTPErrorBodyPattern)
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail}
 		configuration, err := NewConfiguration(configurationAttr)
+
 		assert.NoError(t, err)
 		assert.Nil(t, configuration.ctx)
 		assert.Equal(t, configurationAttr.verifierEmail, configuration.VerifierEmail)
@@ -62,6 +63,7 @@ func TestNewConfiguration(t *testing.T) {
 		emailRegex, _ := newRegex(configurationAttr.emailPattern)
 		smtpErrorBodyRegex, _ := newRegex(configurationAttr.smtpErrorBodyPattern)
 		configuration, err := NewConfiguration(configurationAttr)
+
 		assert.NoError(t, err)
 		assert.Equal(t, configurationAttr.ctx, configuration.ctx)
 		assert.Equal(t, configurationAttr.verifierEmail, configuration.VerifierEmail)
@@ -87,6 +89,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: "email@domain"}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid verifier email", configurationAttr.verifierEmail)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -95,6 +98,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, verifierDomain: "invalid_domain"}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid verifier domain", configurationAttr.verifierDomain)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -103,6 +107,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeDefault: "invalid validation type"}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", configurationAttr.validationTypeDefault)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -111,6 +116,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionTimeout: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionTimeout)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -119,6 +125,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, responseTimeout: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.responseTimeout)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -127,6 +134,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionAttempts: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionAttempts)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -135,6 +143,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, whitelistedDomains: []string{randomDomain(), "a"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.whitelistedDomains[1])
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -143,6 +152,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, blacklistedDomains: []string{randomDomain(), "b"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.blacklistedDomains[1])
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -151,6 +161,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, blacklistedMxIpAddresses: []string{randomIpAddress(), "1.1.1.256:65536"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid ip address", configurationAttr.blacklistedMxIpAddresses[1])
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -159,6 +170,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: []string{randomIpAddress(), "1.1.1.256:65536"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns[1])
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -167,6 +179,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: []string{randomIpAddress(), "2.2.2.2:65536"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns[1])
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -176,6 +189,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeByDomain: map[string]string{randomDomain(): "regex", invalidDomain: "wrong_type"}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid domain name", invalidDomain)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -185,6 +199,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeByDomain: map[string]string{randomDomain(): "regex", randomDomain(): invalidType}}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", invalidType)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -193,6 +208,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, emailPattern: `\K`}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.emailPattern)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
@@ -201,6 +217,7 @@ func TestNewConfiguration(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, smtpErrorBodyPattern: `\K`}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.smtpErrorBodyPattern)
+
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})

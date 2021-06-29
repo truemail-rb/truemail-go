@@ -1,7 +1,7 @@
 package truemail
 
-func validateMx(validatorResult *validatorResult) *validatorResult {
-	if !validateRegex(validatorResult).Success {
+func (validation *validation) mx(validatorResult *validatorResult) *validatorResult {
+	if !validation.regex(validatorResult).Success {
 		return validatorResult
 	}
 
