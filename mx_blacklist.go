@@ -1,7 +1,7 @@
 package truemail
 
-func validateMxBlacklist(validatorResult *validatorResult) *validatorResult {
-	if !validateMx(validatorResult).Success {
+func (validation *validation) mxBlacklist(validatorResult *validatorResult) *validatorResult {
+	if !validation.mx(validatorResult).Success {
 		return validatorResult
 	}
 

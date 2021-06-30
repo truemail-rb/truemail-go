@@ -6,9 +6,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateSMTP(t *testing.T) {
+func TestValidationSMTP(t *testing.T) {
+	t.Run("when previous validation failed", func(t *testing.T) {
+		validator := createValidator(randomEmail(), createConfiguration())
+		validatorResult := validator.result
+
+		assert.Equal(t, validatorResult, new(validation).smtp(validatorResult))
+		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.usedValidations)
+	})
+
 	t.Run("SMTP validation layer", func(t *testing.T) {
-		validatorResult := createValidatorResult(randomEmail(), createConfiguration())
-		assert.Equal(t, validateSMTP(validatorResult), validatorResult)
+		validator := createValidator(randomEmail(), createConfiguration())
+		validatorResult := validator.result
+		validatorResult.Success = true
+
+		assert.Equal(t, validatorResult, new(validation).smtp(validatorResult))
+		assert.Equal(t, usedValidationsByType(ValidationTypeSMTP), validator.usedValidations)
 	})
 }

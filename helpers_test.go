@@ -38,11 +38,23 @@ func createValidatorResult(email string, configuration *configuration, options .
 	return validatorResult
 }
 
-func createRandomValidationType() string {
+func randomValidationType() string {
 	gofakeit.Seed(0)
 	availableValidationTypes := []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP}
 	index := gofakeit.Number(0, len(availableValidationTypes)-1)
 	return availableValidationTypes[index]
+}
+
+func createValidator(email string, configuration *configuration, options ...string) *validator {
+	validationType, _ := variadicValidationType(options)
+	return newValidator(email, validationType, configuration)
+}
+
+func createValidatorPassedFromDomainListMatch(email string, configuration *configuration, options ...string) *validator {
+	validator := createValidator(email, configuration, options...)
+	validator.isPassFromDomainListMatch = true
+	validator.result.Success = true
+	return validator
 }
 
 func usedValidationsByType(validationType string) []string {
@@ -51,4 +63,10 @@ func usedValidationsByType(validationType string) []string {
 		ValidationTypeMx:    {ValidationTypeRegex, ValidationTypeMx},
 		ValidationTypeSMTP:  {ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP},
 	}[validationType]
+}
+
+func runDomainListMatchValidation(email string, configuration *configuration, options ...string) *validatorResult {
+	validator := createValidator(email, configuration, options...)
+	validatorResult := validator.result
+	return validator.validate.domainListMatch(validatorResult)
 }
