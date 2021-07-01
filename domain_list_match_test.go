@@ -19,7 +19,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.True(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchWhitelist, validatorResult.ValidationType)
 	})
 
@@ -33,7 +33,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
 	})
 
@@ -47,7 +47,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration, validationType)
 
 		assert.True(t, validatorResult.Success)
-		assert.True(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.True(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, validationType, validatorResult.ValidationType)
 	})
 
@@ -62,7 +62,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
 	})
 
@@ -78,7 +78,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration, validationType)
 
 		assert.True(t, validatorResult.Success)
-		assert.True(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.True(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, validationType, validatorResult.ValidationType)
 	})
 
@@ -92,7 +92,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
 	})
 
@@ -107,7 +107,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
 	})
 
@@ -123,7 +123,7 @@ func TestValidationDomainListMatch(t *testing.T) {
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.validator.isPassFromDomainListMatch)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
 	})
 }

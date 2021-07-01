@@ -120,7 +120,7 @@ configuration := truemail.NewConfiguration(
 
     // Optional parameter. You can predefine default validation type for
     // truemail.Validate("email@email.com", configuration) call without type-parameter
-    // Available validation types: "regex", "mx", "smtp"
+    // Available validation types: "regex", "mx", "mx_blacklist", "smtp"
     validationTypeDefault: "mx",
 
     // Optional parameter. You can predefine which type of validation will be used for domains.

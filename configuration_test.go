@@ -106,7 +106,7 @@ func TestNewConfiguration(t *testing.T) {
 	t.Run("invalid default validation type", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeDefault: "invalid validation type"}
 		configuration, err := NewConfiguration(configurationAttr)
-		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", configurationAttr.validationTypeDefault)
+		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", configurationAttr.validationTypeDefault)
 
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
@@ -198,7 +198,7 @@ func TestNewConfiguration(t *testing.T) {
 		invalidType := "inavlid validation type"
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, validationTypeByDomain: map[string]string{randomDomain(): "regex", randomDomain(): invalidType}}
 		configuration, err := NewConfiguration(configurationAttr)
-		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx smtp]", invalidType)
+		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", invalidType)
 
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)

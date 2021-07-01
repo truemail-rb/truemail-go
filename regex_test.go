@@ -11,7 +11,6 @@ func TestValidationRegex(t *testing.T) {
 		validator := createValidator(randomEmail(), createConfiguration())
 		validatorResult := validator.result
 
-		assert.Equal(t, validatorResult, new(validation).regex(validatorResult))
-		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.usedValidations)
+		assert.Equal(t, validatorResult, new(validationRegex).check(validatorResult))
 	})
 }

@@ -1,12 +1,12 @@
 package truemail
 
 // Whitelist/Blacklist validation, zero validation level
-func (validation *validation) domainListMatch(validatorResult *validatorResult) *validatorResult {
+func (validation *validationDomainListMatch) check(validatorResult *validatorResult) *validatorResult {
 	// Failure scenario
 	if isBlacklistedDomain(validatorResult) ||
 		(isWhitelistValidation(validatorResult) && !isWhitelistedDomain(validatorResult)) {
 		validatorResult.ValidationType = DomainListMatchBlacklist
-		return addError(validatorResult, DomainListMatchErrorKey, DomainListMatchErrorContext)
+		return addError(validatorResult, ValidationTypeDomainListMatch, DomainListMatchErrorContext)
 	}
 
 	// Successful scenario
@@ -21,7 +21,7 @@ func (validation *validation) domainListMatch(validatorResult *validatorResult) 
 	// Handle flow for processing validatorResult via next validation level
 	if (isWhitelistValidation(validatorResult) && isWhitelistedDomain(validatorResult)) ||
 		(!isBlacklistedDomain(validatorResult) && !isWhitelistedDomain(validatorResult)) {
-		validatorResult.validator.isPassFromDomainListMatch = true
+		validatorResult.isPassFromDomainListMatch = true
 	}
 
 	return validatorResult
@@ -30,7 +30,6 @@ func (validation *validation) domainListMatch(validatorResult *validatorResult) 
 const (
 	DomainListMatchWhitelist    = "whitelist"
 	DomainListMatchBlacklist    = "blacklist"
-	DomainListMatchErrorKey     = "domain_list_match"
 	DomainListMatchErrorContext = "blacklisted email"
 )
 

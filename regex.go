@@ -1,6 +1,5 @@
 package truemail
 
-func (validation *validation) regex(validatorResult *validatorResult) *validatorResult {
-	validatorResult.validator.addUsedValidationType(ValidationTypeRegex)
+func (validation *validationRegex) check(validatorResult *validatorResult) *validatorResult {
 	return validatorResult
 }

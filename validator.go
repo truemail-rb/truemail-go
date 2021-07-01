@@ -12,32 +12,49 @@ func Validate(email string, configuration *configuration, options ...string) (*v
 	return newValidator(email, validationType, configuration).run(), err
 }
 
-type validate interface {
-	domainListMatch(validatorResult *validatorResult) *validatorResult
-	regex(validatorResult *validatorResult) *validatorResult
-	mx(validatorResult *validatorResult) *validatorResult
-	smtp(validatorResult *validatorResult) *validatorResult
+type validationDomainListMatch struct{}
+type validationRegex struct{}
+type validationMx struct{}
+type validationMxBlacklist struct{}
+type validationSmtp struct{}
+
+type domainListMatch interface {
+	check(validatorResult *validatorResult) *validatorResult
+}
+
+type regex interface {
+	check(validatorResult *validatorResult) *validatorResult
+}
+
+type mx interface {
+	check(validatorResult *validatorResult) *validatorResult
+}
+
+type mxBlacklist interface {
+	check(validatorResult *validatorResult) *validatorResult
+}
+
+type smtp interface {
+	check(validatorResult *validatorResult) *validatorResult
 }
 
 // validatorResult structure
 type validatorResult struct {
-	Success, SMTPDebug            bool
-	Email, Domain, ValidationType string
-	MailServers                   []string
-	Errors                        map[string]string
-	Configuration                 *configuration
-	validator                     *validator
+	Success, SMTPDebug, isPassFromDomainListMatch bool
+	Email, Domain, ValidationType                 string
+	MailServers, usedValidations                  []string
+	Errors                                        map[string]string
+	Configuration                                 *configuration
 }
-
-// validation structure with bunch of methods
-type validation struct{}
 
 // validator, structure with behaviour
 type validator struct {
-	result                    *validatorResult
-	usedValidations           []string
-	isPassFromDomainListMatch bool
-	validate
+	result *validatorResult
+	domainListMatch
+	regex
+	mx
+	mxBlacklist
+	smtp
 }
 
 func variadicValidationType(options []string) (string, error) {
@@ -67,10 +84,12 @@ func newValidator(email, validationType string, configuration *configuration) *v
 			Configuration:  configuration,
 			ValidationType: validationType,
 		},
-		validate: &validation{},
+		domainListMatch: &validationDomainListMatch{},
+		regex:           &validationRegex{},
+		mx:              &validationMx{},
+		mxBlacklist:     &validationMxBlacklist{},
+		smtp:            &validationSmtp{},
 	}
-
-	validator.result.validator = validator
 
 	return validator
 }
@@ -86,43 +105,95 @@ func addError(validatorResult *validatorResult, key, value string) *validatorRes
 // validator methods
 
 func (validator *validator) validateDomainListMatch() {
-	validator.validate.domainListMatch(validator.result)
+	validator.domainListMatch.check(validator.result)
 }
 
 func (validator *validator) validateRegex() {
-	validator.validate.regex(validator.result)
+	validatorResult := validator.result
+	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	validator.regex.check(validatorResult)
 }
 
 func (validator *validator) validateMx() {
-	validator.validate.mx(validator.result)
+	validatorResult := validator.result
+
+	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	if !validator.regex.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeMx)
+	validator.mx.check(validatorResult)
+}
+
+func (validator *validator) validateMxBlacklist() {
+	validatorResult := validator.result
+
+	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	if !validator.regex.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeMx)
+	if !validator.mx.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
+	validator.mxBlacklist.check(validatorResult)
 }
 
 func (validator *validator) validateSMTP() {
-	validator.validate.smtp(validator.result)
+	validatorResult := validator.result
+
+	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	if !validator.regex.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeMx)
+	if !validator.mx.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
+	if !validator.mxBlacklist.check(validatorResult).Success {
+		return
+	}
+
+	validatorResult.addUsedValidationType(ValidationTypeSMTP)
+	validator.smtp.check(validatorResult)
 }
 
 func (validator *validator) run() *validatorResult {
+	// TODO: add painc if run will called more then one time
+	// or check len(validatorResult.usedValidations) == 0
+
 	// preparing for running
-	validator.usedValidations = []string{}
+	validatorResult := validator.result
+	validatorResult.usedValidations = []string{}
 
 	// Whitelist/Blacklist validation
-	validatorResult := validator.result
 	validator.validateDomainListMatch()
-	if !validatorResult.Success || !validator.isPassFromDomainListMatch {
+	if !validatorResult.Success || !validatorResult.isPassFromDomainListMatch {
 		return validatorResult
 	}
-	// define validation flow
+	// run validation flow
 	switch validatorResult.ValidationType {
 	case ValidationTypeRegex:
 		validator.validateRegex()
 	case ValidationTypeMx:
 		validator.validateMx()
+	case ValidationTypeMxBlacklist:
+		validator.validateMxBlacklist()
 	case ValidationTypeSMTP:
 		validator.validateSMTP()
 	}
 	return validatorResult
 }
 
-func (validator *validator) addUsedValidationType(validationType string) {
-	validator.usedValidations = append(validator.usedValidations, validationType)
+// validatorResult methods
+
+func (validatorResult *validatorResult) addUsedValidationType(validationType string) {
+	validatorResult.usedValidations = append(validatorResult.usedValidations, validationType)
 }

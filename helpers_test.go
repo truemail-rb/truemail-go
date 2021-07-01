@@ -34,7 +34,6 @@ func createConfiguration() *configuration {
 func createValidatorResult(email string, configuration *configuration, options ...string) *validatorResult {
 	validationType, _ := variadicValidationType(options)
 	validatorResult := &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
-	validatorResult.validator = &validator{result: validatorResult}
 	return validatorResult
 }
 
@@ -50,23 +49,25 @@ func createValidator(email string, configuration *configuration, options ...stri
 	return newValidator(email, validationType, configuration)
 }
 
-func createValidatorPassedFromDomainListMatch(email string, configuration *configuration, options ...string) *validator {
-	validator := createValidator(email, configuration, options...)
-	validator.isPassFromDomainListMatch = true
-	validator.result.Success = true
-	return validator
-}
-
 func usedValidationsByType(validationType string) []string {
 	return map[string][]string{
-		ValidationTypeRegex: {ValidationTypeRegex},
-		ValidationTypeMx:    {ValidationTypeRegex, ValidationTypeMx},
-		ValidationTypeSMTP:  {ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP},
+		ValidationTypeRegex:       {ValidationTypeRegex},
+		ValidationTypeMx:          {ValidationTypeRegex, ValidationTypeMx},
+		ValidationTypeMxBlacklist: {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist},
+		ValidationTypeSMTP:        {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP},
 	}[validationType]
 }
 
 func runDomainListMatchValidation(email string, configuration *configuration, options ...string) *validatorResult {
 	validator := createValidator(email, configuration, options...)
 	validatorResult := validator.result
-	return validator.validate.domainListMatch(validatorResult)
+	return validator.domainListMatch.check(validatorResult)
+}
+
+func doPassedFromDomainListMatch(validatorResult *validatorResult) {
+	validatorResult.Success, validatorResult.isPassFromDomainListMatch = true, true
+}
+
+func failedValidatorResult() *validatorResult {
+	return new(validatorResult)
 }

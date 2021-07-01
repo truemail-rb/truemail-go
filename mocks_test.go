@@ -2,29 +2,52 @@ package truemail
 
 import "github.com/stretchr/testify/mock"
 
-// validation structure mock
-type validationMock struct {
+// validationDomainListMatch structure mock
+type validationDomainListMatchMock struct {
 	mock.Mock
 }
 
-// validation structure mock methods
-
-func (validation *validationMock) domainListMatch(result *validatorResult) *validatorResult {
+func (validation *validationDomainListMatchMock) check(result *validatorResult) *validatorResult {
 	args := validation.Called(result)
 	return args.Get(0).(*validatorResult)
 }
 
-func (validation *validationMock) regex(result *validatorResult) *validatorResult {
+// validationRegex structure mock
+type validationRegexMock struct {
+	mock.Mock
+}
+
+func (validation *validationRegexMock) check(result *validatorResult) *validatorResult {
 	args := validation.Called(result)
 	return args.Get(0).(*validatorResult)
 }
 
-func (validation *validationMock) mx(result *validatorResult) *validatorResult {
+// validationMx structure mock
+type validationMxMock struct {
+	mock.Mock
+}
+
+func (validation *validationMxMock) check(result *validatorResult) *validatorResult {
 	args := validation.Called(result)
 	return args.Get(0).(*validatorResult)
 }
 
-func (validation *validationMock) smtp(result *validatorResult) *validatorResult {
+// validationMxBlacklistMock structure mock
+type validationMxBlacklistMock struct {
+	mock.Mock
+}
+
+func (validation *validationMxBlacklistMock) check(result *validatorResult) *validatorResult {
+	args := validation.Called(result)
+	return args.Get(0).(*validatorResult)
+}
+
+// validationSmtpMock structure mock
+type validationSmtpMock struct {
+	mock.Mock
+}
+
+func (validation *validationSmtpMock) check(result *validatorResult) *validatorResult {
 	args := validation.Called(result)
 	return args.Get(0).(*validatorResult)
 }
