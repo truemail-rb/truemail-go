@@ -1,10 +1,5 @@
 package truemail
 
-func (validation *validation) smtp(validatorResult *validatorResult) *validatorResult {
-	if !validation.mxBlacklist(validatorResult).Success {
-		return validatorResult
-	}
-
-	validatorResult.validator.addUsedValidationType(ValidationTypeSMTP)
+func (validation *validationSmtp) check(validatorResult *validatorResult) *validatorResult {
 	return validatorResult
 }

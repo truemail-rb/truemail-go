@@ -29,7 +29,7 @@ func buildVerifierDomain(verifierEmail, verifierDomain string) (string, error) {
 }
 
 func availableValidationTypes() []string {
-	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP}
+	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP}
 }
 
 func validateValidationTypeDefaultContext(ValidationTypeDefault string) error {

@@ -70,7 +70,7 @@ func TestBuildVerifierDomain(t *testing.T) {
 
 func TestAvailableValidationTypes(t *testing.T) {
 	t.Run("slice of available validation types", func(t *testing.T) {
-		assert.Equal(t, []string{"regex", "mx", "smtp"}, availableValidationTypes())
+		assert.Equal(t, []string{"regex", "mx", "mx_blacklist", "smtp"}, availableValidationTypes())
 	})
 }
 
@@ -83,7 +83,7 @@ func TestValidateValidationTypeDefaultContext(t *testing.T) {
 
 	t.Run("invalid validation type", func(t *testing.T) {
 		invalidType := "invalid type"
-		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx smtp]", invalidType)
+		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", invalidType)
 
 		assert.EqualError(t, validateValidationTypeDefaultContext(invalidType), errorMessage)
 	})
@@ -240,7 +240,7 @@ func TestValidateTypeByDomainContext(t *testing.T) {
 	t.Run("included invalid validation type", func(t *testing.T) {
 		wrongType := "wrong validation type"
 		typesByDomains := map[string]string{randomDomain(): wrongType}
-		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx smtp]", wrongType)
+		errorMessage := fmt.Sprintf("%s is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", wrongType)
 
 		assert.EqualError(t, validateTypeByDomainContext(typesByDomains), errorMessage)
 	})
