@@ -1,22 +1,48 @@
 package truemail
 
-import "fmt"
-
-func Validate(email string, configuration *configuration, options ...string) (*validatorResult, error) {
-	validationType, err := variadicValidationType(options)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return newValidator(email, validationType, configuration).run(), err
-}
+// validation layers structures
 
 type validationDomainListMatch struct{}
 type validationRegex struct{}
 type validationMx struct{}
 type validationMxBlacklist struct{}
 type validationSmtp struct{}
+
+// Validator result mutable object. Each validation
+// layer write something into validatorResult
+type validatorResult struct {
+	Success, SMTPDebug, isPassFromDomainListMatch bool
+	Email, Domain, ValidationType                 string
+	MailServers, usedValidations                  []string
+	Errors                                        map[string]string
+	Configuration                                 *configuration
+}
+
+// validatorResult methods
+
+func (validatorResult *validatorResult) addUsedValidationType(validationType string) {
+	validatorResult.usedValidations = append(validatorResult.usedValidations, validationType)
+}
+
+func (validatorResult *validatorResult) addError(key, value string) {
+	if validatorResult.Errors == nil {
+		validatorResult.Errors = map[string]string{}
+	}
+	validatorResult.Errors[key] = value
+}
+
+// Structure with behaviour. Responsible for the
+// logic of calling the validation layers sequence
+type validator struct {
+	result *validatorResult
+	domainListMatch
+	regex
+	mx
+	mxBlacklist
+	smtp
+}
+
+// validation layers interfaces
 
 type domainListMatch interface {
 	check(validatorResult *validatorResult) *validatorResult
@@ -36,70 +62,6 @@ type mxBlacklist interface {
 
 type smtp interface {
 	check(validatorResult *validatorResult) *validatorResult
-}
-
-// validatorResult structure
-type validatorResult struct {
-	Success, SMTPDebug, isPassFromDomainListMatch bool
-	Email, Domain, ValidationType                 string
-	MailServers, usedValidations                  []string
-	Errors                                        map[string]string
-	Configuration                                 *configuration
-}
-
-// validator, structure with behaviour
-type validator struct {
-	result *validatorResult
-	domainListMatch
-	regex
-	mx
-	mxBlacklist
-	smtp
-}
-
-func variadicValidationType(options []string) (string, error) {
-	if len(options) == 0 {
-		return ValidationTypeDefault, nil
-	}
-
-	validationType := options[0]
-	return validationType, validateValidationTypeContext(validationType)
-}
-
-func validateValidationTypeContext(validationType string) error {
-	if isIncluded(availableValidationTypes(), validationType) {
-		return nil
-	}
-	return fmt.Errorf(
-		"%s is invalid validation type, use one of these: %s",
-		validationType,
-		availableValidationTypes(),
-	)
-}
-
-func newValidator(email, validationType string, configuration *configuration) *validator {
-	validator := &validator{
-		result: &validatorResult{
-			Email:          email,
-			Configuration:  configuration,
-			ValidationType: validationType,
-		},
-		domainListMatch: &validationDomainListMatch{},
-		regex:           &validationRegex{},
-		mx:              &validationMx{},
-		mxBlacklist:     &validationMxBlacklist{},
-		smtp:            &validationSmtp{},
-	}
-
-	return validator
-}
-
-func addError(validatorResult *validatorResult, key, value string) *validatorResult {
-	if validatorResult.Errors == nil {
-		validatorResult.Errors = map[string]string{}
-	}
-	validatorResult.Errors[key] = value
-	return validatorResult
 }
 
 // validator methods
@@ -165,6 +127,8 @@ func (validator *validator) validateSMTP() {
 	validator.smtp.check(validatorResult)
 }
 
+// validator entrypoint. This method triggers chain of
+// validation layers
 func (validator *validator) run() *validatorResult {
 	// TODO: add painc if run will called more then one time
 	// or check len(validatorResult.usedValidations) == 0
@@ -190,10 +154,4 @@ func (validator *validator) run() *validatorResult {
 		validator.validateSMTP()
 	}
 	return validatorResult
-}
-
-// validatorResult methods
-
-func (validatorResult *validatorResult) addUsedValidationType(validationType string) {
-	validatorResult.usedValidations = append(validatorResult.usedValidations, validationType)
 }
