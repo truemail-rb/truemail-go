@@ -6,7 +6,8 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 	if isBlacklistedDomain(validatorResult) ||
 		(isWhitelistValidation(validatorResult) && !isWhitelistedDomain(validatorResult)) {
 		validatorResult.ValidationType = DomainListMatchBlacklist
-		return addError(validatorResult, ValidationTypeDomainListMatch, DomainListMatchErrorContext)
+		validatorResult.addError(ValidationTypeDomainListMatch, DomainListMatchErrorContext)
+		return validatorResult
 	}
 
 	// Successful scenario

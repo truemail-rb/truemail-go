@@ -188,5 +188,5 @@ import "github.com/truemail-rb/truemail-go"
 configuration := truemail.NewConfiguration(ConfigurationAttr{verifierEmail: "verifier@example.com"})
 
 truemail.Validate("some@email.com", configuration)
-truemail.isValid("some@email.com", configuration, "regex")
+truemail.IsValid("some@email.com", configuration, "regex")
 ```

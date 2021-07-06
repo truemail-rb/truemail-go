@@ -10,7 +10,7 @@ import (
 
 func TestValidateVerifierEmail(t *testing.T) {
 	t.Run("valid verifier email", func(t *testing.T) {
-		assert.NoError(t, validateVerifierEmail("niño@mañana.es"))
+		assert.NoError(t, validateVerifierEmail("el+niño!@mañana.es"))
 	})
 
 	t.Run("invalid verifier email", func(t *testing.T) {
