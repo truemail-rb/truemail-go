@@ -37,6 +37,10 @@ func createValidatorResult(email string, configuration *configuration, options .
 	return validatorResult
 }
 
+func createSuccessfulValidatorResult(email string, configuration *configuration) *validatorResult {
+	return &validatorResult{Email: email, Configuration: configuration, Success: true}
+}
+
 func randomValidationType() string {
 	gofakeit.Seed(0)
 	availableValidationTypes := []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP}

@@ -8,8 +8,7 @@ import (
 
 func TestValidationRegex(t *testing.T) {
 	t.Run("regex validation: successful", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration())
-		validatorResult := validator.result
+		validatorResult := createSuccessfulValidatorResult(randomEmail(), createConfiguration())
 		new(validationRegex).check(validatorResult)
 
 		assert.True(t, validatorResult.Success)
@@ -18,8 +17,7 @@ func TestValidationRegex(t *testing.T) {
 	})
 
 	t.Run("regex validation: failure", func(t *testing.T) {
-		validator := createValidator("invalid@email", createConfiguration())
-		validatorResult := validator.result
+		validatorResult := createSuccessfulValidatorResult("invalid@email", createConfiguration())
 		new(validationRegex).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
