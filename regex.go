@@ -1,10 +1,8 @@
 package truemail
 
 func (validation *validationRegex) check(validatorResult *validatorResult) *validatorResult {
-	result := validatorResult.Configuration.EmailPattern.MatchString(validatorResult.Email)
-	validatorResult.Success = result
-
-	if !result {
+	if !validatorResult.Configuration.EmailPattern.MatchString(validatorResult.Email) {
+		validatorResult.Success = false
 		validatorResult.addError(ValidationTypeRegex, RegexErrorContext)
 	}
 
