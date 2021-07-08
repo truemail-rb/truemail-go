@@ -77,16 +77,16 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("Mx blacklist validation fails", func(t *testing.T) {
-		email, ipAddress := randomEmail(), randomIpAddress()
+		email, blacklistedMxIpAddress := randomEmail(), randomIpAddress()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
 				verifierEmail:            randomEmail(),
-				blacklistedMxIpAddresses: []string{ipAddress},
+				blacklistedMxIpAddresses: []string{blacklistedMxIpAddress},
 			},
 		)
 		validatorResult, _ := Validate(email, configuration, ValidationTypeMxBlacklist)
 
-		// assert.False(t, validatorResult.Success) // TODO: update after validationMxBlacklist.check() implementation
+		// assert.False(t, validatorResult.Success) // TODO: update after validationMx.check() implementation
 		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validatorResult.usedValidations)
 	})
 }
