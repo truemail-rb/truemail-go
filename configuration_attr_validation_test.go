@@ -247,14 +247,26 @@ func TestValidateTypeByDomainContext(t *testing.T) {
 }
 
 func TestIsIncluded(t *testing.T) {
+	var item string
+
 	t.Run("item found in slice", func(t *testing.T) {
-		var item string
-		slice := []string{item}
-		assert.True(t, isIncluded(slice, item))
+		assert.True(t, isIncluded([]string{item}, item))
 	})
 
 	t.Run("item not found in slice", func(t *testing.T) {
-		assert.False(t, isIncluded([]string{}, ""))
+		assert.False(t, isIncluded([]string{}, item))
+	})
+}
+
+func TestIsIntersected(t *testing.T) {
+	var item string
+
+	t.Run("item from target slice found in base slice", func(t *testing.T) {
+		assert.True(t, isIntersected([]string{item}, []string{item}))
+	})
+
+	t.Run("item from target slice not found in base slice", func(t *testing.T) {
+		assert.False(t, isIntersected([]string{}, []string{item}))
 	})
 }
 

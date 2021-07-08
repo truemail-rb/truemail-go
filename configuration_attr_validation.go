@@ -123,6 +123,15 @@ func isIncluded(slice []string, target string) bool {
 	return false
 }
 
+func isIntersected(baseSlice []string, targetSlice []string) bool {
+	for _, item := range targetSlice {
+		if isIncluded(baseSlice, item) {
+			return true
+		}
+	}
+	return false
+}
+
 func newRegex(regexPattern string) (*regexp.Regexp, error) {
 	return regexp.Compile(regexPattern)
 }
