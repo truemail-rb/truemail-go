@@ -4,18 +4,17 @@ package truemail
 
 type validationDomainListMatch struct{}
 type validationRegex struct{}
-type validationMx struct{}
 type validationMxBlacklist struct{}
 type validationSmtp struct{}
 
 // Validator result mutable object. Each validation
 // layer write something into validatorResult
 type validatorResult struct {
-	Success, SMTPDebug, isPassFromDomainListMatch bool
-	Email, Domain, ValidationType                 string
-	MailServers, usedValidations                  []string
-	Errors                                        map[string]string
-	Configuration                                 *configuration
+	Success, SMTPDebug, isPassFromDomainListMatch, isNullMxRecordFound bool
+	Email, Domain, ValidationType, punycodeEmail, punycodeDomain       string
+	MailServers, usedValidations                                       []string
+	Errors                                                             map[string]string
+	Configuration                                                      *configuration
 }
 
 // validatorResult methods
@@ -47,7 +46,7 @@ func newValidator(email, validationType string, configuration *configuration) *v
 	validator := &validator{
 		result: &validatorResult{
 			Email:          email,
-			Configuration:  configuration,
+			Configuration:  copyConfigurationByPointer(configuration),
 			ValidationType: validationType,
 		},
 		domainListMatch: &validationDomainListMatch{},

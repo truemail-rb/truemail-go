@@ -130,3 +130,29 @@ func TestEmailDomain(t *testing.T) {
 		assert.Equal(t, domain, emailDomain(email))
 	})
 }
+
+func TestCopyConfigurationByPointer(t *testing.T) {
+	t.Run("returns pointer of copied configuration by pointer", func(t *testing.T) {
+		configuration := createConfiguration()
+		copiedConfiguration := copyConfigurationByPointer(configuration)
+
+		assert.NotSame(t, configuration, copiedConfiguration)
+		assert.EqualValues(t, configuration, copiedConfiguration)
+	})
+}
+
+func TestUniqStrings(t *testing.T) {
+	t.Run("returns slice of uniq strings", func(t *testing.T) {
+		strings := []string{"a", "b", "a", "c"}
+
+		assert.Equal(t, []string{"a", "b", "c"}, uniqStrings(strings))
+	})
+}
+
+func TestSliceDiff(t *testing.T) {
+	t.Run("returns new slice with items that doesn't appear in other slice", func(t *testing.T) {
+		sliceFirst, sliceSecond := []string{"a", "b", "a", "c"}, []string{"c", "a", "d"}
+
+		assert.Equal(t, []string{"b"}, sliceDiff(sliceFirst, sliceSecond))
+	})
+}

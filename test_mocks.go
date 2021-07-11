@@ -53,3 +53,33 @@ func (validation *validationSmtpMock) check(result *validatorResult) *validatorR
 	args := validation.Called(result)
 	return args.Get(0).(*validatorResult)
 }
+
+// validationSmtpMock structure mock
+type dnsResolverMock struct {
+	mock.Mock
+}
+
+func (resolver *dnsResolverMock) aRecord(hostName string) (string, error) {
+	args := resolver.Called(hostName)
+	return args.String(0), args.Error(1)
+}
+
+func (resolver *dnsResolverMock) aRecords(hostName string) ([]string, error) {
+	args := resolver.Called(hostName)
+	return args.Get(0).([]string), args.Error(1)
+}
+
+func (resolver *dnsResolverMock) cnameRecord(hostName string) (string, error) {
+	args := resolver.Called(hostName)
+	return args.String(0), args.Error(1)
+}
+
+func (resolver *dnsResolverMock) mxRecords(hostName string) ([]uint16, []string, error) {
+	args := resolver.Called(hostName)
+	return args.Get(0).([]uint16), args.Get(1).([]string), args.Error(2)
+}
+
+func (resolver *dnsResolverMock) ptrRecords(hostName string) ([]string, error) {
+	args := resolver.Called(hostName)
+	return args.Get(0).([]string), args.Error(1)
+}

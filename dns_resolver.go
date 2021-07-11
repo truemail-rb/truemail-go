@@ -54,7 +54,7 @@ func (dnsResolver *dnsResolver) dnsNameToHostName(dnsName string) string {
 // Helper method. Filter out ipv6 ip addresses from mixed collection
 func (dnsResolver *dnsResolver) rejectIp6Addresses(ipAddresses []string) (ip4Addresses []string) {
 	for _, ipAddress := range ipAddresses {
-		if matchRegex(ipAddress, RegexIpAddressPattern) {
+		if matchRegex(ipAddress, RegexIpAddressPattern) && ipAddress != "0.0.0.0" { // ipv6 can be converted to 0.0.0.0
 			ip4Addresses = append(ip4Addresses, ipAddress)
 		}
 		continue
