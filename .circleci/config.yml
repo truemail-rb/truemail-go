@@ -15,9 +15,12 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Installing Gotestsum
+          command: go get gotest.tools/gotestsum
+
+      - run:
           name: Running tests
-          command: |
-            go test -v -race ./... -coverprofile=c.out
+          command: gotestsum --format standard-verbose -- -coverprofile=c.out ./...
 
       - run:
           name: Creating coverage reports
