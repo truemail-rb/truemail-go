@@ -89,16 +89,6 @@ func validateDNSServerContext(dnsServer string) error {
 	return validateStringContext(dnsServer, RegexDNSServerAddressPattern, "dns server")
 }
 
-func validateDNSServersContext(dnsServers []string) error {
-	for _, dnsServer := range dnsServers {
-		err := validateDNSServerContext(dnsServer)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func validateTypeByDomainContext(typesByDomains map[string]string) error {
 	for domainName, validationType := range typesByDomains {
 		err := validateDomainContext(domainName)
