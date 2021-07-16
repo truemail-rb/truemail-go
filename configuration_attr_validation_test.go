@@ -155,7 +155,7 @@ func TestValidateIpAddressesContext(t *testing.T) {
 	})
 
 	t.Run("valid ip addresses", func(t *testing.T) {
-		assert.NoError(t, validateDNSServersContext([]string{randomIpAddress(), randomIpAddress()}))
+		assert.NoError(t, validateIpAddressesContext([]string{randomIpAddress(), randomIpAddress()}))
 	})
 
 	t.Run("included invalid ip addresses", func(t *testing.T) {
@@ -195,24 +195,6 @@ func TestValidateDNSServerContext(t *testing.T) {
 		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
 
 		assert.EqualError(t, validateDNSServerContext(invalidDNSServer), errorMessage)
-	})
-}
-
-func TestValidateDNSServersContext(t *testing.T) {
-	t.Run("empty dns servers", func(t *testing.T) {
-		assert.NoError(t, validateDNSServersContext([]string{}))
-	})
-
-	t.Run("valid dns servers", func(t *testing.T) {
-		assert.NoError(t, validateDNSServersContext([]string{randomIpAddress(), randomIpAddress() + ":54"}))
-	})
-
-	t.Run("included invalid dns servers", func(t *testing.T) {
-		invalidDNSServer := "not_ip_address"
-		domains := []string{randomIpAddress(), invalidDNSServer, "1.1.1.1:0"}
-		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
-
-		assert.EqualError(t, validateDNSServersContext(domains), errorMessage)
 	})
 }
 

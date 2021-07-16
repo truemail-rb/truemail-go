@@ -7,23 +7,23 @@ import (
 
 // configuration structure
 type configuration struct {
-	ctx                                                                   context.Context
-	VerifierEmail, VerifierDomain, ValidationTypeDefault                  string
-	ConnectionTimeout, ResponseTimeout, ConnectionAttempts                int
-	WhitelistedDomains, BlacklistedDomains, BlacklistedMxIpAddresses, DNS []string
-	ValidationTypeByDomain                                                map[string]string
-	WhitelistValidation, NotRfcMxLookupFlow, SMTPFailFast, SMTPSafeCheck  bool
-	EmailPattern, SMTPErrorBodyPattern                                    *regexp.Regexp
+	ctx                                                                  context.Context
+	VerifierEmail, VerifierDomain, ValidationTypeDefault, DNS            string
+	ConnectionTimeout, ResponseTimeout, ConnectionAttempts               int
+	WhitelistedDomains, BlacklistedDomains, BlacklistedMxIpAddresses     []string
+	ValidationTypeByDomain                                               map[string]string
+	WhitelistValidation, NotRfcMxLookupFlow, SMTPFailFast, SMTPSafeCheck bool
+	EmailPattern, SMTPErrorBodyPattern                                   *regexp.Regexp
 }
 
 // ConfigurationAttr kwargs for configuration builder
 type ConfigurationAttr struct {
-	ctx                                                                                      context.Context
-	verifierEmail, verifierDomain, validationTypeDefault, emailPattern, smtpErrorBodyPattern string
-	connectionTimeout, responseTimeout, connectionAttempts                                   int
-	whitelistedDomains, blacklistedDomains, blacklistedMxIpAddresses, dns                    []string
-	validationTypeByDomain                                                                   map[string]string
-	whitelistValidation, notRfcMxLookupFlow, smtpFailFast, smtpSafeCheck                     bool
+	ctx                                                                                           context.Context
+	verifierEmail, verifierDomain, validationTypeDefault, emailPattern, smtpErrorBodyPattern, dns string
+	connectionTimeout, responseTimeout, connectionAttempts                                        int
+	whitelistedDomains, blacklistedDomains, blacklistedMxIpAddresses                              []string
+	validationTypeByDomain                                                                        map[string]string
+	whitelistValidation, notRfcMxLookupFlow, smtpFailFast, smtpSafeCheck                          bool
 }
 
 // Configuration builder constants, regex patterns
@@ -117,9 +117,13 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		return nil, err
 	}
 
-	err = validateDNSServersContext(config.dns)
-	if err != nil {
-		return nil, err
+	dns := config.dns
+
+	if dns != "" {
+		err = validateDNSServerContext(config.dns)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = validateTypeByDomainContext(config.validationTypeByDomain)
@@ -149,7 +153,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		WhitelistedDomains:       config.whitelistedDomains,
 		BlacklistedDomains:       config.blacklistedDomains,
 		BlacklistedMxIpAddresses: config.blacklistedMxIpAddresses,
-		DNS:                      config.dns,
+		DNS:                      dns,
 		ValidationTypeByDomain:   config.validationTypeByDomain,
 		WhitelistValidation:      config.whitelistValidation,
 		NotRfcMxLookupFlow:       config.notRfcMxLookupFlow,

@@ -76,7 +76,7 @@ You can use global gem configuration or custom independent configuration. Availa
 - whitelist validation
 - blacklisted domains
 - blacklisted mx ip-addresses
-- custom DNS gateway(s)
+- custom DNS gateway
 - RFC MX lookup flow
 - SMTP fail fast
 - SMTP safe check
@@ -158,7 +158,7 @@ configuration := truemail.NewConfiguration(
     // nameserver's ports Truemail will use default DNS TCP/UDP port 53. By default Truemail
     // uses DNS gateway from system settings and this option is equal to empty slice of
     // strings by default.
-    dns: []string{"10.0.0.1", "10.0.0.2:54"},
+    dns: "10.0.0.1:5300",
 
     // Optional parameter. This option will provide to use not RFC MX lookup flow.
     // It means that MX and Null MX records will be cheked on the DNS validation layer only.

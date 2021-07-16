@@ -12,7 +12,7 @@ func TestNewConfiguration(t *testing.T) {
 	validVerifierEmail, domain := pairRandomEmailDomain()
 
 	t.Run("sets default configuration template", func(t *testing.T) {
-		emptyStringSlice, emptyStringMap := []string(nil), map[string]string(nil)
+		emptyString, emptyStringSlice, emptyStringMap := "", []string(nil), map[string]string(nil)
 		emailRegex, _ := newRegex(RegexEmailPattern)
 		smtpErrorBodyRegex, _ := newRegex(RegexSMTPErrorBodyPattern)
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail}
@@ -29,7 +29,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, emptyStringSlice, configuration.WhitelistedDomains)
 		assert.Equal(t, emptyStringSlice, configuration.BlacklistedDomains)
 		assert.Equal(t, emptyStringSlice, configuration.BlacklistedMxIpAddresses)
-		assert.Equal(t, emptyStringSlice, configuration.DNS)
+		assert.Equal(t, emptyString, configuration.DNS)
 		assert.Equal(t, emptyStringMap, configuration.ValidationTypeByDomain)
 		assert.Equal(t, false, configuration.WhitelistValidation)
 		assert.Equal(t, false, configuration.NotRfcMxLookupFlow)
@@ -53,7 +53,7 @@ func TestNewConfiguration(t *testing.T) {
 			whitelistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedMxIpAddresses: []string{randomIpAddress(), randomIpAddress()},
-			dns:                      []string{randomIpAddress(), randomIpAddress() + ":54"},
+			dns:                      randomIpAddress() + ":5300",
 			validationTypeByDomain:   map[string]string{randomDomain(): "regex"},
 			whitelistValidation:      true,
 			notRfcMxLookupFlow:       true,
@@ -167,18 +167,18 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid dns, wrong ip address", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: []string{randomIpAddress(), "1.1.1.256:65536"}}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "1.1.1.256:65536"}
 		configuration, err := NewConfiguration(configurationAttr)
-		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns[1])
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
 
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
 	})
 
 	t.Run("invalid dns, wrong port number", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: []string{randomIpAddress(), "2.2.2.2:65536"}}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "2.2.2.2:65536"}
 		configuration, err := NewConfiguration(configurationAttr)
-		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns[1])
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
 
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
