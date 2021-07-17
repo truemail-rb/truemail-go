@@ -20,7 +20,7 @@ func validateVerifierDomain(verifierDomain string) (string, error) {
 }
 
 func buildVerifierDomain(verifierEmail, verifierDomain string) (string, error) {
-	if verifierDomain == "" {
+	if verifierDomain == EmptyString {
 		regex, _ := newRegex(RegexEmailPattern)
 		domainCaptureGroup := 3
 		return regex.FindStringSubmatch(verifierEmail)[domainCaptureGroup], nil

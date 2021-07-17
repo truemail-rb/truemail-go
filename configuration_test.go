@@ -12,7 +12,7 @@ func TestNewConfiguration(t *testing.T) {
 	validVerifierEmail, domain := pairRandomEmailDomain()
 
 	t.Run("sets default configuration template", func(t *testing.T) {
-		emptyString, emptyStringSlice, emptyStringMap := "", []string(nil), map[string]string(nil)
+		emptyString, emptyStringSlice, emptyStringMap := EmptyString, []string(nil), map[string]string(nil)
 		emailRegex, _ := newRegex(RegexEmailPattern)
 		smtpErrorBodyRegex, _ := newRegex(RegexSMTPErrorBodyPattern)
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail}
