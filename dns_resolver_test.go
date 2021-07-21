@@ -26,9 +26,9 @@ func TestNewDnsResolver(t *testing.T) {
 		assert.True(t, isIncluded(resolvedHostAddresses, "8.8.8.8"))
 	})
 
-	// Integration test witn internal DNS request
+	// Integration test with internal DNS request
 	t.Run("when DNS gateway not specified dnsResolver uses default system DNS gateway", func(t *testing.T) {
-		hostName, hostAddress := "dns.google", "1.2.3.4"
+		hostName, hostAddress := randomDomain(), randomIpAddress()
 		dnsRecords := map[string]mockdns.Zone{hostName + ".": {A: []string{hostAddress}}}
 		connectionTimeout, dns, configuration := 1, runMockDnsServer(dnsRecords), createConfiguration()
 		configuration.ConnectionTimeout, configuration.DNS = connectionTimeout, dns
