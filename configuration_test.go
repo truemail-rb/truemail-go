@@ -12,7 +12,7 @@ func TestNewConfiguration(t *testing.T) {
 	validVerifierEmail, domain := pairRandomEmailDomain()
 
 	t.Run("sets default configuration template", func(t *testing.T) {
-		emptyString, emptyStringSlice, emptyStringMap := EmptyString, []string(nil), map[string]string(nil)
+		emptyStringSlice, emptyStringMap := []string(nil), map[string]string(nil)
 		emailRegex, _ := newRegex(RegexEmailPattern)
 		smtpErrorBodyRegex, _ := newRegex(RegexSMTPErrorBodyPattern)
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail}
@@ -29,7 +29,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, emptyStringSlice, configuration.WhitelistedDomains)
 		assert.Equal(t, emptyStringSlice, configuration.BlacklistedDomains)
 		assert.Equal(t, emptyStringSlice, configuration.BlacklistedMxIpAddresses)
-		assert.Equal(t, emptyString, configuration.DNS)
+		assert.Equal(t, EmptyString, configuration.DNS)
 		assert.Equal(t, emptyStringMap, configuration.ValidationTypeByDomain)
 		assert.Equal(t, false, configuration.WhitelistValidation)
 		assert.Equal(t, false, configuration.NotRfcMxLookupFlow)
@@ -39,7 +39,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, smtpErrorBodyRegex, configuration.SMTPErrorBodyPattern)
 	})
 
-	t.Run("sets custom configuration template", func(t *testing.T) {
+	t.Run("sets custom configuration template, custom DNS with port number", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
 			ctx:                      context.TODO(),
 			verifierEmail:            validVerifierEmail,
@@ -53,7 +53,7 @@ func TestNewConfiguration(t *testing.T) {
 			whitelistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedMxIpAddresses: []string{randomIpAddress(), randomIpAddress()},
-			dns:                      randomIpAddress() + ":5300",
+			dns:                      randomDnsServer(),
 			validationTypeByDomain:   map[string]string{randomDomain(): "regex"},
 			whitelistValidation:      true,
 			notRfcMxLookupFlow:       true,
@@ -76,6 +76,52 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, configurationAttr.blacklistedDomains, configuration.BlacklistedDomains)
 		assert.Equal(t, configurationAttr.blacklistedMxIpAddresses, configuration.BlacklistedMxIpAddresses)
 		assert.Equal(t, configurationAttr.dns, configuration.DNS)
+		assert.Equal(t, configurationAttr.validationTypeByDomain, configuration.ValidationTypeByDomain)
+		assert.Equal(t, configurationAttr.whitelistValidation, configuration.WhitelistValidation)
+		assert.Equal(t, configurationAttr.notRfcMxLookupFlow, configuration.NotRfcMxLookupFlow)
+		assert.Equal(t, configurationAttr.smtpFailFast, configuration.SMTPFailFast)
+		assert.Equal(t, configurationAttr.smtpSafeCheck, configuration.SMTPSafeCheck)
+		assert.Equal(t, emailRegex, configuration.EmailPattern)
+		assert.Equal(t, smtpErrorBodyRegex, configuration.SMTPErrorBodyPattern)
+	})
+
+	t.Run("sets custom configuration template, custom DNS without port number", func(t *testing.T) {
+		configurationAttr := ConfigurationAttr{
+			ctx:                      context.TODO(),
+			verifierEmail:            validVerifierEmail,
+			verifierDomain:           randomDomain(),
+			validationTypeDefault:    randomValidationType(),
+			emailPattern:             `\A.+@.+\z`,
+			smtpErrorBodyPattern:     `550{1}`,
+			connectionTimeout:        3,
+			responseTimeout:          4,
+			connectionAttempts:       5,
+			whitelistedDomains:       []string{randomDomain(), randomDomain()},
+			blacklistedDomains:       []string{randomDomain(), randomDomain()},
+			blacklistedMxIpAddresses: []string{randomIpAddress(), randomIpAddress()},
+			dns:                      randomIpAddress(),
+			validationTypeByDomain:   map[string]string{randomDomain(): randomValidationType()},
+			whitelistValidation:      true,
+			notRfcMxLookupFlow:       true,
+			smtpFailFast:             true,
+			smtpSafeCheck:            true,
+		}
+		emailRegex, _ := newRegex(configurationAttr.emailPattern)
+		smtpErrorBodyRegex, _ := newRegex(configurationAttr.smtpErrorBodyPattern)
+		configuration, err := NewConfiguration(configurationAttr)
+
+		assert.NoError(t, err)
+		assert.Equal(t, configurationAttr.ctx, configuration.ctx)
+		assert.Equal(t, configurationAttr.verifierEmail, configuration.VerifierEmail)
+		assert.Equal(t, configurationAttr.verifierDomain, configuration.VerifierDomain)
+		assert.Equal(t, configurationAttr.validationTypeDefault, configuration.ValidationTypeDefault)
+		assert.Equal(t, configurationAttr.connectionTimeout, configuration.ConnectionTimeout)
+		assert.Equal(t, configurationAttr.responseTimeout, configuration.ResponseTimeout)
+		assert.Equal(t, configurationAttr.connectionAttempts, configuration.ConnectionAttempts)
+		assert.Equal(t, configurationAttr.whitelistedDomains, configuration.WhitelistedDomains)
+		assert.Equal(t, configurationAttr.blacklistedDomains, configuration.BlacklistedDomains)
+		assert.Equal(t, configurationAttr.blacklistedMxIpAddresses, configuration.BlacklistedMxIpAddresses)
+		assert.Equal(t, configurationAttr.dns+":"+DefaultDnsPort, configuration.DNS)
 		assert.Equal(t, configurationAttr.validationTypeByDomain, configuration.ValidationTypeByDomain)
 		assert.Equal(t, configurationAttr.whitelistValidation, configuration.WhitelistValidation)
 		assert.Equal(t, configurationAttr.notRfcMxLookupFlow, configuration.NotRfcMxLookupFlow)

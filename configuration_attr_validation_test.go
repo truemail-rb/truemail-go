@@ -283,3 +283,17 @@ func TestMatchRegex(t *testing.T) {
 		assert.False(t, matchRegex(EmptyString, `\K`))
 	})
 }
+
+func TestFormatDns(t *testing.T) {
+	t.Run("when DNS port not specified", func(t *testing.T) {
+		dnsGateway := randomIpAddress()
+
+		assert.Equal(t, dnsGateway+":"+DefaultDnsPort, formatDns(dnsGateway))
+	})
+
+	t.Run("when DNS port specified", func(t *testing.T) {
+		dnsGateway := randomIpAddress() + ":5300"
+
+		assert.Equal(t, dnsGateway, formatDns(dnsGateway))
+	})
+}

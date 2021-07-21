@@ -154,10 +154,10 @@ configuration := truemail.NewConfiguration(
     blacklistedMxIpAddresses: []string{"1.1.1.1", "2.2.2.2"},
 
     // Optional parameter. This option will provide to use custom DNS gateway when Truemail
-    // interacts with DNS. Valid port numbers are in the range 1-65535. If you won't specify
-    // nameserver's ports Truemail will use default DNS TCP/UDP port 53. By default Truemail
-    // uses DNS gateway from system settings and this option is equal to empty slice of
-    // strings by default.
+    // interacts with DNS. Valid port number is in the range 1-65535. If you won't specify
+    // nameserver port Truemail will use default DNS TCP/UDP port 53. It means that you can
+    // use ip4 addres as DNS gateway, for example "10.0.0.1". By default Truemail uses
+    // DNS gateway from system settings and this option is equal to empty string.
     dns: "10.0.0.1:5300",
 
     // Optional parameter. This option will provide to use not RFC MX lookup flow.
