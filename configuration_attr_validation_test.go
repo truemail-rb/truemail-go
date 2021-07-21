@@ -52,7 +52,7 @@ func TestBuildVerifierDomain(t *testing.T) {
 	})
 
 	t.Run("empty verifier domain", func(t *testing.T) {
-		actualDomain, err := buildVerifierDomain(verifierEmail, "")
+		actualDomain, err := buildVerifierDomain(verifierEmail, EmptyString)
 
 		assert.Equal(t, expectedDomain, actualDomain)
 		assert.NoError(t, err)
@@ -254,7 +254,7 @@ func TestIsIntersected(t *testing.T) {
 
 func TestNewRegex(t *testing.T) {
 	t.Run("valid regex pattern", func(t *testing.T) {
-		regexPattern := ""
+		regexPattern := EmptyString
 		actualRegex, err := newRegex(regexPattern)
 		expectedRegex, _ := regexp.Compile(regexPattern)
 
@@ -272,7 +272,7 @@ func TestNewRegex(t *testing.T) {
 
 func TestMatchRegex(t *testing.T) {
 	t.Run("valid regex pattern, matched string", func(t *testing.T) {
-		assert.True(t, matchRegex("", ""))
+		assert.True(t, matchRegex(EmptyString, EmptyString))
 	})
 
 	t.Run("valid regex pattern, not matched string", func(t *testing.T) {
@@ -280,6 +280,6 @@ func TestMatchRegex(t *testing.T) {
 	})
 
 	t.Run("invalid regex pattern", func(t *testing.T) {
-		assert.False(t, matchRegex("", `\K`))
+		assert.False(t, matchRegex(EmptyString, `\K`))
 	})
 }

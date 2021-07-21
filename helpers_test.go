@@ -1,7 +1,12 @@
 package truemail
 
 import (
+	"fmt"
+	"net"
+	"strconv"
+
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/foxcpp/go-mockdns"
 )
 
 func randomEmail() string {
@@ -24,6 +29,21 @@ func pairRandomEmailDomain() (string, string) {
 func randomIpAddress() string {
 	gofakeit.Seed(0)
 	return gofakeit.IPv4Address()
+}
+
+func randomIp6Address() string {
+	gofakeit.Seed(0)
+	return gofakeit.IPv6Address()
+}
+
+func randomPortNumber() int {
+	gofakeit.Seed(0)
+	return gofakeit.Number(1, 65535)
+}
+
+func randomDnsServer() string {
+	gofakeit.Seed(0)
+	return randomIpAddress() + ":" + strconv.Itoa(randomPortNumber())
 }
 
 func createConfiguration() *configuration {
@@ -74,4 +94,26 @@ func doPassedFromDomainListMatch(validatorResult *validatorResult) {
 
 func failedValidatorResult() *validatorResult {
 	return new(validatorResult)
+}
+
+// Returns dnsResolver with mocked DNS records
+func createDnsResolver(dnsRecords map[string]mockdns.Zone) *dnsResolver {
+	return &dnsResolver{gateway: &mockdns.Resolver{Zones: dnsRecords}}
+}
+
+func createDnsResolverWithEpmtyRecords() *dnsResolver {
+	return createDnsResolver(map[string]mockdns.Zone{})
+}
+
+func dnsErrorMessage(hostname string) string {
+	return fmt.Sprintf("lookup %s on 127.0.0.1:53: no such host", hostname)
+}
+
+func runMockDnsServer(dnsRecords map[string]mockdns.Zone) string { // TODO: how to remove DNS request stdout dig log?
+	srv, _ := mockdns.NewServer(dnsRecords, false)
+	runningMockServerAddress := srv.LocalAddr().String()
+	defer srv.Close()
+	srv.PatchNet(net.DefaultResolver)
+	defer mockdns.UnpatchNet(net.DefaultResolver)
+	return runningMockServerAddress
 }

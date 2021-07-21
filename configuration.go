@@ -47,18 +47,19 @@ const (
 	RegexIpAddress                = `((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])`
 	RegexIpAddressPattern         = `\A` + RegexIpAddress + `\z`
 	RegexDNSServerAddressPattern  = `\A` + RegexIpAddress + `(:` + RegexPortNumber + `)?\z`
+	EmptyString                   = ""
 )
 
 // NewConfiguration builder
 func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 	// assign fileds default values
-	if config.validationTypeDefault == "" {
+	if config.validationTypeDefault == EmptyString {
 		config.validationTypeDefault = ValidationTypeDefault
 	}
-	if config.emailPattern == "" {
+	if config.emailPattern == EmptyString {
 		config.emailPattern = RegexEmailPattern
 	}
-	if config.smtpErrorBodyPattern == "" {
+	if config.smtpErrorBodyPattern == EmptyString {
 		config.smtpErrorBodyPattern = RegexSMTPErrorBodyPattern
 	}
 	if config.connectionTimeout == 0 {
@@ -119,7 +120,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 
 	dns := config.dns
 
-	if dns != "" {
+	if dns != EmptyString {
 		err = validateDNSServerContext(config.dns)
 		if err != nil {
 			return nil, err
