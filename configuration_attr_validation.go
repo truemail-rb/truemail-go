@@ -133,3 +133,15 @@ func matchRegex(strContext, regexPattern string) bool {
 	}
 	return regex.MatchString(strContext)
 }
+
+// Addes default DNS port to ip address by template {address}:{port} for cases when port
+// number not specified
+func formatDns(dnsGateway string) string {
+	regex, _ := newRegex(RegexDNSServerAddressPattern)
+	portNumberCaptureGroup := 5
+	if regex.FindStringSubmatch(dnsGateway)[portNumberCaptureGroup] != EmptyString {
+		return dnsGateway
+	}
+
+	return dnsGateway + ":" + DefaultDnsPort
+}

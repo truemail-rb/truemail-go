@@ -47,6 +47,7 @@ const (
 	RegexIpAddress                = `((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])`
 	RegexIpAddressPattern         = `\A` + RegexIpAddress + `\z`
 	RegexDNSServerAddressPattern  = `\A` + RegexIpAddress + `(:` + RegexPortNumber + `)?\z`
+	DefaultDnsPort                = "53"
 	EmptyString                   = ""
 )
 
@@ -125,6 +126,8 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		dns = formatDns(dns)
 	}
 
 	err = validateTypeByDomainContext(config.validationTypeByDomain)
