@@ -14,6 +14,9 @@ type gateway interface {
 	LookupMX(context.Context, string) ([]*net.MX, error)
 	LookupAddr(context.Context, string) ([]string, error)
 }
+
+// dnsResolver structure. Provides possibility to send DNS requests
+// via system or custom DNS gateway
 type dnsResolver struct {
 	connectionTimeout int
 	dnsServer         string
@@ -102,7 +105,7 @@ func (dnsResolver *dnsResolver) mxRecords(hostName string) (hostNames []string, 
 		return hostNames, err
 	}
 
-	// sort mx records by priority
+	// sorting MX records by priority
 	sort.SliceStable(mxRecords, func(i, j int) bool {
 		return mxRecords[i].Pref < mxRecords[j].Pref
 	})

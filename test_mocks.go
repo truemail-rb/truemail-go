@@ -2,6 +2,8 @@ package truemail
 
 import "github.com/stretchr/testify/mock"
 
+// Testing mocks
+
 // validationDomainListMatch structure mock
 type validationDomainListMatchMock struct {
 	mock.Mock

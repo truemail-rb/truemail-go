@@ -28,12 +28,6 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 	return validatorResult
 }
 
-const (
-	DomainListMatchWhitelist    = "whitelist"
-	DomainListMatchBlacklist    = "blacklist"
-	DomainListMatchErrorContext = "blacklisted email"
-)
-
 func emailDomain(email string) string {
 	regex, _ := newRegex(RegexDomainFromEmail)
 	domainCaptureGroup := 1

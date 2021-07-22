@@ -8,7 +8,3 @@ func (validation *validationMxBlacklist) check(validatorResult *validatorResult)
 
 	return validatorResult
 }
-
-const (
-	MxBlacklistErrorContext = "blacklisted mx server ip address"
-)

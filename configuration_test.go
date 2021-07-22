@@ -213,7 +213,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid dns, wrong ip address", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "1.1.1.256:65536"}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "1.1.1.256:65535"}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
 
@@ -223,6 +223,15 @@ func TestNewConfiguration(t *testing.T) {
 
 	t.Run("invalid dns, wrong port number", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "2.2.2.2:65536"}
+		configuration, err := NewConfiguration(configurationAttr)
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
+
+		assert.Nil(t, configuration)
+		assert.EqualError(t, err, errorMessage)
+	})
+
+	t.Run("invalid dns, wrong ip address and port number", func(t *testing.T) {
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, dns: "1.1.1.256:65536"}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
 
