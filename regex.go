@@ -8,7 +8,3 @@ func (validation *validationRegex) check(validatorResult *validatorResult) *vali
 
 	return validatorResult
 }
-
-const (
-	RegexErrorContext = "email does not match the regular expression"
-)
