@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationMxBlacklist(t *testing.T) {
+func TestValidationMxBlacklistCheck(t *testing.T) {
 	t.Run("MX blacklist validation: successful", func(t *testing.T) {
 		validatorResult := createSuccessfulValidatorResult(randomEmail(), createConfiguration())
 		new(validationMxBlacklist).check(validatorResult)

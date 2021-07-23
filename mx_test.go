@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationMx(t *testing.T) {
+func TestValidationMxCheck(t *testing.T) {
 	t.Run("DNS validation layer", func(t *testing.T) {
 		validator := createValidator(randomEmail(), createConfiguration())
 		validatorResult := validator.result

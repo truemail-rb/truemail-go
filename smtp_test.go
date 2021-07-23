@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationSMTP(t *testing.T) {
+func TestValidationSmtpCheck(t *testing.T) {
 	t.Run("SMTP validation layer", func(t *testing.T) {
 		validator := createValidator(randomEmail(), createConfiguration())
 		validatorResult := validator.result

@@ -1,10 +1,11 @@
 package truemail
 
 // Whitelist/Blacklist validation, zero validation level
+// interface implementation
 func (validation *validationDomainListMatch) check(validatorResult *validatorResult) *validatorResult {
 	// Failure scenario
-	if isBlacklistedDomain(validatorResult) ||
-		(isWhitelistValidation(validatorResult) && !isWhitelistedDomain(validatorResult)) {
+	if validation.isBlacklistedDomain(validatorResult) ||
+		(validation.isWhitelistValidation(validatorResult) && !validation.isWhitelistedDomain(validatorResult)) {
 		validatorResult.ValidationType = DomainListMatchBlacklist
 		validatorResult.addError(ValidationTypeDomainListMatch, DomainListMatchErrorContext)
 		return validatorResult
@@ -14,40 +15,42 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 	validatorResult.Success = true
 
 	// Handle flow with ValidationType persisting
-	if !isWhitelistValidation(validatorResult) &&
-		!(!isBlacklistedDomain(validatorResult) && !isWhitelistedDomain(validatorResult)) {
+	if !validation.isWhitelistValidation(validatorResult) &&
+		!(!validation.isBlacklistedDomain(validatorResult) && !validation.isWhitelistedDomain(validatorResult)) {
 		validatorResult.ValidationType = DomainListMatchWhitelist
 	}
 
 	// Handle flow for processing validatorResult via next validation level
-	if (isWhitelistValidation(validatorResult) && isWhitelistedDomain(validatorResult)) ||
-		(!isBlacklistedDomain(validatorResult) && !isWhitelistedDomain(validatorResult)) {
+	if (validation.isWhitelistValidation(validatorResult) && validation.isWhitelistedDomain(validatorResult)) ||
+		(!validation.isBlacklistedDomain(validatorResult) && !validation.isWhitelistedDomain(validatorResult)) {
 		validatorResult.isPassFromDomainListMatch = true
 	}
 
 	return validatorResult
 }
 
-func emailDomain(email string) string {
+// validationDomainListMatch methods
+
+func (validation *validationDomainListMatch) emailDomain(email string) string {
 	regex, _ := newRegex(RegexDomainFromEmail)
 	domainCaptureGroup := 1
 	return regex.FindStringSubmatch(email)[domainCaptureGroup]
 }
 
-func isWhitelistedDomain(validatorResult *validatorResult) bool {
+func (validation *validationDomainListMatch) isWhitelistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.WhitelistedDomains,
-		emailDomain(validatorResult.Email),
+		validation.emailDomain(validatorResult.Email),
 	)
 }
 
-func isWhitelistValidation(validatorResult *validatorResult) bool {
+func (validation *validationDomainListMatch) isWhitelistValidation(validatorResult *validatorResult) bool {
 	return validatorResult.Configuration.WhitelistValidation
 }
 
-func isBlacklistedDomain(validatorResult *validatorResult) bool {
+func (validation *validationDomainListMatch) isBlacklistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.BlacklistedDomains,
-		emailDomain(validatorResult.Email),
+		validation.emailDomain(validatorResult.Email),
 	)
 }
