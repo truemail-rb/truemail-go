@@ -1,5 +1,7 @@
 package truemail
 
+// DNS (MX) validation, second validation level
+// interface implementation
 func (validation *validationMx) check(validatorResult *validatorResult) *validatorResult {
 	// resolver := newDnsResolver(validatorResult.Configuration)
 

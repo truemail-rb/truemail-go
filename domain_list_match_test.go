@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationDomainListMatch(t *testing.T) {
+func TestValidationDomainListMatchCheck(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
 	t.Run("whitelist case, email is in whitelist", func(t *testing.T) {
@@ -128,60 +128,60 @@ func TestValidationDomainListMatch(t *testing.T) {
 	})
 }
 
-func TestEmailDomain(t *testing.T) {
+func TestValidationDomainListMatchEmailDomain(t *testing.T) {
 	t.Run("extracts domain name from email address", func(t *testing.T) {
 		email, domain := pairRandomEmailDomain()
 
-		assert.Equal(t, domain, emailDomain(email))
+		assert.Equal(t, domain, new(validationDomainListMatch).emailDomain(email))
 	})
 }
 
-func TestIsWhitelistedDomain(t *testing.T) {
+func TestValidationDomainListMatchIsWhitelistedDomain(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
 	t.Run("when whitelisted domain", func(t *testing.T) {
 		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), whitelistedDomains: []string{domain}})
 		validatorResult := createValidatorResult(email, configuration)
 
-		assert.True(t, isWhitelistedDomain(validatorResult))
+		assert.True(t, new(validationDomainListMatch).isWhitelistedDomain(validatorResult))
 	})
 
 	t.Run("when not whitelisted domain", func(t *testing.T) {
 		validatorResult := createValidatorResult(email, createConfiguration())
 
-		assert.False(t, isWhitelistedDomain(validatorResult))
+		assert.False(t, new(validationDomainListMatch).isWhitelistedDomain(validatorResult))
 	})
 }
 
-func TestIsWhitelistValidation(t *testing.T) {
+func TestValidationDomainListMatchIsWhitelistValidation(t *testing.T) {
 	t.Run("when whitelist validation", func(t *testing.T) {
 		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), whitelistValidation: true})
 		validatorResult := createValidatorResult(randomEmail(), configuration)
 
-		assert.True(t, isWhitelistValidation(validatorResult))
+		assert.True(t, new(validationDomainListMatch).isWhitelistValidation(validatorResult))
 	})
 
 	t.Run("when not whitelist validation", func(t *testing.T) {
 		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), whitelistValidation: false})
 		validatorResult := createValidatorResult(randomEmail(), configuration)
 
-		assert.False(t, isWhitelistValidation(validatorResult))
+		assert.False(t, new(validationDomainListMatch).isWhitelistValidation(validatorResult))
 	})
 }
 
-func TestIsBlacklistedDomain(t *testing.T) {
+func TestValidationDomainListMatchIsBlacklistedDomain(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
 	t.Run("when blacklisted domain", func(t *testing.T) {
 		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), blacklistedDomains: []string{domain}})
 		validatorResult := createValidatorResult(email, configuration)
 
-		assert.True(t, isBlacklistedDomain(validatorResult))
+		assert.True(t, new(validationDomainListMatch).isBlacklistedDomain(validatorResult))
 	})
 
 	t.Run("when not blacklisted domain", func(t *testing.T) {
 		validatorResult := createValidatorResult(email, createConfiguration())
 
-		assert.False(t, isBlacklistedDomain(validatorResult))
+		assert.False(t, new(validationDomainListMatch).isBlacklistedDomain(validatorResult))
 	})
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationRegex(t *testing.T) {
+func TestValidationRegexCheck(t *testing.T) {
 	t.Run("regex validation: successful", func(t *testing.T) {
 		validatorResult := createSuccessfulValidatorResult(randomEmail(), createConfiguration())
 		new(validationRegex).check(validatorResult)
