@@ -31,16 +31,10 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 
 // validationDomainListMatch methods
 
-func (validation *validationDomainListMatch) emailDomain(email string) string {
-	regex, _ := newRegex(RegexDomainFromEmail)
-	domainCaptureGroup := 1
-	return regex.FindStringSubmatch(email)[domainCaptureGroup]
-}
-
 func (validation *validationDomainListMatch) isWhitelistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.WhitelistedDomains,
-		validation.emailDomain(validatorResult.Email),
+		emailDomain(validatorResult.Email),
 	)
 }
 
@@ -51,6 +45,6 @@ func (validation *validationDomainListMatch) isWhitelistValidation(validatorResu
 func (validation *validationDomainListMatch) isBlacklistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.BlacklistedDomains,
-		validation.emailDomain(validatorResult.Email),
+		emailDomain(validatorResult.Email),
 	)
 }

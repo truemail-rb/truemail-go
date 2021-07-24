@@ -110,3 +110,23 @@ func TestValidateValidationTypeContext(t *testing.T) {
 		assert.EqualError(t, validateValidationTypeContext(invalidType), errorMessage)
 	})
 }
+
+func TestRegexCaptureGroup(t *testing.T) {
+	str, regexPattern := "abbc", `\A(a)(b{2}).+\z`
+
+	t.Run("returns string when regex capture group found", func(t *testing.T) {
+		assert.Equal(t, "bb", regexCaptureGroup(str, regexPattern, 2))
+	})
+
+	t.Run("panics when regex capture group not found", func(t *testing.T) {
+		assert.Panics(t, func() { regexCaptureGroup(str, regexPattern, 3) })
+	})
+}
+
+func TestEmailDomain(t *testing.T) {
+	t.Run("extracts domain name from email address", func(t *testing.T) {
+		email, domain := pairRandomEmailDomain()
+
+		assert.Equal(t, domain, emailDomain(email))
+	})
+}

@@ -13,6 +13,7 @@ func isIncluded(slice []string, target string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -22,6 +23,7 @@ func isIntersected(baseSlice []string, targetSlice []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -34,6 +36,7 @@ func matchRegex(strContext, regexPattern string) bool {
 	if err != nil {
 		return false
 	}
+
 	return regex.MatchString(strContext)
 }
 
@@ -45,8 +48,8 @@ func variadicValidationType(options []string, defaultValidationType string) (str
 	if len(options) == 0 {
 		return defaultValidationType, nil
 	}
-
 	validationType := options[0]
+
 	return validationType, validateValidationTypeContext(validationType)
 }
 
@@ -54,9 +57,20 @@ func validateValidationTypeContext(validationType string) error {
 	if isIncluded(availableValidationTypes(), validationType) {
 		return nil
 	}
+
 	return fmt.Errorf(
 		"%s is invalid validation type, use one of these: %s",
 		validationType,
 		availableValidationTypes(),
 	)
+}
+
+func regexCaptureGroup(str string, regexPattern string, captureGroup int) string {
+	regex, _ := newRegex(regexPattern)
+
+	return regex.FindStringSubmatch(str)[captureGroup]
+}
+
+func emailDomain(email string) string {
+	return regexCaptureGroup(email, RegexDomainFromEmail, 1)
 }

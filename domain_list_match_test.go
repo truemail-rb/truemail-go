@@ -128,14 +128,6 @@ func TestValidationDomainListMatchCheck(t *testing.T) {
 	})
 }
 
-func TestValidationDomainListMatchEmailDomain(t *testing.T) {
-	t.Run("extracts domain name from email address", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
-
-		assert.Equal(t, domain, new(validationDomainListMatch).emailDomain(email))
-	})
-}
-
 func TestValidationDomainListMatchIsWhitelistedDomain(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
