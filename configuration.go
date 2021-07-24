@@ -16,7 +16,7 @@ type configuration struct {
 	EmailPattern, SMTPErrorBodyPattern                                   *regexp.Regexp
 }
 
-// NewConfiguration builder. Returns valid newConfiguration structure
+// New configuration builder. Returns valid newConfiguration structure
 func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 	config.assignDefaultValues()
 	err := config.validate()

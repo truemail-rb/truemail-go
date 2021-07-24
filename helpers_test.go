@@ -1,6 +1,7 @@
 package truemail
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -66,5 +67,46 @@ func TestMatchRegex(t *testing.T) {
 func TestAvailableValidationTypes(t *testing.T) {
 	t.Run("slice of available validation types", func(t *testing.T) {
 		assert.Equal(t, []string{"regex", "mx", "mx_blacklist", "smtp"}, availableValidationTypes())
+	})
+}
+
+func TestVariadicValidationType(t *testing.T) {
+	t.Run("without validation type", func(t *testing.T) {
+		result, err := variadicValidationType([]string{}, ValidationTypeMx)
+
+		assert.NoError(t, err)
+		assert.Equal(t, ValidationTypeMx, result)
+	})
+
+	t.Run("valid validation type", func(t *testing.T) {
+		validationType := ValidationTypeRegex
+		result, err := variadicValidationType([]string{validationType}, ValidationTypeMx)
+
+		assert.NoError(t, err)
+		assert.Equal(t, validationType, result)
+	})
+
+	t.Run("invalid validation type", func(t *testing.T) {
+		invalidValidationType := "invalid type"
+		result, err := variadicValidationType([]string{invalidValidationType}, ValidationTypeMx)
+		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx mx_blacklist smtp]", invalidValidationType)
+
+		assert.EqualError(t, err, errorMessage)
+		assert.Equal(t, invalidValidationType, result)
+	})
+}
+
+func TestValidateValidationTypeContext(t *testing.T) {
+	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
+		t.Run("valid validation type", func(t *testing.T) {
+			assert.NoError(t, validateValidationTypeContext(validValidationType))
+		})
+	}
+
+	t.Run("invalid validation type", func(t *testing.T) {
+		invalidType := "invalid type"
+		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx mx_blacklist smtp]", invalidType)
+
+		assert.EqualError(t, validateValidationTypeContext(invalidType), errorMessage)
 	})
 }

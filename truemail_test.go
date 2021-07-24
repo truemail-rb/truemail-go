@@ -9,7 +9,7 @@ import (
 
 func TestValidate(t *testing.T) {
 	// TODO: change to integration tests when validationMx.check() will be implemented
-	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP} {
+	for _, validValidationType := range availableValidationTypes() {
 		t.Run(validValidationType+" valid validation type", func(t *testing.T) {
 			email, configuration := randomEmail(), createConfiguration()
 			validatorResult, err := Validate(email, configuration, validValidationType)
@@ -22,6 +22,21 @@ func TestValidate(t *testing.T) {
 			assert.True(t, validatorResult.Success)
 		})
 	}
+
+	t.Run("succesful validation, default validation type specified in configuration", func(t *testing.T) {
+		email, specifiedValidationTypeByDefault := randomEmail(), ValidationTypeRegex
+		configuration, _ := NewConfiguration(
+			ConfigurationAttr{
+				verifierEmail:         randomEmail(),
+				validationTypeDefault: specifiedValidationTypeByDefault,
+			},
+		)
+		validatorResult, _ := Validate(email, configuration)
+
+		assert.True(t, validatorResult.Success)
+		assert.True(t, validatorResult.isPassFromDomainListMatch)
+		assert.Equal(t, []string{specifiedValidationTypeByDefault}, validatorResult.usedValidations)
+	})
 
 	t.Run("invalid validation type", func(t *testing.T) {
 		invalidValidationType := "invalid type"
@@ -92,7 +107,11 @@ func TestValidate(t *testing.T) {
 }
 
 func TestIsValid(t *testing.T) {
-	t.Run("when succesful validation", func(t *testing.T) {
+	t.Run("when succesful validation, default validation type specified in configuration", func(t *testing.T) {
+		assert.True(t, IsValid(randomEmail(), createConfiguration()))
+	})
+
+	t.Run("when succesful validation, specified validation type", func(t *testing.T) {
 		assert.True(t, IsValid(randomEmail(), createConfiguration(), ValidationTypeRegex))
 	})
 
@@ -102,60 +121,5 @@ func TestIsValid(t *testing.T) {
 
 	t.Run("when invalid validation type", func(t *testing.T) {
 		assert.False(t, IsValid(randomEmail(), createConfiguration(), "invalidValidationType"))
-	})
-}
-
-func TestVariadicValidationType(t *testing.T) {
-	t.Run("without validation type", func(t *testing.T) {
-		result, err := variadicValidationType([]string{})
-
-		assert.NoError(t, err)
-		assert.Equal(t, ValidationTypeDefault, result)
-	})
-
-	t.Run("valid validation type", func(t *testing.T) {
-		validationType := randomValidationType()
-		result, err := variadicValidationType([]string{validationType})
-
-		assert.NoError(t, err)
-		assert.Equal(t, validationType, result)
-	})
-
-	t.Run("invalid validation type", func(t *testing.T) {
-		invalidValidationType := "invalid type"
-		result, err := variadicValidationType([]string{invalidValidationType})
-		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx mx_blacklist smtp]", invalidValidationType)
-
-		assert.EqualError(t, err, errorMessage)
-		assert.Equal(t, invalidValidationType, result)
-	})
-}
-
-func TestValidateValidationTypeContext(t *testing.T) {
-	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
-		t.Run("valid validation type", func(t *testing.T) {
-			assert.NoError(t, validateValidationTypeContext(validValidationType))
-		})
-	}
-
-	t.Run("invalid validation type", func(t *testing.T) {
-		invalidType := "invalid type"
-		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx mx_blacklist smtp]", invalidType)
-
-		assert.EqualError(t, validateValidationTypeContext(invalidType), errorMessage)
-	})
-}
-
-func TestNewValidator(t *testing.T) {
-	t.Run("creates validator", func(t *testing.T) {
-		email, validationType, configuration := randomEmail(), randomValidationType(), createConfiguration()
-		validator := newValidator(email, validationType, configuration)
-		validatorResult := validator.result
-
-		assert.Equal(t, email, validatorResult.Email)
-		assert.Equal(t, validationType, validatorResult.ValidationType)
-		assert.Equal(t, configuration, validatorResult.Configuration)
-		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Empty(t, validatorResult.usedValidations)
 	})
 }

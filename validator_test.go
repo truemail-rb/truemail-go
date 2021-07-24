@@ -6,6 +6,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewValidator(t *testing.T) {
+	t.Run("creates validator", func(t *testing.T) {
+		email, validationType, configuration := randomEmail(), randomValidationType(), createConfiguration()
+		validator := newValidator(email, validationType, configuration)
+		validatorResult := validator.result
+
+		assert.Equal(t, email, validatorResult.Email)
+		assert.Equal(t, validationType, validatorResult.ValidationType)
+		assert.Equal(t, configuration, validatorResult.Configuration)
+		assert.False(t, validatorResult.isPassFromDomainListMatch)
+		assert.Empty(t, validatorResult.usedValidations)
+	})
+}
+
 func TestValidatorValidateDomainListMatch(t *testing.T) {
 	t.Run("validator#validateDomainListMatch", func(t *testing.T) {
 		validator := createValidator(randomEmail(), createConfiguration())

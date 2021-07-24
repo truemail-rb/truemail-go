@@ -69,7 +69,7 @@ func createConfiguration() *configuration {
 }
 
 func createValidatorResult(email string, configuration *configuration, options ...string) *validatorResult {
-	validationType, _ := variadicValidationType(options)
+	validationType, _ := variadicValidationType(options, configuration.ValidationTypeDefault)
 	validatorResult := &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
 	return validatorResult
 }
@@ -86,7 +86,7 @@ func randomValidationType() string {
 }
 
 func createValidator(email string, configuration *configuration, options ...string) *validator {
-	validationType, _ := variadicValidationType(options)
+	validationType, _ := variadicValidationType(options, configuration.ValidationTypeDefault)
 	return newValidator(email, validationType, configuration)
 }
 

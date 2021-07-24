@@ -42,6 +42,24 @@ type validator struct {
 	smtp
 }
 
+// New validator builder. Returns consistent validator structure
+func newValidator(email, validationType string, configuration *configuration) *validator {
+	validator := &validator{
+		result: &validatorResult{
+			Email:          email,
+			Configuration:  configuration,
+			ValidationType: validationType,
+		},
+		domainListMatch: &validationDomainListMatch{},
+		regex:           &validationRegex{},
+		mx:              &validationMx{},
+		mxBlacklist:     &validationMxBlacklist{},
+		smtp:            &validationSmtp{},
+	}
+
+	return validator
+}
+
 // validation layers interfaces
 
 type domainListMatch interface {
