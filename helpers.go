@@ -1,6 +1,9 @@
 package truemail
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 
 // package helpers functions
 
@@ -36,4 +39,24 @@ func matchRegex(strContext, regexPattern string) bool {
 
 func availableValidationTypes() []string {
 	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP}
+}
+
+func variadicValidationType(options []string, defaultValidationType string) (string, error) {
+	if len(options) == 0 {
+		return defaultValidationType, nil
+	}
+
+	validationType := options[0]
+	return validationType, validateValidationTypeContext(validationType)
+}
+
+func validateValidationTypeContext(validationType string) error {
+	if isIncluded(availableValidationTypes(), validationType) {
+		return nil
+	}
+	return fmt.Errorf(
+		"%s is invalid validation type, use one of these: %s",
+		validationType,
+		availableValidationTypes(),
+	)
 }
