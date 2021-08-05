@@ -99,7 +99,7 @@ func (dnsResolver *dnsResolver) cnameRecord(hostName string) (resolvedHostName s
 }
 
 // Returns MX records priorities and hostnames sorted by record priority
-func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []int, hostNames []string, err error) {
+func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []uint16, hostNames []string, err error) {
 	mxRecords, err := dnsResolver.gateway.LookupMX(context.Background(), hostName)
 	if err != nil {
 		return priorities, hostNames, err
@@ -111,7 +111,7 @@ func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []int, ho
 	})
 
 	for _, mxRecord := range mxRecords {
-		priorities = append(priorities, int(mxRecord.Pref))
+		priorities = append(priorities, mxRecord.Pref)
 		hostNames = append(hostNames, dnsResolver.dnsNameToHostName(mxRecord.Host))
 	}
 
