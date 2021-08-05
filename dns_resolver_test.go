@@ -142,26 +142,28 @@ func TestDnsResolverMxRecords(t *testing.T) {
 	domain := randomDomain()
 
 	t.Run("when target MX record found", func(t *testing.T) {
-		mxFirst, mxSecond := randomDomain(), randomDomain()
+		mxPriorityFirst, mxFirst, mxPrioritySecond, mxSecond := 20, randomDomain(), 10, randomDomain()
 		dnsRecords := map[string]mockdns.Zone{
 			domain + ".": {
 				MX: []net.MX{
-					{Host: mxFirst, Pref: 20},
-					{Host: mxSecond, Pref: 10},
+					{Host: mxFirst, Pref: uint16(mxPriorityFirst)},
+					{Host: mxSecond, Pref: uint16(mxPrioritySecond)},
 				},
 			},
 		}
 		dnsResolver := createDnsResolver(dnsRecords)
-		resolvedMxHostNames, err := dnsResolver.mxRecords(domain)
+		resolvedMxPriorities, resolvedMxHostNames, err := dnsResolver.mxRecords(domain)
 
+		assert.Equal(t, []int{mxPrioritySecond, mxPriorityFirst}, resolvedMxPriorities)
 		assert.Equal(t, []string{mxSecond, mxFirst}, resolvedMxHostNames)
 		assert.Nil(t, err)
 	})
 
 	t.Run("when target MX record not found", func(t *testing.T) {
 		dnsResolver := createDnsResolverWithEpmtyRecords()
-		resolvedMxHostNames, err := dnsResolver.mxRecords(domain)
+		resolvedMxPriorities, resolvedMxHostNames, err := dnsResolver.mxRecords(domain)
 
+		assert.Empty(t, resolvedMxPriorities)
 		assert.Empty(t, resolvedMxHostNames)
 		assert.EqualError(t, err, dnsErrorMessage(domain))
 	})
