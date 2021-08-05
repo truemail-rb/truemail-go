@@ -98,11 +98,11 @@ func (dnsResolver *dnsResolver) cnameRecord(hostName string) (resolvedHostName s
 	return resolvedHostName, nil
 }
 
-// Returns MX records hostnames by hostname sorted by record priority
-func (dnsResolver *dnsResolver) mxRecords(hostName string) (hostNames []string, err error) {
+// Returns MX records priorities and hostnames sorted by record priority
+func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []int, hostNames []string, err error) {
 	mxRecords, err := dnsResolver.gateway.LookupMX(context.Background(), hostName)
 	if err != nil {
-		return hostNames, err
+		return priorities, hostNames, err
 	}
 
 	// sorting MX records by priority
@@ -111,10 +111,11 @@ func (dnsResolver *dnsResolver) mxRecords(hostName string) (hostNames []string, 
 	})
 
 	for _, mxRecord := range mxRecords {
+		priorities = append(priorities, int(mxRecord.Pref))
 		hostNames = append(hostNames, dnsResolver.dnsNameToHostName(mxRecord.Host))
 	}
 
-	return hostNames, nil
+	return priorities, hostNames, nil
 }
 
 // Returns PTR records by host address
