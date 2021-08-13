@@ -14,7 +14,8 @@ func TestNewValidator(t *testing.T) {
 
 		assert.Equal(t, email, validatorResult.Email)
 		assert.Equal(t, validationType, validatorResult.ValidationType)
-		assert.Equal(t, configuration, validatorResult.Configuration)
+		assert.EqualValues(t, configuration, validatorResult.Configuration)
+		assert.NotSame(t, configuration, validatorResult.Configuration)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
 		assert.Empty(t, validatorResult.usedValidations)
 	})

@@ -74,3 +74,31 @@ func regexCaptureGroup(str string, regexPattern string, captureGroup int) string
 func emailDomain(email string) string {
 	return regexCaptureGroup(email, RegexDomainFromEmail, 1)
 }
+
+func copyConfigurationByPointer(configuration *configuration) *configuration {
+	config := *configuration
+	return &config
+}
+
+func uniqStrings(strSlice []string) (uniqStrSlice []string) {
+	dict := make(map[string]bool)
+	for _, item := range strSlice {
+		if _, ok := dict[item]; !ok {
+			dict[item], uniqStrSlice = true, append(uniqStrSlice, item)
+		}
+	}
+
+	return uniqStrSlice
+}
+
+// Returns a new slice that is a copy of the original slice,
+// removing any items that also appear in other slice.
+func sliceDiff(slice, otherSlice []string) (diff []string) {
+	for _, item := range slice {
+		if !isIncluded(otherSlice, item) {
+			diff = append(diff, item)
+		}
+	}
+
+	return diff
+}

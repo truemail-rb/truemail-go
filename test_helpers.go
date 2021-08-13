@@ -7,6 +7,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/foxcpp/go-mockdns"
+	"golang.org/x/net/idna"
 )
 
 // Testing helpers
@@ -19,6 +20,20 @@ func randomEmail() string {
 func randomDomain() string {
 	gofakeit.Seed(0)
 	return gofakeit.DomainName()
+}
+
+func randomDnsHostName() string {
+	gofakeit.Seed(0)
+	return gofakeit.DomainName() + "."
+}
+
+func punycodeDomain(domain string) string {
+	punycodeDomain, _ := idna.New().ToASCII(domain)
+	return punycodeDomain
+}
+
+func toDnsHostName(domain string) string {
+	return domain + "."
 }
 
 func pairRandomEmailDomain() (string, string) {
@@ -70,12 +85,11 @@ func createConfiguration() *configuration {
 
 func createValidatorResult(email string, configuration *configuration, options ...string) *validatorResult {
 	validationType, _ := variadicValidationType(options, configuration.ValidationTypeDefault)
-	validatorResult := &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
-	return validatorResult
+	return &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
 }
 
 func createSuccessfulValidatorResult(email string, configuration *configuration) *validatorResult {
-	return &validatorResult{Email: email, Configuration: configuration, Success: true}
+	return &validatorResult{Email: email, Configuration: copyConfigurationByPointer(configuration), Success: true}
 }
 
 func randomValidationType() string {

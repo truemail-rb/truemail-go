@@ -18,18 +18,18 @@ func TestNewDnsResolver(t *testing.T) {
 		assert.Equal(t, dns, dnsResolver.dnsServer)
 	})
 
-	// Integration test with external DNS request
+	// Integration test with internal DNS request
 	t.Run("when DNS gateway not specified dnsResolver uses default system DNS gateway", func(t *testing.T) {
 		dnsResolver := newDnsResolver(createConfiguration())
-		resolvedHostAddresses, _ := dnsResolver.aRecords("dns.google")
+		resolvedHostAddresses, _ := dnsResolver.aRecords("localhost")
 
-		assert.True(t, isIncluded(resolvedHostAddresses, "8.8.8.8"))
+		assert.True(t, isIncluded(resolvedHostAddresses, "127.0.0.1"))
 	})
 
 	// Integration test with internal DNS request
 	t.Run("when DNS gateway not specified dnsResolver uses default system DNS gateway", func(t *testing.T) {
 		hostName, hostAddress := randomDomain(), randomIpAddress()
-		dnsRecords := map[string]mockdns.Zone{hostName + ".": {A: []string{hostAddress}}}
+		dnsRecords := map[string]mockdns.Zone{toDnsHostName(hostName): {A: []string{hostAddress}}}
 		connectionTimeout, dns, configuration := 1, runMockDnsServer(dnsRecords), createConfiguration()
 		configuration.ConnectionTimeout, configuration.DNS = connectionTimeout, dns
 		dnsResolver := newDnsResolver(configuration)
@@ -56,7 +56,7 @@ func TestDnsResolverRejectIp6Addresses(t *testing.T) {
 	ip4Addresses := []string{ip4First, ip4Second}
 
 	t.Run("when slice includes ip4 and ip6 adresses", func(t *testing.T) {
-		assert.Equal(t, ip4Addresses, dnsResolver.rejectIp6Addresses([]string{ip4First, randomIp6Address(), ip4Second}))
+		assert.Equal(t, ip4Addresses, dnsResolver.rejectIp6Addresses([]string{"0.0.0.0", ip4First, randomIp6Address(), ip4Second}))
 	})
 
 	t.Run("when slice includes ip4 adresses only", func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestDnsResolverARecords(t *testing.T) {
 
 	t.Run("when target A record found", func(t *testing.T) {
 		ip4First, ip4Second := randomIpAddress(), randomIpAddress()
-		dnsRecords := map[string]mockdns.Zone{domain + ".": {A: []string{ip4First, randomIp6Address(), ip4Second}}}
+		dnsRecords := map[string]mockdns.Zone{toDnsHostName(domain): {A: []string{ip4First, randomIp6Address(), ip4Second}}}
 		dnsResolver := createDnsResolver(dnsRecords)
 		resolvedIp4Addresses, err := dnsResolver.aRecords(domain)
 
@@ -99,7 +99,7 @@ func TestDnsResolverARecord(t *testing.T) {
 
 	t.Run("when target A record found", func(t *testing.T) {
 		ip4First, ip4Second := randomIpAddress(), randomIpAddress()
-		dnsRecords := map[string]mockdns.Zone{domain + ".": {A: []string{ip4First, randomIp6Address(), ip4Second}}}
+		dnsRecords := map[string]mockdns.Zone{toDnsHostName(domain): {A: []string{ip4First, randomIp6Address(), ip4Second}}}
 		dnsResolver := createDnsResolver(dnsRecords)
 		resolvedIp4Address, err := dnsResolver.aRecord(domain)
 
@@ -121,7 +121,7 @@ func TestDnsResolverCnameRecord(t *testing.T) {
 
 	t.Run("when target CNAME record found", func(t *testing.T) {
 		otherDomain := randomDomain()
-		dnsRecords := map[string]mockdns.Zone{domain: {CNAME: otherDomain + "."}} // TODO: different go-mockdns behaviour for domain key
+		dnsRecords := map[string]mockdns.Zone{domain: {CNAME: toDnsHostName(otherDomain)}} // TODO: different go-mockdns behaviour for domain key, should be with dot
 		dnsResolver := createDnsResolver(dnsRecords)
 		resolvedHostName, err := dnsResolver.cnameRecord(domain)
 
@@ -144,10 +144,10 @@ func TestDnsResolverMxRecords(t *testing.T) {
 	t.Run("when target MX record found", func(t *testing.T) {
 		mxPriorityFirst, mxFirst, mxPrioritySecond, mxSecond := uint16(20), randomDomain(), uint16(10), randomDomain()
 		dnsRecords := map[string]mockdns.Zone{
-			domain + ".": {
+			toDnsHostName(domain): {
 				MX: []net.MX{
-					{Host: mxFirst, Pref: mxPriorityFirst},
-					{Host: mxSecond, Pref: mxPrioritySecond},
+					{Host: toDnsHostName(mxFirst), Pref: mxPriorityFirst},
+					{Host: toDnsHostName(mxSecond), Pref: mxPrioritySecond},
 				},
 			},
 		}
@@ -177,8 +177,8 @@ func TestDnsResolverPtrRecords(t *testing.T) {
 		dnsRecords := map[string]mockdns.Zone{
 			rdnsHostAddress: {
 				PTR: []string{
-					hostNameFirst,
-					hostNameSecond,
+					toDnsHostName(hostNameFirst),
+					toDnsHostName(hostNameSecond),
 				},
 			},
 		}

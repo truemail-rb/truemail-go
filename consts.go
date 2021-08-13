@@ -47,4 +47,8 @@ const (
 	// validationMxBlacklist
 
 	MxBlacklistErrorContext = "blacklisted mx server ip address"
+
+	// validationMx
+
+	MxErrorContext = "target host(s) not found"
 )
