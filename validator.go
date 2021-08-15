@@ -10,11 +10,11 @@ type validationSmtp struct{}
 // Validator result mutable object. Each validation
 // layer write something into validatorResult
 type validatorResult struct {
-	Success, SMTPDebug, isPassFromDomainListMatch, isNullMxRecordFound bool
-	Email, Domain, ValidationType, punycodeEmail, punycodeDomain       string
-	MailServers, usedValidations                                       []string
-	Errors                                                             map[string]string
-	Configuration                                                      *configuration
+	Success, SMTPDebug, isPassFromDomainListMatch                bool
+	Email, Domain, ValidationType, punycodeEmail, punycodeDomain string
+	MailServers, usedValidations                                 []string
+	Errors                                                       map[string]string
+	Configuration                                                *configuration
 }
 
 // validatorResult methods

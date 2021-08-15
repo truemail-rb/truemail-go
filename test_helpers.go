@@ -148,3 +148,17 @@ func runMockDnsServer(dnsRecords map[string]mockdns.Zone) string { // TODO: how 
 	defer mockdns.UnpatchNet(net.DefaultResolver)
 	return runningMockServerAddress
 }
+
+func createDnsNotFoundError() *validationError {
+	return &validationError{isDnsNotFound: true, err: &net.DNSError{IsNotFound: true}}
+}
+
+func isDnsNotFoundError(err error) bool {
+	e, ok := err.(*validationError)
+	return ok && e.isDnsNotFound
+}
+
+func isNullMxError(err error) bool {
+	e, ok := err.(*validationError)
+	return ok && e.isNullMxFound
+}

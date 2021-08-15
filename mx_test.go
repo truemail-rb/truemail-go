@@ -41,7 +41,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.True(t, validatorResult.Success)
-		assert.False(t, validatorResult.isNullMxRecordFound)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -90,7 +89,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.True(t, validatorResult.Success)
-		assert.False(t, validatorResult.isNullMxRecordFound)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -111,7 +109,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.True(t, validatorResult.Success)
-		assert.False(t, validatorResult.isNullMxRecordFound)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -126,7 +123,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.isNullMxRecordFound)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -149,7 +145,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.True(t, validatorResult.isNullMxRecordFound)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -169,7 +164,6 @@ func TestValidationMxCheck(t *testing.T) {
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.False(t, validatorResult.isNullMxRecordFound)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, targetHostName, validatorResult.Domain)
@@ -279,13 +273,23 @@ func TestIsConnectionAttemptAvailable(t *testing.T) {
 	})
 }
 
-func TestValidationMxIsNotFoundError(t *testing.T) {
-	t.Run("when not found error", func(t *testing.T) {
-		assert.True(t, new(validationMx).isNotFoundError(&net.DNSError{IsNotFound: true}))
+func TestValidationMxIsDnsNotFoundError(t *testing.T) {
+	t.Run("when DNS not found error", func(t *testing.T) {
+		assert.True(t, new(validationMx).isDnsNotFoundError(createDnsNotFoundError()))
 	})
 
 	t.Run("when another error", func(t *testing.T) {
-		assert.False(t, new(validationMx).isNotFoundError(new(net.DNSError)))
+		assert.False(t, new(validationMx).isDnsNotFoundError(new(validationError)))
+	})
+}
+
+func TestValidationMxIsNullMxError(t *testing.T) {
+	t.Run("when null MX found error", func(t *testing.T) {
+		assert.True(t, new(validationMx).isNullMxError(&validationError{isNullMxFound: true}))
+	})
+
+	t.Run("when another error", func(t *testing.T) {
+		assert.False(t, new(validationMx).isNullMxError(new(validationError)))
 	})
 }
 
@@ -309,7 +313,7 @@ func TestValidationMxARecords(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostName).Once().Return([]string{}, &net.DNSError{IsNotFound: true})
+		resolver.On(method, hostName).Once().Return([]string{}, createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.aRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedIpAddresses)
@@ -320,7 +324,7 @@ func TestValidationMxARecords(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostName).Times(connectionAttempts).Return([]string{}, new(net.DNSError))
+		resolver.On(method, hostName).Times(connectionAttempts).Return([]string{}, new(validationError))
 		resolvedIpAddresses, err := validation.aRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedIpAddresses)
@@ -356,13 +360,14 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
 		assert.EqualError(t, err, errorMessage)
+		assert.True(t, isNullMxError(err))
 	})
 
 	t.Run("when MX records was not found, mxRecords error", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On("mxRecords", hostName).Once().Return([]uint16{}, []string(nil), &net.DNSError{IsNotFound: true})
+		resolver.On("mxRecords", hostName).Once().Return([]uint16{}, []string(nil), createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromMxRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -374,7 +379,7 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
 		resolver.On("mxRecords", hostName).Once().Return(priorities, hostNames, nil)
-		resolver.On("aRecords", hostNames[0]).Once().Return([]string{}, &net.DNSError{IsNotFound: true})
+		resolver.On("aRecords", hostNames[0]).Once().Return([]string{}, createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromMxRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -385,7 +390,7 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On("mxRecords", hostName).Times(connectionAttempts).Return([]uint16{}, []string(nil), new(net.DNSError))
+		resolver.On("mxRecords", hostName).Times(connectionAttempts).Return([]uint16{}, []string(nil), new(validationError))
 		resolvedIpAddresses, err := validation.hostsFromMxRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -397,7 +402,7 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
 		resolver.On("mxRecords", hostName).Once().Return(priorities, hostNames, nil)
-		resolver.On("aRecords", hostNames[0]).Times(connectionAttempts).Return([]string{}, new(net.DNSError))
+		resolver.On("aRecords", hostNames[0]).Times(connectionAttempts).Return([]string{}, new(validationError))
 		resolvedIpAddresses, err := validation.hostsFromMxRecords(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -425,7 +430,7 @@ func TestValidationMxHostFromARecord(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostName).Once().Return("", &net.DNSError{IsNotFound: true})
+		resolver.On(method, hostName).Once().Return("", createDnsNotFoundError())
 		resolvedIpAddress, err := validation.hostFromARecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedIpAddress)
@@ -436,7 +441,7 @@ func TestValidationMxHostFromARecord(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostName).Times(connectionAttempts).Return("", new(net.DNSError))
+		resolver.On(method, hostName).Times(connectionAttempts).Return("", new(validationError))
 		resolvedIpAddress, err := validation.hostFromARecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedIpAddress)
@@ -463,7 +468,7 @@ func TestValidationMxPtrRecords(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostAddress).Once().Return([]string{}, &net.DNSError{IsNotFound: true})
+		resolver.On(method, hostAddress).Once().Return([]string{}, createDnsNotFoundError())
 		resolvedHostNames, err := validation.ptrRecords(hostAddress)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedHostNames)
@@ -474,7 +479,7 @@ func TestValidationMxPtrRecords(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On(method, hostAddress).Times(connectionAttempts).Return([]string{}, new(net.DNSError))
+		resolver.On(method, hostAddress).Times(connectionAttempts).Return([]string{}, new(validationError))
 		resolvedHostNames, err := validation.ptrRecords(hostAddress)
 		resolver.AssertExpectations(t)
 		assert.Empty(t, resolvedHostNames)
@@ -513,7 +518,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On("cnameRecord", hostName).Once().Return("", &net.DNSError{IsNotFound: true})
+		resolver.On("cnameRecord", hostName).Once().Return("", createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -525,7 +530,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
 		resolver.On("cnameRecord", hostName).Once().Return(resolvedHostNameByCname, nil)
-		resolver.On("aRecord", resolvedHostNameByCname).Once().Return("", &net.DNSError{IsNotFound: true})
+		resolver.On("aRecord", resolvedHostNameByCname).Once().Return("", createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -538,7 +543,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 
 		resolver.On("cnameRecord", hostName).Once().Return(resolvedHostNameByCname, nil)
 		resolver.On("aRecord", resolvedHostNameByCname).Once().Return(resolvedIpAddressByARecord, nil)
-		resolver.On("ptrRecords", resolvedIpAddressByARecord).Once().Return([]string(nil), &net.DNSError{IsNotFound: true})
+		resolver.On("ptrRecords", resolvedIpAddressByARecord).Once().Return([]string(nil), createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -552,7 +557,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 		resolver.On("cnameRecord", hostName).Once().Return(resolvedHostNameByCname, nil)
 		resolver.On("aRecord", resolvedHostNameByCname).Once().Return(resolvedIpAddressByARecord, nil)
 		resolver.On("ptrRecords", resolvedIpAddressByARecord).Once().Return(resolvedHostNamesByPtrRecords, nil)
-		resolver.On("mxRecords", resolvedHostNameByPtrRecord).Once().Return([]uint16(nil), []string(nil), &net.DNSError{IsNotFound: true})
+		resolver.On("mxRecords", resolvedHostNameByPtrRecord).Once().Return([]uint16(nil), []string(nil), createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -581,7 +586,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 		resolver.On("aRecord", resolvedHostNameByCname).Once().Return(resolvedIpAddressByARecord, nil)
 		resolver.On("ptrRecords", resolvedIpAddressByARecord).Once().Return(resolvedHostNamesByPtrRecords, nil)
 		resolver.On("mxRecords", resolvedHostNameByPtrRecord).Once().Return(priorities, resolvedHostNamesByMxRecords, nil)
-		resolver.On("aRecords", resolvedHostNameByMxRecord).Once().Return([]string(nil), &net.DNSError{IsNotFound: true})
+		resolver.On("aRecords", resolvedHostNameByMxRecord).Once().Return([]string(nil), createDnsNotFoundError())
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -592,7 +597,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
 		validation := &validationMx{result: validatorResult, resolver: resolver}
 
-		resolver.On("cnameRecord", hostName).Times(connectionAttempts).Return("", new(net.DNSError))
+		resolver.On("cnameRecord", hostName).Times(connectionAttempts).Return("", new(validationError))
 		resolvedIpAddresses, err := validation.hostsFromCnameRecord(hostName)
 		resolver.AssertExpectations(t)
 		assert.Equal(t, []string(nil), resolvedIpAddresses)
@@ -601,7 +606,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 }
 
 func TestValidationMxRunMxLookup(t *testing.T) {
-	email, notFoundDnsError := randomEmail(), &net.DNSError{IsNotFound: true}
+	email, notFoundDnsError := randomEmail(), createDnsNotFoundError()
 	hostName, configuration := emailDomain(email), createConfiguration()
 
 	t.Run("when mail servers found by MX records during first attempt", func(t *testing.T) {
@@ -678,7 +683,6 @@ func TestValidationMxRunMxLookup(t *testing.T) {
 		validation.runMxLookup()
 		resolver.AssertExpectations(t)
 		assert.Empty(t, validatorResult.MailServers)
-		assert.True(t, validatorResult.isNullMxRecordFound)
 	})
 
 	t.Run("when mail servers not found by A record during first attempt", func(t *testing.T) {

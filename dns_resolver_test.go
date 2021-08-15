@@ -91,6 +91,7 @@ func TestDnsResolverARecords(t *testing.T) {
 
 		assert.Empty(t, resolvedIp4Addresses)
 		assert.EqualError(t, err, dnsErrorMessage(domain))
+		assert.True(t, isDnsNotFoundError(err))
 	})
 }
 
@@ -113,6 +114,7 @@ func TestDnsResolverARecord(t *testing.T) {
 
 		assert.Empty(t, resolvedIp4Address)
 		assert.EqualError(t, err, dnsErrorMessage(domain))
+		assert.True(t, isDnsNotFoundError(err))
 	})
 }
 
@@ -135,6 +137,7 @@ func TestDnsResolverCnameRecord(t *testing.T) {
 
 		assert.Empty(t, resolvedHostName)
 		assert.EqualError(t, err, dnsErrorMessage(domain))
+		assert.True(t, isDnsNotFoundError(err))
 	})
 }
 
@@ -166,6 +169,7 @@ func TestDnsResolverMxRecords(t *testing.T) {
 		assert.Empty(t, resolvedMxPriorities)
 		assert.Empty(t, resolvedMxHostNames)
 		assert.EqualError(t, err, dnsErrorMessage(domain))
+		assert.True(t, isDnsNotFoundError(err))
 	})
 }
 
@@ -195,5 +199,6 @@ func TestDnsResolverPtrRecords(t *testing.T) {
 
 		assert.Empty(t, resolvedPtrHostNames)
 		assert.EqualError(t, err, dnsErrorMessage(rdnsHostAddress))
+		assert.True(t, isDnsNotFoundError(err))
 	})
 }

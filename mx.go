@@ -2,7 +2,6 @@ package truemail
 
 import (
 	"fmt"
-	"net"
 
 	"golang.org/x/net/idna"
 )
@@ -78,9 +77,14 @@ func (validation *validationMx) isConnectionAttemptAvailable(connectionAttempts 
 	return connectionAttempts > 0
 }
 
-func (validation *validationMx) isNotFoundError(err error) bool {
-	e, ok := err.(*net.DNSError)
-	return ok && e.IsNotFound
+func (validation *validationMx) isDnsNotFoundError(err error) bool {
+	e, ok := err.(*validationError)
+	return ok && e.isDnsNotFound
+}
+
+func (validation *validationMx) isNullMxError(err error) bool {
+	e, ok := err.(*validationError)
+	return ok && e.isNullMxFound
 }
 
 func (validation *validationMx) aRecords(hostName string) (ipAddresses []string, err error) {
@@ -92,7 +96,7 @@ func (validation *validationMx) aRecords(hostName string) (ipAddresses []string,
 		if err == nil {
 			break
 		} else {
-			if validation.isNotFoundError(err) {
+			if validation.isDnsNotFoundError(err) {
 				break
 			}
 		}
@@ -115,7 +119,7 @@ func (validation *validationMx) hostsFromMxRecords(hostName string) (resolvedIpA
 		if err == nil {
 			break
 		} else {
-			if validation.isNotFoundError(err) {
+			if validation.isDnsNotFoundError(err) {
 				return resolvedIpAddresses, err
 			}
 		}
@@ -123,8 +127,7 @@ func (validation *validationMx) hostsFromMxRecords(hostName string) (resolvedIpA
 
 	// Checkes null MX record
 	if len(hostNames) == 1 && priorities[0] == 0 && hostNames[0] == EmptyString {
-		validation.result.isNullMxRecordFound = true
-		return resolvedIpAddresses, fmt.Errorf("%s includes null MX record", hostName)
+		return resolvedIpAddresses, wrapNullMxError(fmt.Errorf("%s includes null MX record", hostName))
 	}
 
 	// Resolves host addresses by MX hostname
@@ -150,7 +153,7 @@ func (validation *validationMx) hostFromARecord(hostName string) (resolvedIpAddr
 		if err == nil {
 			break
 		} else {
-			if validation.isNotFoundError(err) {
+			if validation.isDnsNotFoundError(err) {
 				break
 			}
 		}
@@ -168,7 +171,7 @@ func (validation *validationMx) ptrRecords(hostAddress string) (resolvedHostName
 		if err == nil {
 			break
 		} else {
-			if validation.isNotFoundError(err) {
+			if validation.isDnsNotFoundError(err) {
 				break
 			}
 		}
@@ -191,7 +194,7 @@ func (validation *validationMx) hostsFromCnameRecord(hostName string) (resolvedI
 		if err == nil {
 			break
 		} else {
-			if validation.isNotFoundError(err) {
+			if validation.isDnsNotFoundError(err) {
 				break
 			}
 		}
@@ -239,7 +242,7 @@ func (validation *validationMx) runMxLookup() {
 		return
 	}
 
-	if validation.result.isNullMxRecordFound || validation.result.Configuration.NotRfcMxLookupFlow {
+	if validation.isNullMxError(err) || validation.result.Configuration.NotRfcMxLookupFlow {
 		return
 	}
 
