@@ -140,6 +140,7 @@ func dnsErrorMessage(hostname string) string {
 	return fmt.Sprintf("lookup %s on 127.0.0.1:53: no such host", hostname)
 }
 
+// Runs DNS mock server. Returns running mock server address
 func runMockDnsServer(dnsRecords map[string]mockdns.Zone) string { // TODO: how to remove DNS request stdout dig log?
 	srv, _ := mockdns.NewServer(dnsRecords, false)
 	runningMockServerAddress := srv.LocalAddr().String()

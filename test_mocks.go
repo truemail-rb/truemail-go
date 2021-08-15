@@ -54,7 +54,7 @@ func (validation *validationSmtpMock) check(result *validatorResult) *validatorR
 	return args.Get(0).(*validatorResult)
 }
 
-// validationSmtpMock structure mock
+// dnsResolverMock structure mock
 type dnsResolverMock struct {
 	mock.Mock
 }
