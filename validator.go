@@ -144,8 +144,7 @@ func (validator *validator) validateSMTP() {
 	validator.smtp.check(validatorResult)
 }
 
-// validator entrypoint. This method triggers chain of
-// validation layers
+// validator entrypoint. This method triggers chain of validation layers
 func (validator *validator) run() *validatorResult {
 	// TODO: add painc if run will called more then one time
 	// or check len(validatorResult.usedValidations) == 0

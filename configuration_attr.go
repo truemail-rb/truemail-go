@@ -117,6 +117,7 @@ func (config *ConfigurationAttr) validate() error {
 	return nil
 }
 
+// Validates verifier email. Returns error if validation fails
 func (config *ConfigurationAttr) validateVerifierEmail(verifierEmail string) error {
 	if matchRegex(verifierEmail, EmailCharsSize) && matchRegex(verifierEmail, RegexEmailPattern) {
 		return nil
@@ -124,6 +125,7 @@ func (config *ConfigurationAttr) validateVerifierEmail(verifierEmail string) err
 	return fmt.Errorf("%s is invalid verifier email", verifierEmail)
 }
 
+// Validates verifier domain. Returns error if validation fails
 func (config *ConfigurationAttr) validateVerifierDomain(verifierDomain string) (string, error) {
 	if matchRegex(verifierDomain, DomainCharsSize) && matchRegex(verifierDomain, RegexDomainPattern) {
 		return verifierDomain, nil
@@ -131,6 +133,7 @@ func (config *ConfigurationAttr) validateVerifierDomain(verifierDomain string) (
 	return verifierDomain, fmt.Errorf("%s is invalid verifier domain", verifierDomain)
 }
 
+// Returns verifier domain builded from verifier email or validated from function arg
 func (config *ConfigurationAttr) buildVerifierDomain(verifierEmail, verifierDomain string) (string, error) {
 	if verifierDomain == EmptyString {
 		regex, _ := newRegex(RegexEmailPattern)
@@ -140,6 +143,7 @@ func (config *ConfigurationAttr) buildVerifierDomain(verifierEmail, verifierDoma
 	return config.validateVerifierDomain(verifierDomain)
 }
 
+// Validates validation type. Returns error if validation fails
 func (config *ConfigurationAttr) validateValidationTypeDefaultContext(ValidationTypeDefault string) error {
 	if isIncluded(availableValidationTypes(), ValidationTypeDefault) {
 		return nil
@@ -151,6 +155,7 @@ func (config *ConfigurationAttr) validateValidationTypeDefaultContext(Validation
 	)
 }
 
+// Validates is integer is a positive. Returns error if validation fails
 func (config *ConfigurationAttr) validateIntegerPositive(integer int) error {
 	if integer > 0 {
 		return nil
@@ -158,6 +163,7 @@ func (config *ConfigurationAttr) validateIntegerPositive(integer int) error {
 	return fmt.Errorf("%v should be a positive integer", integer)
 }
 
+// Validates is string matches to regex pattern. Returns error if validation fails
 func (config *ConfigurationAttr) validateStringContext(target, regexPattern, msg string) error {
 	if matchRegex(target, regexPattern) {
 		return nil
@@ -165,10 +171,14 @@ func (config *ConfigurationAttr) validateStringContext(target, regexPattern, msg
 	return fmt.Errorf("%s is invalid %s", target, msg)
 }
 
+// Validates is domain name matches to regex domain pattern.
+// Returns error if validation fails
 func (config *ConfigurationAttr) validateDomainContext(domainName string) error {
 	return config.validateStringContext(domainName, RegexDomainPattern, "domain name")
 }
 
+// Validates is each domain name from slice matches to regex domain pattern.
+// Returns error if at least one of domain validations fails
 func (config *ConfigurationAttr) validateDomainsContext(domains []string) error {
 	for _, domainName := range domains {
 		err := config.validateDomainContext(domainName)
@@ -179,10 +189,14 @@ func (config *ConfigurationAttr) validateDomainsContext(domains []string) error 
 	return nil
 }
 
+// Validates is ip address matches to regex ip address pattern.
+// Returns error if validation fails
 func (config *ConfigurationAttr) validateIpAddressContext(ipAddress string) error {
 	return config.validateStringContext(ipAddress, RegexIpAddressPattern, "ip address")
 }
 
+// Validates is ip address matches to regex ip address pattern.
+// Returns error if at least one of ip address validations fails
 func (config *ConfigurationAttr) validateIpAddressesContext(ipAddresses []string) error {
 	for _, ipAddress := range ipAddresses {
 		err := config.validateIpAddressContext(ipAddress)
@@ -193,10 +207,13 @@ func (config *ConfigurationAttr) validateIpAddressesContext(ipAddresses []string
 	return nil
 }
 
+// Validates is DNS server matches to regex DNS server address pattern.
+// Returns error if validation fails
 func (config *ConfigurationAttr) validateDNSServerContext(dnsServer string) error {
 	return config.validateStringContext(dnsServer, RegexDNSServerAddressPattern, "dns server")
 }
 
+// Validates typesByDomains map key-values. Returns error if validation fails
 func (config *ConfigurationAttr) validateTypeByDomainContext(typesByDomains map[string]string) error {
 	for domainName, validationType := range typesByDomains {
 		err := config.validateDomainContext(domainName)
