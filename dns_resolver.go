@@ -67,7 +67,7 @@ func (dnsResolver *dnsResolver) rejectIp6Addresses(ipAddresses []string) (ip4Add
 func (dnsResolver *dnsResolver) aRecords(hostName string) ([]string, error) {
 	ipAddresses, err := dnsResolver.gateway.LookupHost(context.Background(), hostName)
 	if err != nil {
-		return []string{}, err
+		return []string{}, wrapDnsError(err)
 	}
 
 	return dnsResolver.rejectIp6Addresses(ipAddresses), nil
@@ -87,7 +87,7 @@ func (dnsResolver *dnsResolver) aRecord(hostName string) (string, error) {
 func (dnsResolver *dnsResolver) cnameRecord(hostName string) (resolvedHostName string, err error) {
 	cName, err := dnsResolver.gateway.LookupCNAME(context.Background(), hostName)
 	if err != nil {
-		return resolvedHostName, err
+		return resolvedHostName, wrapDnsError(err)
 	}
 
 	cName = dnsResolver.dnsNameToHostName(cName)
@@ -102,7 +102,7 @@ func (dnsResolver *dnsResolver) cnameRecord(hostName string) (resolvedHostName s
 func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []uint16, hostNames []string, err error) {
 	mxRecords, err := dnsResolver.gateway.LookupMX(context.Background(), hostName)
 	if err != nil {
-		return priorities, hostNames, err
+		return priorities, hostNames, wrapDnsError(err)
 	}
 
 	// sorting MX records by priority
@@ -122,7 +122,7 @@ func (dnsResolver *dnsResolver) mxRecords(hostName string) (priorities []uint16,
 func (dnsResolver *dnsResolver) ptrRecords(hostAddress string) (hostNames []string, err error) {
 	hostNames, err = dnsResolver.gateway.LookupAddr(context.Background(), hostAddress)
 	if err != nil {
-		return hostNames, err
+		return hostNames, wrapDnsError(err)
 	}
 
 	for index, hostName := range hostNames {
