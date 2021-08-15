@@ -7,6 +7,8 @@ import (
 
 // package helpers functions
 
+// Returns true if the given string is present in slice,
+// otherwise returns false.
 func isIncluded(slice []string, target string) bool {
 	for _, item := range slice {
 		if item == target {
@@ -17,6 +19,8 @@ func isIncluded(slice []string, target string) bool {
 	return false
 }
 
+// Returns true if string from target slice found in base slice,
+// otherwise returns false.
 func isIntersected(baseSlice []string, targetSlice []string) bool {
 	for _, item := range targetSlice {
 		if isIncluded(baseSlice, item) {
@@ -27,10 +31,12 @@ func isIntersected(baseSlice []string, targetSlice []string) bool {
 	return false
 }
 
+// Regex builder
 func newRegex(regexPattern string) (*regexp.Regexp, error) {
 	return regexp.Compile(regexPattern)
 }
 
+// Matches string to regex pattern
 func matchRegex(strContext, regexPattern string) bool {
 	regex, err := newRegex(regexPattern)
 	if err != nil {
@@ -40,10 +46,12 @@ func matchRegex(strContext, regexPattern string) bool {
 	return regex.MatchString(strContext)
 }
 
+// Returns slice of available validation types
 func availableValidationTypes() []string {
 	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP}
 }
 
+// Extracts and validates validation type from variadic argument
 func variadicValidationType(options []string, defaultValidationType string) (string, error) {
 	if len(options) == 0 {
 		return defaultValidationType, nil
@@ -53,6 +61,8 @@ func variadicValidationType(options []string, defaultValidationType string) (str
 	return validationType, validateValidationTypeContext(validationType)
 }
 
+// Validates validation type by available values,
+// returns error if validation fails
 func validateValidationTypeContext(validationType string) error {
 	if isIncluded(availableValidationTypes(), validationType) {
 		return nil
@@ -65,21 +75,25 @@ func validateValidationTypeContext(validationType string) error {
 	)
 }
 
+// Returns string by regex pattern capture group index
 func regexCaptureGroup(str string, regexPattern string, captureGroup int) string {
 	regex, _ := newRegex(regexPattern)
 
 	return regex.FindStringSubmatch(str)[captureGroup]
 }
 
+// Returns domain from email string
 func emailDomain(email string) string {
 	return regexCaptureGroup(email, RegexDomainFromEmail, 1)
 }
 
+// Returns pointer of copied configuration
 func copyConfigurationByPointer(configuration *configuration) *configuration {
 	config := *configuration
 	return &config
 }
 
+// Returns a new slice by removing duplicate values in a passed slice
 func uniqStrings(strSlice []string) (uniqStrSlice []string) {
 	dict := make(map[string]bool)
 	for _, item := range strSlice {

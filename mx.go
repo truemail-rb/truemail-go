@@ -38,15 +38,18 @@ func (validation *validationMx) check(validatorResult *validatorResult) *validat
 
 // validationMx methods
 
+// Assigns domain from validated email to validatorResult
 func (validation *validationMx) setValidatorResultDomain() {
 	validation.result.Domain = emailDomain(validation.result.Email)
 }
 
+// Returns punycode domain representation
 func (validation *validationMx) punycodeDomain(domain string) string {
 	punycodeDomain, _ := idna.New().ToASCII(domain)
 	return punycodeDomain
 }
 
+// Assigns punycodeEmail, punycodeDomain representations to validatorResult
 func (validation *validationMx) setValidatorResultPunycodeRepresentation() {
 	email := validation.result.Email
 	user := regexCaptureGroup(email, RegexEmailPattern, 2)
@@ -56,6 +59,7 @@ func (validation *validationMx) setValidatorResultPunycodeRepresentation() {
 	validation.result.punycodeDomain = punycodeDomain
 }
 
+// Initializes MX validation DNS resolver
 func (validation *validationMx) initDnsResolver() {
 	validation.resolver = newDnsResolver(validation.result.Configuration)
 }
@@ -68,6 +72,7 @@ func (validation *validationMx) isMailServerFound() bool {
 	return len(validation.result.MailServers) > 0
 }
 
+// Addes just uniques hosts to validatorResult.MailServers
 func (validation *validationMx) fetchTargetHosts(hosts ...string) {
 	mailServers := validation.result.MailServers
 	validation.result.MailServers = append(mailServers, sliceDiff(uniqStrings(hosts), mailServers)...)
@@ -77,16 +82,19 @@ func (validation *validationMx) isConnectionAttemptAvailable(connectionAttempts 
 	return connectionAttempts > 0
 }
 
+// Casts is wrapped error is an DnsNotFound error
 func (validation *validationMx) isDnsNotFoundError(err error) bool {
 	e, ok := err.(*validationError)
 	return ok && e.isDnsNotFound
 }
 
+// Casts is wrapped error is an NullMxError error
 func (validation *validationMx) isNullMxError(err error) bool {
 	e, ok := err.(*validationError)
 	return ok && e.isNullMxFound
 }
 
+// A records resolver, the part of MX records resolver
 func (validation *validationMx) aRecords(hostName string) (ipAddresses []string, err error) {
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
 	for validation.isConnectionAttemptAvailable(connectionAttempts) {
@@ -229,6 +237,7 @@ func (validation *validationMx) hostsFromCnameRecord(hostName string) (resolvedI
 	return resolvedIpAddresses, err
 }
 
+// Complex MX lookup for target domain, uses step by step MX, CNAME and A resolvers
 func (validation *validationMx) runMxLookup() {
 	var hostAddress string
 	var hostAddresses []string
