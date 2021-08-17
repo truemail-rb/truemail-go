@@ -64,10 +64,12 @@ func (validation *validationMx) initDnsResolver() {
 	validation.resolver = newDnsResolver(validation.result.Configuration)
 }
 
+// Returns true if validatorResult contains no mail servers, otherwise returns false
 func (validation *validationMx) isMailServerNotFound() bool {
 	return len(validation.result.MailServers) == 0
 }
 
+// Returns true if validatorResult contains mail servers, otherwise returns false
 func (validation *validationMx) isMailServerFound() bool {
 	return len(validation.result.MailServers) > 0
 }
@@ -78,7 +80,8 @@ func (validation *validationMx) fetchTargetHosts(hosts ...string) {
 	validation.result.MailServers = append(mailServers, sliceDiff(uniqStrings(hosts), mailServers)...)
 }
 
-func (validation *validationMx) isConnectionAttemptAvailable(connectionAttempts int) bool {
+// Returns true if connection attempts more than zero, otherwise returns false
+func (validation *validationMx) isConnectionAttemptsAvailable(connectionAttempts int) bool {
 	return connectionAttempts > 0
 }
 
@@ -97,7 +100,7 @@ func (validation *validationMx) isNullMxError(err error) bool {
 // A records resolver, the part of MX records resolver
 func (validation *validationMx) aRecords(hostName string) (ipAddresses []string, err error) {
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
-	for validation.isConnectionAttemptAvailable(connectionAttempts) {
+	for validation.isConnectionAttemptsAvailable(connectionAttempts) {
 		ipAddresses, err = validation.resolver.aRecords(hostName)
 		connectionAttempts -= 1
 
@@ -120,7 +123,7 @@ func (validation *validationMx) hostsFromMxRecords(hostName string) (resolvedIpA
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
 
 	// Resolves MX hostnames by hostname
-	for validation.isConnectionAttemptAvailable(connectionAttempts) {
+	for validation.isConnectionAttemptsAvailable(connectionAttempts) {
 		priorities, hostNames, err = validation.resolver.mxRecords(hostName)
 		connectionAttempts -= 1
 
@@ -154,7 +157,7 @@ func (validation *validationMx) hostsFromMxRecords(hostName string) (resolvedIpA
 // A record resolver
 func (validation *validationMx) hostFromARecord(hostName string) (resolvedIpAddress string, err error) {
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
-	for validation.isConnectionAttemptAvailable(connectionAttempts) {
+	for validation.isConnectionAttemptsAvailable(connectionAttempts) {
 		resolvedIpAddress, err = validation.resolver.aRecord(hostName)
 		connectionAttempts -= 1
 
@@ -172,7 +175,7 @@ func (validation *validationMx) hostFromARecord(hostName string) (resolvedIpAddr
 
 func (validation *validationMx) ptrRecords(hostAddress string) (resolvedHostNames []string, err error) {
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
-	for validation.isConnectionAttemptAvailable(connectionAttempts) {
+	for validation.isConnectionAttemptsAvailable(connectionAttempts) {
 		resolvedHostNames, err = validation.resolver.ptrRecords(hostAddress)
 		connectionAttempts -= 1
 
@@ -195,7 +198,7 @@ func (validation *validationMx) hostsFromCnameRecord(hostName string) (resolvedI
 	connectionAttempts := validation.result.Configuration.ConnectionAttempts
 
 	// Resolves hostname by CNAME record
-	for validation.isConnectionAttemptAvailable(connectionAttempts) {
+	for validation.isConnectionAttemptsAvailable(connectionAttempts) {
 		resolvedHostNameByCname, err = validation.resolver.cnameRecord(hostName)
 		connectionAttempts -= 1
 

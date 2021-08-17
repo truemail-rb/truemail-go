@@ -1,6 +1,8 @@
 package truemail
 
 // Whitelist/Blacklist validation, zero validation level
+type validationDomainListMatch struct{}
+
 // interface implementation
 func (validation *validationDomainListMatch) check(validatorResult *validatorResult) *validatorResult {
 	// Failure scenario
@@ -31,6 +33,7 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 
 // validationDomainListMatch methods
 
+// Returns true if email domain is included in whitelisted domains slice, otherwise returns false
 func (validation *validationDomainListMatch) isWhitelistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.WhitelistedDomains,
@@ -38,10 +41,12 @@ func (validation *validationDomainListMatch) isWhitelistedDomain(validatorResult
 	)
 }
 
+// Returns true if whitelist validation enebled, otherwise returns false
 func (validation *validationDomainListMatch) isWhitelistValidation(validatorResult *validatorResult) bool {
 	return validatorResult.Configuration.WhitelistValidation
 }
 
+// Returns true if email domain is included in blacklisted domains slice, otherwise returns false
 func (validation *validationDomainListMatch) isBlacklistedDomain(validatorResult *validatorResult) bool {
 	return isIncluded(
 		validatorResult.Configuration.BlacklistedDomains,
