@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/idna"
 )
 
+// DNS (MX) validation resolver interface
 type resolver interface {
 	aRecord(string) (string, error)
 	aRecords(string) ([]string, error)

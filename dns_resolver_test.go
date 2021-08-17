@@ -23,7 +23,7 @@ func TestNewDnsResolver(t *testing.T) {
 		dnsResolver := newDnsResolver(createConfiguration())
 		resolvedHostAddresses, _ := dnsResolver.aRecords("localhost")
 
-		assert.True(t, isIncluded(resolvedHostAddresses, "127.0.0.1"))
+		assert.True(t, isIncluded(resolvedHostAddresses, localhostIPv4Address))
 	})
 
 	// Integration test with internal DNS request

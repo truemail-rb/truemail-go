@@ -83,3 +83,31 @@ func (resolver *dnsResolverMock) ptrRecords(hostName string) ([]string, error) {
 	args := resolver.Called(hostName)
 	return args.Get(0).([]string), args.Error(1)
 }
+
+// smtpClientMock structure mock
+type smtpClientMock struct {
+	mock.Mock
+}
+
+func (client *smtpClientMock) sessionError() *smtpClientError {
+	return client.Called().Get(0).(*smtpClientError)
+}
+
+func (client *smtpClientMock) runSession() bool {
+	return client.Called().Bool(0)
+}
+
+// smtpBuilderMock structure mock
+type smtpBuilderMock struct {
+	mock.Mock
+}
+
+func (builder *smtpBuilderMock) newSmtpRequest(attempts int, targetEmail, targetHostAddress string, configuration *configuration) *smtpRequest {
+	args := builder.Called(attempts, targetEmail, targetHostAddress, configuration)
+	return args.Get(0).(*smtpRequest)
+}
+
+func (builder *smtpBuilderMock) newSmtpClient(configuration *smtpRequestConfiguration) client {
+	args := builder.Called(configuration)
+	return args.Get(0).(client)
+}

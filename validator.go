@@ -8,7 +8,7 @@ type validatorResult struct {
 	MailServers, usedValidations                                 []string
 	Errors                                                       map[string]string
 	Configuration                                                *configuration
-	// SMTPDebug                                                    []*smtpRequest // TODO: uncomment during SMTP validation implementation
+	SMTPDebug                                                    []*smtpRequest
 }
 
 // validatorResult methods
