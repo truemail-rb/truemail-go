@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/idna"
 )
 
-// Testing helpers
+// truemail test helpers
 
 func randomEmail() string {
 	gofakeit.Seed(0)

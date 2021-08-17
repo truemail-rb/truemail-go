@@ -263,13 +263,13 @@ func TestValidationMxFetchTargetHosts(t *testing.T) {
 	})
 }
 
-func TestIsConnectionAttemptAvailable(t *testing.T) {
+func TestIsConnectionAttemptsAvailable(t *testing.T) {
 	t.Run("when connection attempts are available", func(t *testing.T) {
-		assert.True(t, new(validationMx).isConnectionAttemptAvailable(1))
+		assert.True(t, new(validationMx).isConnectionAttemptsAvailable(1))
 	})
 
 	t.Run("when connection attempts aren't available", func(t *testing.T) {
-		assert.False(t, new(validationMx).isConnectionAttemptAvailable(0))
+		assert.False(t, new(validationMx).isConnectionAttemptsAvailable(0))
 	})
 }
 

@@ -1,12 +1,5 @@
 package truemail
 
-// validation layers structures
-
-type validationDomainListMatch struct{}
-type validationRegex struct{}
-type validationMxBlacklist struct{}
-type validationSmtp struct{}
-
 // Validator result mutable object. Each validation
 // layer write something into validatorResult
 type validatorResult struct {
@@ -19,10 +12,12 @@ type validatorResult struct {
 
 // validatorResult methods
 
+// Addes current validation type to validator result used validations slice
 func (validatorResult *validatorResult) addUsedValidationType(validationType string) {
 	validatorResult.usedValidations = append(validatorResult.usedValidations, validationType)
 }
 
+// Addes error to validator result errors dictionary
 func (validatorResult *validatorResult) addError(key, value string) {
 	if validatorResult.Errors == nil {
 		validatorResult.Errors = map[string]string{}
@@ -83,16 +78,19 @@ type smtp interface {
 
 // validator methods
 
+// Runs Whitelist/Blacklist validation
 func (validator *validator) validateDomainListMatch() {
 	validator.domainListMatch.check(validator.result)
 }
 
+// Runs Regex validation
 func (validator *validator) validateRegex() {
 	validatorResult := validator.result
 	validatorResult.addUsedValidationType(ValidationTypeRegex)
 	validator.regex.check(validatorResult)
 }
 
+// Runs validations chain: Regex -> Mx
 func (validator *validator) validateMx() {
 	validatorResult := validator.result
 
@@ -105,6 +103,7 @@ func (validator *validator) validateMx() {
 	validator.mx.check(validatorResult)
 }
 
+// Runs validations chain: Regex -> Mx -> MxBlacklist
 func (validator *validator) validateMxBlacklist() {
 	validatorResult := validator.result
 
@@ -122,6 +121,7 @@ func (validator *validator) validateMxBlacklist() {
 	validator.mxBlacklist.check(validatorResult)
 }
 
+// Runs validations chain: Regex -> Mx -> MxBlacklist -> SMTP
 func (validator *validator) validateSMTP() {
 	validatorResult := validator.result
 

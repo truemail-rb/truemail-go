@@ -2,6 +2,7 @@ package truemail
 
 import "net"
 
+// Error wrapper
 type validationError struct {
 	isDnsNotFound, isNullMxFound bool
 	err                          error
