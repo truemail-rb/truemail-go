@@ -89,7 +89,7 @@ func createValidatorResult(email string, configuration *configuration, options .
 }
 
 func createSuccessfulValidatorResult(email string, configuration *configuration) *validatorResult {
-	return &validatorResult{Email: email, Configuration: copyConfigurationByPointer(configuration), Success: true}
+	return &validatorResult{Email: email, Domain: emailDomain(email), Configuration: copyConfigurationByPointer(configuration), Success: true}
 }
 
 func randomValidationType() string {

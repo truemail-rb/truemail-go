@@ -23,7 +23,6 @@ type validationMx struct {
 // interface implementation
 func (validation *validationMx) check(validatorResult *validatorResult) *validatorResult {
 	validation.result = validatorResult
-	validation.setValidatorResultDomain()
 	validation.setValidatorResultPunycodeRepresentation()
 	validation.initDnsResolver()
 	validation.runMxLookup()
@@ -37,11 +36,6 @@ func (validation *validationMx) check(validatorResult *validatorResult) *validat
 }
 
 // validationMx methods
-
-// Assigns domain from validated email to validatorResult
-func (validation *validationMx) setValidatorResultDomain() {
-	validation.result.Domain = emailDomain(validation.result.Email)
-}
 
 // Returns punycode domain representation
 func (validation *validationMx) punycodeDomain(domain string) string {

@@ -43,7 +43,6 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Equal(t, []string{resolvedIpAddressFirst, resolvedIpAddressSecond}, validatorResult.MailServers)
@@ -91,7 +90,6 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Equal(t, []string{resolvedIpAddressSecond, resolvedIpAddressFirst}, validatorResult.MailServers)
@@ -111,7 +109,6 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Equal(t, []string{resolvedIpAddressFirst}, validatorResult.MailServers)
@@ -125,7 +122,6 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Empty(t, validatorResult.MailServers)
@@ -147,7 +143,6 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Empty(t, validatorResult.MailServers)
@@ -166,21 +161,9 @@ func TestValidationMxCheck(t *testing.T) {
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
-		assert.Equal(t, targetHostName, validatorResult.Domain)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
 		assert.Empty(t, validatorResult.MailServers)
-	})
-}
-
-func TestValidationMxSetValidatorResultDomain(t *testing.T) {
-	t.Run("sets domain to validatorResult", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
-		validatorResult := &validatorResult{Email: email + "@" + domain}
-		validation := &validationMx{result: validatorResult}
-		validation.setValidatorResultDomain()
-
-		assert.Equal(t, validatorResult.Domain, domain)
 	})
 }
 
