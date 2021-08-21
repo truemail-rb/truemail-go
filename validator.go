@@ -25,6 +25,11 @@ func (validatorResult *validatorResult) addError(key, value string) {
 	validatorResult.Errors[key] = value
 }
 
+// Assigns domain based on validator result email to self
+func (validatorResult *validatorResult) setDomain() {
+	validatorResult.Domain = emailDomain(validatorResult.Email)
+}
+
 // Structure with behaviour. Responsible for the
 // logic of calling the validation layers sequence
 type validator struct {

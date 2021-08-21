@@ -5,6 +5,8 @@ type validationDomainListMatch struct{}
 
 // interface implementation
 func (validation *validationDomainListMatch) check(validatorResult *validatorResult) *validatorResult {
+	validatorResult.setDomain()
+
 	// Failure scenario
 	if validation.isBlacklistedDomain(validatorResult) ||
 		(validation.isWhitelistValidation(validatorResult) && !validation.isWhitelistedDomain(validatorResult)) {
@@ -35,10 +37,7 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 
 // Returns true if email domain is included in whitelisted domains slice, otherwise returns false
 func (validation *validationDomainListMatch) isWhitelistedDomain(validatorResult *validatorResult) bool {
-	return isIncluded(
-		validatorResult.Configuration.WhitelistedDomains,
-		emailDomain(validatorResult.Email),
-	)
+	return isIncluded(validatorResult.Configuration.WhitelistedDomains, validatorResult.Domain)
 }
 
 // Returns true if whitelist validation enebled, otherwise returns false
@@ -48,8 +47,5 @@ func (validation *validationDomainListMatch) isWhitelistValidation(validatorResu
 
 // Returns true if email domain is included in blacklisted domains slice, otherwise returns false
 func (validation *validationDomainListMatch) isBlacklistedDomain(validatorResult *validatorResult) bool {
-	return isIncluded(
-		validatorResult.Configuration.BlacklistedDomains,
-		emailDomain(validatorResult.Email),
-	)
+	return isIncluded(validatorResult.Configuration.BlacklistedDomains, validatorResult.Domain)
 }

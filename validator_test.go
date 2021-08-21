@@ -428,12 +428,22 @@ func TestValidatorResultAddUsedValidationType(t *testing.T) {
 	})
 }
 
-func TestValidatorAddError(t *testing.T) {
+func TestValidatorResultAddError(t *testing.T) {
 	t.Run("validatorResult#addError", func(t *testing.T) {
 		key, value := "some_error_key", "some_error_value"
 		result := new(validatorResult)
 		result.addError(key, value)
 
 		assert.Equal(t, value, result.Errors[key])
+	})
+}
+
+func TestValidatorResultSetDomain(t *testing.T) {
+	t.Run("validatorResult#setDomain", func(t *testing.T) {
+		email, domain := pairRandomEmailDomain()
+		result := &validatorResult{Email: email}
+		result.setDomain()
+
+		assert.Equal(t, domain, result.Domain)
 	})
 }
