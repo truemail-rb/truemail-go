@@ -437,13 +437,3 @@ func TestValidatorResultAddError(t *testing.T) {
 		assert.Equal(t, value, result.Errors[key])
 	})
 }
-
-func TestValidatorResultSetDomain(t *testing.T) {
-	t.Run("validatorResult#setDomain", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
-		result := &validatorResult{Email: email}
-		result.setDomain()
-
-		assert.Equal(t, domain, result.Domain)
-	})
-}
