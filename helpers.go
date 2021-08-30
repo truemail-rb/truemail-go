@@ -48,7 +48,7 @@ func matchRegex(strContext, regexPattern string) bool {
 
 // Returns slice of available validation types
 func availableValidationTypes() []string {
-	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP}
+	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSmtp}
 }
 
 // Extracts and validates validation type from variadic argument
@@ -115,4 +115,9 @@ func sliceDiff(slice, otherSlice []string) (diff []string) {
 	}
 
 	return diff
+}
+
+// Returns server with port number follows {server}:{portNumber} pattern
+func serverWithPortNumber(server string, portNumber int) string {
+	return fmt.Sprintf("%s:%d", server, portNumber)
 }

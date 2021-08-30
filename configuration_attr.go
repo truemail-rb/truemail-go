@@ -238,5 +238,5 @@ func (config *ConfigurationAttr) formatDns(dnsGateway string) string {
 		return dnsGateway
 	}
 
-	return dnsGateway + ":" + DefaultDnsPort
+	return serverWithPortNumber(dnsGateway, DefaultDnsPort)
 }

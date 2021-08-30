@@ -3,6 +3,7 @@ package truemail
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -97,7 +98,7 @@ func TestVariadicValidationType(t *testing.T) {
 }
 
 func TestValidateValidationTypeContext(t *testing.T) {
-	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP} {
+	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSmtp} {
 		t.Run("valid validation type", func(t *testing.T) {
 			assert.NoError(t, validateValidationTypeContext(validValidationType))
 		})
@@ -154,5 +155,13 @@ func TestSliceDiff(t *testing.T) {
 		sliceFirst, sliceSecond := []string{"a", "b", "a", "c"}, []string{"c", "a", "d"}
 
 		assert.Equal(t, []string{"b"}, sliceDiff(sliceFirst, sliceSecond))
+	})
+}
+
+func TestServerWithPortNumber(t *testing.T) {
+	t.Run("returns server with port number", func(t *testing.T) {
+		server, portNumber := randomIpAddress(), randomPortNumber()
+
+		assert.Equal(t, server+":"+strconv.Itoa(portNumber), serverWithPortNumber(server, portNumber))
 	})
 }

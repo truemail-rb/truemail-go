@@ -121,7 +121,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, configurationAttr.whitelistedDomains, configuration.WhitelistedDomains)
 		assert.Equal(t, configurationAttr.blacklistedDomains, configuration.BlacklistedDomains)
 		assert.Equal(t, configurationAttr.blacklistedMxIpAddresses, configuration.BlacklistedMxIpAddresses)
-		assert.Equal(t, configurationAttr.dns+":"+DefaultDnsPort, configuration.DNS)
+		assert.Equal(t, serverWithPortNumber(configurationAttr.dns, DefaultDnsPort), configuration.DNS)
 		assert.Equal(t, configurationAttr.validationTypeByDomain, configuration.ValidationTypeByDomain)
 		assert.Equal(t, configurationAttr.whitelistValidation, configuration.WhitelistValidation)
 		assert.Equal(t, configurationAttr.notRfcMxLookupFlow, configuration.NotRfcMxLookupFlow)
