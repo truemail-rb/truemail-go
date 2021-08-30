@@ -75,7 +75,7 @@ func randomDnsServer() string {
 
 func randomDnsServerWithDefaultPortNumber() (string, string) {
 	ipAddress := randomIpAddress()
-	return ipAddress, ipAddress + ":" + DefaultDnsPort
+	return ipAddress, serverWithPortNumber(ipAddress, DefaultDnsPort)
 }
 
 func createConfiguration() *configuration {
@@ -94,7 +94,7 @@ func createSuccessfulValidatorResult(email string, configuration *configuration)
 
 func randomValidationType() string {
 	gofakeit.Seed(0)
-	availableValidationTypes := []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSMTP}
+	availableValidationTypes := []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSmtp}
 	index := gofakeit.Number(0, len(availableValidationTypes)-1)
 	return availableValidationTypes[index]
 }
@@ -109,14 +109,14 @@ func usedValidationsByType(validationType string) []string {
 		ValidationTypeRegex:       {ValidationTypeRegex},
 		ValidationTypeMx:          {ValidationTypeRegex, ValidationTypeMx},
 		ValidationTypeMxBlacklist: {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist},
-		ValidationTypeSMTP:        {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSMTP},
+		ValidationTypeSmtp:        {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSmtp},
 	}[validationType]
 }
 
 func runDomainListMatchValidation(email string, configuration *configuration, options ...string) *validatorResult {
 	validator := createValidator(email, configuration, options...)
 	validatorResult := validator.result
-	return validator.domainListMatch.check(validatorResult)
+	return validator.domainListMatchLayer.check(validatorResult)
 }
 
 func doPassedFromDomainListMatch(validatorResult *validatorResult) {

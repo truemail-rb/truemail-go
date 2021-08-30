@@ -6,7 +6,9 @@ const (
 	DefaultConnectionTimeout  = 2
 	DefaultResponseTimeout    = 2
 	DefaultConnectionAttempts = 2
-	DefaultDnsPort            = "53"
+	DefaultDnsPort            = 53
+	DefaultSmtpPort           = 25
+	TcpTransportLayer         = "tcp"
 
 	// validation types
 
@@ -14,8 +16,8 @@ const (
 	ValidationTypeRegex           = "regex"
 	ValidationTypeMx              = "mx"
 	ValidationTypeMxBlacklist     = "mx_blacklist"
-	ValidationTypeSMTP            = "smtp"
-	ValidationTypeDefault         = ValidationTypeSMTP
+	ValidationTypeSmtp            = "smtp"
+	ValidationTypeDefault         = ValidationTypeSmtp
 
 	// regex patterns
 
@@ -51,4 +53,8 @@ const (
 	// validationMx
 
 	MxErrorContext = "target host(s) not found"
+
+	// validatorSmtp
+
+	SmtpErrorContext = "smtp error"
 )

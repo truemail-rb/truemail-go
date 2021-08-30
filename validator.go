@@ -1,13 +1,14 @@
 package truemail
 
-// Validator result mutable object. Each validation
+// Validator result mutable structure. Each validation
 // layer write something into validatorResult
 type validatorResult struct {
-	Success, SMTPDebug, isPassFromDomainListMatch                bool
+	Success, isPassFromDomainListMatch                           bool
 	Email, Domain, ValidationType, punycodeEmail, punycodeDomain string
 	MailServers, usedValidations                                 []string
 	Errors                                                       map[string]string
 	Configuration                                                *configuration
+	// SMTPDebug                                                    []*smtpRequest // TODO: uncomment during SMTP validation implementation
 }
 
 // validatorResult methods
@@ -29,11 +30,11 @@ func (validatorResult *validatorResult) addError(key, value string) {
 // logic of calling the validation layers sequence
 type validator struct {
 	result *validatorResult
-	domainListMatch
-	regex
-	mx
-	mxBlacklist
-	smtp
+	domainListMatchLayer
+	regexLayer
+	mxLayer
+	mxBlacklistLayer
+	smtpLayer
 }
 
 // New validator builder. Returns consistent validator structure
@@ -44,11 +45,11 @@ func newValidator(email, validationType string, configuration *configuration) *v
 			Configuration:  copyConfigurationByPointer(configuration),
 			ValidationType: validationType,
 		},
-		domainListMatch: &validationDomainListMatch{},
-		regex:           &validationRegex{},
-		mx:              &validationMx{},
-		mxBlacklist:     &validationMxBlacklist{},
-		smtp:            &validationSmtp{},
+		domainListMatchLayer: &validationDomainListMatch{},
+		regexLayer:           &validationRegex{},
+		mxLayer:              &validationMx{},
+		mxBlacklistLayer:     &validationMxBlacklist{},
+		smtpLayer:            &validationSmtp{},
 	}
 
 	return validator
@@ -56,23 +57,23 @@ func newValidator(email, validationType string, configuration *configuration) *v
 
 // validation layers interfaces
 
-type domainListMatch interface {
+type domainListMatchLayer interface {
 	check(validatorResult *validatorResult) *validatorResult
 }
 
-type regex interface {
+type regexLayer interface {
 	check(validatorResult *validatorResult) *validatorResult
 }
 
-type mx interface {
+type mxLayer interface {
 	check(validatorResult *validatorResult) *validatorResult
 }
 
-type mxBlacklist interface {
+type mxBlacklistLayer interface {
 	check(validatorResult *validatorResult) *validatorResult
 }
 
-type smtp interface {
+type smtpLayer interface {
 	check(validatorResult *validatorResult) *validatorResult
 }
 
@@ -80,14 +81,14 @@ type smtp interface {
 
 // Runs Whitelist/Blacklist validation
 func (validator *validator) validateDomainListMatch() {
-	validator.domainListMatch.check(validator.result)
+	validator.domainListMatchLayer.check(validator.result)
 }
 
 // Runs Regex validation
 func (validator *validator) validateRegex() {
 	validatorResult := validator.result
 	validatorResult.addUsedValidationType(ValidationTypeRegex)
-	validator.regex.check(validatorResult)
+	validator.regexLayer.check(validatorResult)
 }
 
 // Runs validations chain: Regex -> Mx
@@ -95,12 +96,12 @@ func (validator *validator) validateMx() {
 	validatorResult := validator.result
 
 	validatorResult.addUsedValidationType(ValidationTypeRegex)
-	if !validator.regex.check(validatorResult).Success {
+	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
 	validatorResult.addUsedValidationType(ValidationTypeMx)
-	validator.mx.check(validatorResult)
+	validator.mxLayer.check(validatorResult)
 }
 
 // Runs validations chain: Regex -> Mx -> MxBlacklist
@@ -108,17 +109,17 @@ func (validator *validator) validateMxBlacklist() {
 	validatorResult := validator.result
 
 	validatorResult.addUsedValidationType(ValidationTypeRegex)
-	if !validator.regex.check(validatorResult).Success {
+	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
 	validatorResult.addUsedValidationType(ValidationTypeMx)
-	if !validator.mx.check(validatorResult).Success {
+	if !validator.mxLayer.check(validatorResult).Success {
 		return
 	}
 
 	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
-	validator.mxBlacklist.check(validatorResult)
+	validator.mxBlacklistLayer.check(validatorResult)
 }
 
 // Runs validations chain: Regex -> Mx -> MxBlacklist -> SMTP
@@ -126,22 +127,22 @@ func (validator *validator) validateSMTP() {
 	validatorResult := validator.result
 
 	validatorResult.addUsedValidationType(ValidationTypeRegex)
-	if !validator.regex.check(validatorResult).Success {
+	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
 	validatorResult.addUsedValidationType(ValidationTypeMx)
-	if !validator.mx.check(validatorResult).Success {
+	if !validator.mxLayer.check(validatorResult).Success {
 		return
 	}
 
 	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
-	if !validator.mxBlacklist.check(validatorResult).Success {
+	if !validator.mxBlacklistLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeSMTP)
-	validator.smtp.check(validatorResult)
+	validatorResult.addUsedValidationType(ValidationTypeSmtp)
+	validator.smtpLayer.check(validatorResult)
 }
 
 // validator entrypoint. This method triggers chain of validation layers
@@ -166,7 +167,7 @@ func (validator *validator) run() *validatorResult {
 		validator.validateMx()
 	case ValidationTypeMxBlacklist:
 		validator.validateMxBlacklist()
-	case ValidationTypeSMTP:
+	case ValidationTypeSmtp:
 		validator.validateSMTP()
 	}
 	return validatorResult
