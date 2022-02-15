@@ -10,7 +10,7 @@ import (
 type ConfigurationAttr struct {
 	ctx                                                                                           context.Context
 	verifierEmail, verifierDomain, validationTypeDefault, emailPattern, smtpErrorBodyPattern, dns string
-	connectionTimeout, responseTimeout, connectionAttempts                                        int
+	connectionTimeout, responseTimeout, connectionAttempts, smtpPort                              int
 	whitelistedDomains, blacklistedDomains, blacklistedMxIpAddresses                              []string
 	validationTypeByDomain                                                                        map[string]string
 	whitelistValidation, notRfcMxLookupFlow, smtpFailFast, smtpSafeCheck                          bool
@@ -38,6 +38,10 @@ func (config *ConfigurationAttr) assignDefaultValues() {
 	}
 	if config.connectionAttempts == 0 {
 		config.connectionAttempts = DefaultConnectionAttempts
+	}
+
+	if config.smtpPort == 0 {
+		config.smtpPort = DefaultSmtpPort
 	}
 }
 
@@ -69,6 +73,11 @@ func (config *ConfigurationAttr) validate() error {
 	}
 
 	err = config.validateIntegerPositive(config.connectionAttempts)
+	if err != nil {
+		return err
+	}
+
+	err = config.validateIntegerPositive(config.smtpPort)
 	if err != nil {
 		return err
 	}

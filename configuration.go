@@ -9,7 +9,7 @@ import (
 type configuration struct {
 	ctx                                                                  context.Context
 	VerifierEmail, VerifierDomain, ValidationTypeDefault, DNS            string
-	ConnectionTimeout, ResponseTimeout, ConnectionAttempts               int
+	ConnectionTimeout, ResponseTimeout, ConnectionAttempts, SmtpPort     int
 	WhitelistedDomains, BlacklistedDomains, BlacklistedMxIpAddresses     []string
 	ValidationTypeByDomain                                               map[string]string
 	WhitelistValidation, NotRfcMxLookupFlow, SMTPFailFast, SMTPSafeCheck bool
@@ -40,6 +40,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		ValidationTypeByDomain:   config.validationTypeByDomain,
 		WhitelistValidation:      config.whitelistValidation,
 		NotRfcMxLookupFlow:       config.notRfcMxLookupFlow,
+		SmtpPort:                 config.smtpPort,
 		SMTPFailFast:             config.smtpFailFast,
 		SMTPSafeCheck:            config.smtpSafeCheck,
 		EmailPattern:             config.regexEmail,
