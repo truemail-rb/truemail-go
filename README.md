@@ -165,6 +165,10 @@ configuration := truemail.NewConfiguration(
     // By default this option is disabled and equal to false.
     notRfcMxLookupFlow: true,
 
+    // Optional parameter. SMTP port number. It is equal to 25 by default.
+    // This parameter uses for SMTP session in SMTP validation layer.
+    smtpPort: 2525,
+
     // Optional parameter. This option will provide to use smtp fail fast behaviour. When
     // smtpFailFast = true it means that Truemail ends smtp validation session after first
     // attempt on the first mx server in any fail cases (network connection/timeout error,

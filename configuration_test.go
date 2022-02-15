@@ -33,6 +33,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, emptyStringMap, configuration.ValidationTypeByDomain)
 		assert.Equal(t, false, configuration.WhitelistValidation)
 		assert.Equal(t, false, configuration.NotRfcMxLookupFlow)
+		assert.Equal(t, DefaultSmtpPort, configuration.SmtpPort)
 		assert.Equal(t, false, configuration.SMTPFailFast)
 		assert.Equal(t, false, configuration.SMTPSafeCheck)
 		assert.Equal(t, emailRegex, configuration.EmailPattern)
@@ -47,9 +48,9 @@ func TestNewConfiguration(t *testing.T) {
 			validationTypeDefault:    "mx",
 			emailPattern:             `\A.+@.+\z`,
 			smtpErrorBodyPattern:     `550{1}`,
-			connectionTimeout:        3,
-			responseTimeout:          4,
-			connectionAttempts:       5,
+			connectionTimeout:        randomPositiveNumber(),
+			responseTimeout:          randomPositiveNumber(),
+			connectionAttempts:       randomPositiveNumber(),
 			whitelistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedMxIpAddresses: []string{randomIpAddress(), randomIpAddress()},
@@ -57,6 +58,7 @@ func TestNewConfiguration(t *testing.T) {
 			validationTypeByDomain:   map[string]string{randomDomain(): "regex"},
 			whitelistValidation:      true,
 			notRfcMxLookupFlow:       true,
+			smtpPort:                 randomPortNumber(),
 			smtpFailFast:             true,
 			smtpSafeCheck:            true,
 		}
@@ -79,6 +81,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, configurationAttr.validationTypeByDomain, configuration.ValidationTypeByDomain)
 		assert.Equal(t, configurationAttr.whitelistValidation, configuration.WhitelistValidation)
 		assert.Equal(t, configurationAttr.notRfcMxLookupFlow, configuration.NotRfcMxLookupFlow)
+		assert.Equal(t, configurationAttr.smtpPort, configuration.SmtpPort)
 		assert.Equal(t, configurationAttr.smtpFailFast, configuration.SMTPFailFast)
 		assert.Equal(t, configurationAttr.smtpSafeCheck, configuration.SMTPSafeCheck)
 		assert.Equal(t, emailRegex, configuration.EmailPattern)
@@ -93,9 +96,9 @@ func TestNewConfiguration(t *testing.T) {
 			validationTypeDefault:    randomValidationType(),
 			emailPattern:             `\A.+@.+\z`,
 			smtpErrorBodyPattern:     `550{1}`,
-			connectionTimeout:        3,
-			responseTimeout:          4,
-			connectionAttempts:       5,
+			connectionTimeout:        randomPositiveNumber(),
+			responseTimeout:          randomPositiveNumber(),
+			connectionAttempts:       randomPositiveNumber(),
 			whitelistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedDomains:       []string{randomDomain(), randomDomain()},
 			blacklistedMxIpAddresses: []string{randomIpAddress(), randomIpAddress()},
@@ -103,6 +106,7 @@ func TestNewConfiguration(t *testing.T) {
 			validationTypeByDomain:   map[string]string{randomDomain(): randomValidationType()},
 			whitelistValidation:      true,
 			notRfcMxLookupFlow:       true,
+			smtpPort:                 randomPortNumber(),
 			smtpFailFast:             true,
 			smtpSafeCheck:            true,
 		}
@@ -125,6 +129,7 @@ func TestNewConfiguration(t *testing.T) {
 		assert.Equal(t, configurationAttr.validationTypeByDomain, configuration.ValidationTypeByDomain)
 		assert.Equal(t, configurationAttr.whitelistValidation, configuration.WhitelistValidation)
 		assert.Equal(t, configurationAttr.notRfcMxLookupFlow, configuration.NotRfcMxLookupFlow)
+		assert.Equal(t, configurationAttr.smtpPort, configuration.SmtpPort)
 		assert.Equal(t, configurationAttr.smtpFailFast, configuration.SMTPFailFast)
 		assert.Equal(t, configurationAttr.smtpSafeCheck, configuration.SMTPSafeCheck)
 		assert.Equal(t, emailRegex, configuration.EmailPattern)
@@ -159,7 +164,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid connection timeout", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionTimeout: -42}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionTimeout: randomNegativeNumber()}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionTimeout)
 
@@ -168,7 +173,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid response timeout", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, responseTimeout: -42}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, responseTimeout: randomNegativeNumber()}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.responseTimeout)
 
@@ -177,9 +182,18 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid connection attempts", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionAttempts: -42}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionAttempts: randomNegativeNumber()}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionAttempts)
+
+		assert.Nil(t, configuration)
+		assert.EqualError(t, err, errorMessage)
+	})
+
+	t.Run("invalid SMTP port number", func(t *testing.T) {
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, smtpPort: randomNegativeNumber()}
+		configuration, err := NewConfiguration(configurationAttr)
+		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.smtpPort)
 
 		assert.Nil(t, configuration)
 		assert.EqualError(t, err, errorMessage)
