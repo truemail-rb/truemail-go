@@ -164,7 +164,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid connection timeout", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionTimeout: randomNegativeNumber()}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionTimeout: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionTimeout)
 
@@ -173,7 +173,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid response timeout", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, responseTimeout: randomNegativeNumber()}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, responseTimeout: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.responseTimeout)
 
@@ -182,7 +182,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid connection attempts", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionAttempts: randomNegativeNumber()}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, connectionAttempts: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionAttempts)
 
@@ -191,7 +191,7 @@ func TestNewConfiguration(t *testing.T) {
 	})
 
 	t.Run("invalid SMTP port number", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, smtpPort: randomNegativeNumber()}
+		configurationAttr := ConfigurationAttr{verifierEmail: validVerifierEmail, smtpPort: -42}
 		configuration, err := NewConfiguration(configurationAttr)
 		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.smtpPort)
 

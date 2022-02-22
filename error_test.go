@@ -28,7 +28,7 @@ func TestWrapNullMxError(t *testing.T) {
 }
 
 func TestWrapDnsError(t *testing.T) {
-	hostname, server, errMessage := randomDomain(), "127.0.0.1:53", "no such host"
+	hostname, server, errMessage := randomDomain(), localhostIPv4Address+":53", "no such host"
 
 	t.Run("when DNSError not found error", func(t *testing.T) {
 		err := wrapDnsError(&net.DNSError{Name: hostname, Server: server, Err: errMessage, IsNotFound: true})
@@ -42,5 +42,14 @@ func TestWrapDnsError(t *testing.T) {
 
 		assert.False(t, err.isDnsNotFound)
 		assert.Equal(t, dnsErrorMessage(hostname), err.Error())
+	})
+}
+
+func TestSmtpClientErrorError(t *testing.T) {
+	t.Run("returns wrapped error message", func(t *testing.T) {
+		errorMessage := "error message"
+		customError := &smtpClientError{err: fmt.Errorf(errorMessage)}
+
+		assert.Equal(t, errorMessage, customError.Error())
 	})
 }

@@ -7,10 +7,13 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/foxcpp/go-mockdns"
+	smtpmock "github.com/mocktools/go-smtp-mock"
 	"golang.org/x/net/idna"
 )
 
 // truemail test helpers
+
+var localhostIPv4Address = "127.0.0.1"
 
 func randomEmail() string {
 	gofakeit.Seed(0)
@@ -162,4 +165,11 @@ func isDnsNotFoundError(err error) bool {
 func isNullMxError(err error) bool {
 	e, ok := err.(*validationError)
 	return ok && e.isNullMxFound
+}
+
+func startSmtpMock(config smtpmock.ConfigurationAttr) *smtpmock.Server {
+	server := smtpmock.New(config)
+	_ = server.Start()
+
+	return server
 }

@@ -6,29 +6,48 @@ import (
 	"testing"
 
 	"github.com/foxcpp/go-mockdns"
+	smtpmock "github.com/mocktools/go-smtp-mock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestValidate(t *testing.T) {
-	// TODO: change to integration tests when validationSmtp.check() will be implemented
+	email, domain := pairRandomEmailDomain()
+	resolvedHostNameByMxReord := randomDnsHostName()
+	blacklistedEmail, blacklistedDomain := pairRandomEmailDomain()
+	blacklistedResolvedHostNameByMxReord, blacklistedMxIpAddress, blacklistedVerifierEmail := randomDnsHostName(), randomIpAddress(), randomEmail()
+
+	server := startSmtpMock(smtpmock.ConfigurationAttr{BlacklistedMailfromEmails: []string{blacklistedVerifierEmail}})
+	portNumber := server.PortNumber
+	defer func() { _ = server.Stop() }()
+
+	dns := runMockDnsServer(
+		map[string]mockdns.Zone{
+			toDnsHostName(punycodeDomain(domain)): {
+				MX: []net.MX{
+					{Host: resolvedHostNameByMxReord, Pref: uint16(5)},
+				},
+			},
+			resolvedHostNameByMxReord: {
+				A: []string{localhostIPv4Address},
+			},
+			toDnsHostName(punycodeDomain(blacklistedDomain)): {
+				MX: []net.MX{
+					{Host: blacklistedResolvedHostNameByMxReord, Pref: uint16(5)},
+				},
+			},
+			blacklistedResolvedHostNameByMxReord: {
+				A: []string{blacklistedMxIpAddress},
+			},
+		},
+	)
+
 	for _, validValidationType := range availableValidationTypes() {
 		t.Run(validValidationType+" valid validation type", func(t *testing.T) {
-			email, domain := pairRandomEmailDomain()
-			resolvedHostNameByMxReord := randomDnsHostName()
-			dnsRecords := map[string]mockdns.Zone{
-				toDnsHostName(punycodeDomain(domain)): {
-					MX: []net.MX{
-						{Host: resolvedHostNameByMxReord, Pref: uint16(5)},
-					},
-				},
-				resolvedHostNameByMxReord: {
-					A: []string{randomIpAddress()},
-				},
-			}
 			configuration, _ := NewConfiguration(
 				ConfigurationAttr{
 					verifierEmail: randomEmail(),
-					dns:           runMockDnsServer(dnsRecords),
+					dns:           dns,
+					smtpPort:      portNumber,
 				},
 			)
 			validatorResult, err := Validate(email, configuration, validValidationType)
@@ -80,35 +99,23 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("Whitelist/Blacklist validation passes to next validation level", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
-		resolvedHostNameByMxReord := randomDnsHostName()
-		dnsRecords := map[string]mockdns.Zone{
-			toDnsHostName(punycodeDomain(domain)): {
-				MX: []net.MX{
-					{Host: resolvedHostNameByMxReord, Pref: uint16(5)},
-				},
-			},
-			resolvedHostNameByMxReord: {
-				A: []string{randomIpAddress()},
-			},
-		}
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
 				verifierEmail:       randomEmail(),
 				whitelistedDomains:  []string{domain},
 				whitelistValidation: true,
-				dns:                 runMockDnsServer(dnsRecords),
+				dns:                 dns,
+				smtpPort:            portNumber,
 			},
 		)
-		validatorResult, _ := Validate(email, configuration, ValidationTypeMx)
+		validatorResult, _ := Validate(email, configuration)
 
 		assert.True(t, validatorResult.Success)
 		assert.True(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMx), validatorResult.usedValidations)
+		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validatorResult.usedValidations)
 	})
 
 	t.Run("Whitelist/Blacklist validation fails", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
 				verifierEmail:      randomEmail(),
@@ -123,43 +130,86 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("Mx blacklist validation fails", func(t *testing.T) {
-		email, domain := pairRandomEmailDomain()
-		resolvedHostNameByMxReord, blacklistedMxIpAddress := randomDnsHostName(), randomIpAddress()
-		dnsRecords := map[string]mockdns.Zone{
+		configuration, _ := NewConfiguration(
+			ConfigurationAttr{
+				verifierEmail:            randomEmail(),
+				blacklistedMxIpAddresses: []string{blacklistedMxIpAddress},
+				dns:                      dns,
+			},
+		)
+		validatorResult, _ := Validate(blacklistedEmail, configuration)
+
+		assert.False(t, validatorResult.Success)
+		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validatorResult.usedValidations)
+	})
+
+	t.Run("SMTP validation fails", func(t *testing.T) {
+		configuration, _ := NewConfiguration(
+			ConfigurationAttr{
+				verifierEmail: blacklistedVerifierEmail,
+				dns:           dns,
+				smtpPort:      portNumber,
+			},
+		)
+		validatorResult, _ := Validate(email, configuration)
+
+		assert.False(t, validatorResult.Success)
+		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validatorResult.usedValidations)
+	})
+}
+
+func TestIsValid(t *testing.T) {
+	email, domain := pairRandomEmailDomain()
+	resolvedHostNameByMxReord := randomDnsHostName()
+	nonExistentEmail, nonExistentDomain := pairRandomEmailDomain()
+	nonExistentResolvedHostNameByMxReord := randomDnsHostName()
+
+	server := startSmtpMock(smtpmock.ConfigurationAttr{NotRegisteredEmails: []string{nonExistentEmail}})
+	portNumber := server.PortNumber
+	defer func() { _ = server.Stop() }()
+
+	dns := runMockDnsServer(
+		map[string]mockdns.Zone{
 			toDnsHostName(punycodeDomain(domain)): {
 				MX: []net.MX{
 					{Host: resolvedHostNameByMxReord, Pref: uint16(5)},
 				},
 			},
 			resolvedHostNameByMxReord: {
-				A: []string{blacklistedMxIpAddress},
+				A: []string{localhostIPv4Address},
 			},
-		}
-		configuration, _ := NewConfiguration(
-			ConfigurationAttr{
-				verifierEmail:            randomEmail(),
-				blacklistedMxIpAddresses: []string{blacklistedMxIpAddress},
-				dns:                      runMockDnsServer(dnsRecords),
+			toDnsHostName(punycodeDomain(nonExistentDomain)): {
+				MX: []net.MX{
+					{Host: nonExistentResolvedHostNameByMxReord, Pref: uint16(5)},
+				},
 			},
-		)
-		validatorResult, _ := Validate(email, configuration, ValidationTypeMxBlacklist)
+			nonExistentResolvedHostNameByMxReord: {
+				A: []string{localhostIPv4Address},
+			},
+		},
+	)
 
-		assert.False(t, validatorResult.Success)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validatorResult.usedValidations)
+	configuration, _ := NewConfiguration(
+		ConfigurationAttr{
+			verifierEmail: randomEmail(),
+			dns:           dns,
+			smtpPort:      portNumber,
+		},
+	)
+
+	t.Run("when succesful validation, default validation type specified in configuration", func(t *testing.T) {
+		assert.True(t, IsValid(email, configuration))
 	})
-}
 
-func TestIsValid(t *testing.T) {
-	// TODO: uncomment when validationSmtp.check() will be implemented
-	// t.Run("when succesful validation, default validation type specified in configuration", func(t *testing.T) {
-	// 	assert.True(t, IsValid(randomEmail(), createConfiguration()))
-	// })
+	t.Run("when failed validation, default validation type specified in configuration", func(t *testing.T) {
+		assert.False(t, IsValid(nonExistentEmail, configuration))
+	})
 
 	t.Run("when succesful validation, specified validation type", func(t *testing.T) {
 		assert.True(t, IsValid(randomEmail(), createConfiguration(), ValidationTypeRegex))
 	})
 
-	t.Run("when failure validation", func(t *testing.T) {
+	t.Run("when failed validation", func(t *testing.T) {
 		assert.False(t, IsValid("invalid@email", createConfiguration(), ValidationTypeRegex))
 	})
 
