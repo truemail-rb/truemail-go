@@ -32,9 +32,6 @@ Also Truemail library allows performing an audit of the host in which runs.
 - Ability to configure different MX/SMTP validation flows
 - Ability to configure [DEA](https://en.wikipedia.org/wiki/Disposable_email_address) validation flow
 - Simple SMTP debugger
-- Event logger
-- Host auditor tools (helps to detect common host problems interfering to proper email verification)
-- JSON serializers
 
 ## Requirements
 
@@ -61,12 +58,11 @@ import "github.com/truemail-rb/truemail-go"
 
 ### Configuration features
 
-You can use global gem configuration or custom independent configuration. Available configuration options:
+You can use global package configuration or custom independent configuration. Available configuration options:
 
 - verifier email
 - verifier domain
 - email pattern
-- SMTP error body pattern
 - connection timeout
 - response timeout
 - connection attempts
@@ -78,9 +74,10 @@ You can use global gem configuration or custom independent configuration. Availa
 - blacklisted mx ip-addresses
 - custom DNS gateway
 - RFC MX lookup flow
+- SMTP port number
+- SMTP error body pattern
 - SMTP fail fast
 - SMTP safe check
-- JSON serializer
 
 #### Creating configuration
 
@@ -93,35 +90,35 @@ configuration := truemail.NewConfiguration(
   ConfigurationAttr{
     // Required parameter. Must be an existing email on behalf of which verification will be
     // performed
-    verifierEmail: "verifier@example.com",
+    VerifierEmail: "verifier@example.com",
 
     // Optional parameter. Must be an existing domain on behalf of which verification will be
     // performed. By default verifier domain based on verifier email
-    verifierDomain: "somedomain.com",
+    VerifierDomain: "somedomain.com",
 
     // Optional parameter. You can override default regex pattern
-    emailPattern: `\A.+@(.+)\z`,
+    EmailPattern: `\A.+@(.+)\z`,
 
     // Optional parameter. You can override default regex pattern
-    smtpErrorBodyPattern: `.*(user|account).*`,
+    SmtpErrorBodyPattern: `.*(user|account).*`,
 
     // Optional parameter. Connection timeout in seconds.
     // It is equal to 2 by default.
-    connectionTimeout: 1,
+    ConnectionTimeout: 1,
 
     // Optional parameter. A SMTP server response timeout in seconds.
     // It is equal to 2 by default.
-    responseTimeout: 1,
+    ResponseTimeout: 1,
 
     // Optional parameter. Total of connection attempts. It is equal to 2 by default.
     // This parameter uses in mx lookup timeout error and smtp request (for cases when
     // there is one mx server).
-    connectionAttempts: 1,
+    ConnectionAttempts: 1,
 
     // Optional parameter. You can predefine default validation type for
     // truemail.Validate("email@email.com", configuration) call without type-parameter
     // Available validation types: "regex", "mx", "mx_blacklist", "smtp"
-    validationTypeDefault: "mx",
+    ValidationTypeDefault: "mx",
 
     // Optional parameter. You can predefine which type of validation will be used for domains.
     // Also you can skip validation by domain.
@@ -130,56 +127,56 @@ configuration := truemail.NewConfiguration(
     // All of validations for "somedomain.com" will be processed with regex validation only.
     // And all of validations for "otherdomain.com" will be processed with mx validation only.
     // It is equal to empty map of strings by default.
-    validationTypeByDomain: map[string]string{"somedomain.com": "regex", "otherdomain.com": "mx"},
+    ValidationTypeByDomain: map[string]string{"somedomain.com": "regex", "otherdomain.com": "mx"},
 
     // Optional parameter. Validation of email which contains whitelisted domain always will
     // return true. Other validations will not processed even if it was defined in
     // validationTypeByDomain. It is equal to empty slice of strings by default.
-    whitelistedDomains: []string{"somedomain1.com", "somedomain2.com"},
+    WhitelistedDomains: []string{"somedomain1.com", "somedomain2.com"},
 
     // Optional parameter. With this option Truemail will validate email which contains whitelisted
     // domain only, i.e. if domain whitelisted, validation will passed to Regex, MX or SMTP
     // validators. Validation of email which not contains whitelisted domain always will return
     // false. It is equal false by default.
-    whitelistValidation: true,
+    WhitelistValidation: true,
 
     // Optional parameter. Validation of email which contains blacklisted domain always will
     // return false. Other validations will not processed even if it was defined in
     // validationTypeByDomain. It is equal to empty slice of strings by default.
-    blacklistedDomains: []string{"somedomain3.com", "somedomain4.com"},
+    BlacklistedDomains: []string{"somedomain3.com", "somedomain4.com"},
 
     // Optional parameter. With this option Truemail will filter out unwanted mx servers via
     // predefined list of ip addresses. It can be used as a part of DEA (disposable email
     // address) validations. It is equal to empty slice of strings by default.
-    blacklistedMxIpAddresses: []string{"1.1.1.1", "2.2.2.2"},
+    BlacklistedMxIpAddresses: []string{"1.1.1.1", "2.2.2.2"},
 
     // Optional parameter. This option will provide to use custom DNS gateway when Truemail
     // interacts with DNS. Valid port number is in the range 1-65535. If you won't specify
     // nameserver port Truemail will use default DNS TCP/UDP port 53. It means that you can
     // use ip4 addres as DNS gateway, for example "10.0.0.1". By default Truemail uses
     // DNS gateway from system settings and this option is equal to empty string.
-    dns: "10.0.0.1:5300",
+    Dns: "10.0.0.1:5300",
 
     // Optional parameter. This option will provide to use not RFC MX lookup flow.
     // It means that MX and Null MX records will be cheked on the DNS validation layer only.
     // By default this option is disabled and equal to false.
-    notRfcMxLookupFlow: true,
+    NotRfcMxLookupFlow: true,
 
     // Optional parameter. SMTP port number. It is equal to 25 by default.
     // This parameter uses for SMTP session in SMTP validation layer.
-    smtpPort: 2525,
+    SmtpPort: 2525,
 
     // Optional parameter. This option will provide to use smtp fail fast behaviour. When
     // smtpFailFast = true it means that Truemail ends smtp validation session after first
     // attempt on the first mx server in any fail cases (network connection/timeout error,
     // smtp validation error). This feature helps to reduce total time of SMTP validation
     // session up to 1 second. By default this option is disabled and equal to false.
-    smtpFailFast: true,
+    SmtpFailFast: true,
 
     // Optional parameter. This option will be parse bodies of SMTP errors. It will be helpful
     // if SMTP server does not return an exact answer that the email does not exist
     // By default this option is disabled, available for SMTP validation only.
-    smtpSafeCheck: true,
+    SmtpSafeCheck: true,
   },
 )
 ```
@@ -189,7 +186,7 @@ configuration := truemail.NewConfiguration(
 ```go
 import "github.com/truemail-rb/truemail-go"
 
-configuration := truemail.NewConfiguration(ConfigurationAttr{verifierEmail: "verifier@example.com"})
+configuration := truemail.NewConfiguration(ConfigurationAttr{VerifierEmail: "verifier@example.com"})
 
 truemail.Validate("some@email.com", configuration)
 truemail.IsValid("some@email.com", configuration, "regex")

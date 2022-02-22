@@ -21,7 +21,7 @@ func TestValidationRegexCheck(t *testing.T) {
 		new(validationRegex).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, map[string]string{ValidationTypeRegex: RegexErrorContext}, validatorResult.Errors)
+		assert.Equal(t, map[string]string{validationTypeRegex: regexErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 	})
 }

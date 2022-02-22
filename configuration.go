@@ -8,12 +8,12 @@ import (
 // configuration structure
 type configuration struct {
 	ctx                                                                  context.Context
-	VerifierEmail, VerifierDomain, ValidationTypeDefault, DNS            string
+	VerifierEmail, VerifierDomain, ValidationTypeDefault, Dns            string
 	ConnectionTimeout, ResponseTimeout, ConnectionAttempts, SmtpPort     int
 	WhitelistedDomains, BlacklistedDomains, BlacklistedMxIpAddresses     []string
 	ValidationTypeByDomain                                               map[string]string
-	WhitelistValidation, NotRfcMxLookupFlow, SMTPFailFast, SMTPSafeCheck bool
-	EmailPattern, SMTPErrorBodyPattern                                   *regexp.Regexp
+	WhitelistValidation, NotRfcMxLookupFlow, SmtpFailFast, SmtpSafeCheck bool
+	EmailPattern, SmtpErrorBodyPattern                                   *regexp.Regexp
 }
 
 // New configuration builder. Returns valid newConfiguration structure
@@ -27,24 +27,24 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 
 	newConfiguration := configuration{
 		ctx:                      config.ctx,
-		VerifierEmail:            config.verifierEmail,
-		VerifierDomain:           config.verifierDomain,
-		ValidationTypeDefault:    config.validationTypeDefault,
-		ConnectionTimeout:        config.connectionTimeout,
-		ResponseTimeout:          config.responseTimeout,
-		ConnectionAttempts:       config.connectionAttempts,
-		WhitelistedDomains:       config.whitelistedDomains,
-		BlacklistedDomains:       config.blacklistedDomains,
-		BlacklistedMxIpAddresses: config.blacklistedMxIpAddresses,
-		DNS:                      config.dns,
-		ValidationTypeByDomain:   config.validationTypeByDomain,
-		WhitelistValidation:      config.whitelistValidation,
-		NotRfcMxLookupFlow:       config.notRfcMxLookupFlow,
-		SmtpPort:                 config.smtpPort,
-		SMTPFailFast:             config.smtpFailFast,
-		SMTPSafeCheck:            config.smtpSafeCheck,
-		EmailPattern:             config.regexEmail,
-		SMTPErrorBodyPattern:     config.regexSMTPErrorBody,
+		VerifierEmail:            config.VerifierEmail,
+		VerifierDomain:           config.VerifierDomain,
+		ValidationTypeDefault:    config.ValidationTypeDefault,
+		ConnectionTimeout:        config.ConnectionTimeout,
+		ResponseTimeout:          config.ResponseTimeout,
+		ConnectionAttempts:       config.ConnectionAttempts,
+		WhitelistedDomains:       config.WhitelistedDomains,
+		BlacklistedDomains:       config.BlacklistedDomains,
+		BlacklistedMxIpAddresses: config.BlacklistedMxIpAddresses,
+		Dns:                      config.Dns,
+		ValidationTypeByDomain:   config.ValidationTypeByDomain,
+		WhitelistValidation:      config.WhitelistValidation,
+		NotRfcMxLookupFlow:       config.NotRfcMxLookupFlow,
+		SmtpPort:                 config.SmtpPort,
+		SmtpFailFast:             config.SmtpFailFast,
+		SmtpSafeCheck:            config.SmtpSafeCheck,
+		EmailPattern:             config.RegexEmail,
+		SmtpErrorBodyPattern:     config.RegexSmtpErrorBody,
 	}
 	return &newConfiguration, err
 }

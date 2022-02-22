@@ -26,7 +26,7 @@ type dnsResolver struct {
 // dnsResolver builder. Creates custom resolver with
 // connection timeout and DNS gateway from configuration
 func newDnsResolver(configuration *configuration) *dnsResolver {
-	connectionTimeout, dnsServer := configuration.ConnectionTimeout, configuration.DNS
+	connectionTimeout, dnsServer := configuration.ConnectionTimeout, configuration.Dns
 
 	return &dnsResolver{
 		connectionTimeout: connectionTimeout,
@@ -35,7 +35,7 @@ func newDnsResolver(configuration *configuration) *dnsResolver {
 			PreferGo: true,
 			Dial: func(ctx context.Context, networkProtocol, customDnsIpAddress string) (net.Conn, error) {
 				dialer := net.Dialer{Timeout: time.Duration(connectionTimeout) * time.Second}
-				if dnsServer != EmptyString {
+				if dnsServer != emptyString {
 					customDnsIpAddress = dnsServer
 				}
 				return dialer.DialContext(ctx, networkProtocol, customDnsIpAddress)
@@ -54,7 +54,7 @@ func (dnsResolver *dnsResolver) dnsNameToHostName(dnsName string) string {
 // Helper method. Filter out ipv6 ip addresses from mixed collection
 func (dnsResolver *dnsResolver) rejectIp6Addresses(ipAddresses []string) (ip4Addresses []string) {
 	for _, ipAddress := range ipAddresses {
-		if matchRegex(ipAddress, RegexIpAddressPattern) && ipAddress != "0.0.0.0" { // ipv6 can be converted to 0.0.0.0
+		if matchRegex(ipAddress, regexIpAddressPattern) && ipAddress != "0.0.0.0" { // ipv6 can be converted to 0.0.0.0
 			ip4Addresses = append(ip4Addresses, ipAddress)
 		}
 		continue
@@ -77,7 +77,7 @@ func (dnsResolver *dnsResolver) aRecords(hostName string) ([]string, error) {
 func (dnsResolver *dnsResolver) aRecord(hostName string) (string, error) {
 	ipAddresses, err := dnsResolver.aRecords(hostName)
 	if err != nil {
-		return EmptyString, err
+		return emptyString, err
 	}
 
 	return ipAddresses[0], nil

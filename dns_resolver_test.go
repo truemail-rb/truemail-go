@@ -11,7 +11,7 @@ import (
 func TestNewDnsResolver(t *testing.T) {
 	t.Run("creates dnsResolver with custom gateway", func(t *testing.T) {
 		connectionTimeout, dns, configuration := 42, randomDnsServer(), createConfiguration()
-		configuration.ConnectionTimeout, configuration.DNS = connectionTimeout, dns
+		configuration.ConnectionTimeout, configuration.Dns = connectionTimeout, dns
 		dnsResolver := newDnsResolver(configuration)
 
 		assert.Equal(t, connectionTimeout, dnsResolver.connectionTimeout)
@@ -31,7 +31,7 @@ func TestNewDnsResolver(t *testing.T) {
 		hostName, hostAddress := randomDomain(), randomIpAddress()
 		dnsRecords := map[string]mockdns.Zone{toDnsHostName(hostName): {A: []string{hostAddress}}}
 		connectionTimeout, dns, configuration := 1, runMockDnsServer(dnsRecords), createConfiguration()
-		configuration.ConnectionTimeout, configuration.DNS = connectionTimeout, dns
+		configuration.ConnectionTimeout, configuration.Dns = connectionTimeout, dns
 		dnsResolver := newDnsResolver(configuration)
 		resolvedHostAddresses, _ := dnsResolver.aRecords(hostName)
 

@@ -8,7 +8,7 @@ type validatorResult struct {
 	MailServers, usedValidations                                 []string
 	Errors                                                       map[string]string
 	Configuration                                                *configuration
-	SMTPDebug                                                    []*smtpRequest
+	SmtpDebug                                                    []*smtpRequest
 }
 
 // validatorResult methods
@@ -87,7 +87,7 @@ func (validator *validator) validateDomainListMatch() {
 // Runs Regex validation
 func (validator *validator) validateRegex() {
 	validatorResult := validator.result
-	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	validatorResult.addUsedValidationType(validationTypeRegex)
 	validator.regexLayer.check(validatorResult)
 }
 
@@ -95,12 +95,12 @@ func (validator *validator) validateRegex() {
 func (validator *validator) validateMx() {
 	validatorResult := validator.result
 
-	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	validatorResult.addUsedValidationType(validationTypeRegex)
 	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeMx)
+	validatorResult.addUsedValidationType(validationTypeMx)
 	validator.mxLayer.check(validatorResult)
 }
 
@@ -108,17 +108,17 @@ func (validator *validator) validateMx() {
 func (validator *validator) validateMxBlacklist() {
 	validatorResult := validator.result
 
-	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	validatorResult.addUsedValidationType(validationTypeRegex)
 	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeMx)
+	validatorResult.addUsedValidationType(validationTypeMx)
 	if !validator.mxLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
+	validatorResult.addUsedValidationType(validationTypeMxBlacklist)
 	validator.mxBlacklistLayer.check(validatorResult)
 }
 
@@ -126,22 +126,22 @@ func (validator *validator) validateMxBlacklist() {
 func (validator *validator) validateSMTP() {
 	validatorResult := validator.result
 
-	validatorResult.addUsedValidationType(ValidationTypeRegex)
+	validatorResult.addUsedValidationType(validationTypeRegex)
 	if !validator.regexLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeMx)
+	validatorResult.addUsedValidationType(validationTypeMx)
 	if !validator.mxLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeMxBlacklist)
+	validatorResult.addUsedValidationType(validationTypeMxBlacklist)
 	if !validator.mxBlacklistLayer.check(validatorResult).Success {
 		return
 	}
 
-	validatorResult.addUsedValidationType(ValidationTypeSmtp)
+	validatorResult.addUsedValidationType(validationTypeSmtp)
 	validator.smtpLayer.check(validatorResult)
 }
 
@@ -161,13 +161,13 @@ func (validator *validator) run() *validatorResult {
 	}
 	// run validation flow
 	switch validatorResult.ValidationType {
-	case ValidationTypeRegex:
+	case validationTypeRegex:
 		validator.validateRegex()
-	case ValidationTypeMx:
+	case validationTypeMx:
 		validator.validateMx()
-	case ValidationTypeMxBlacklist:
+	case validationTypeMxBlacklist:
 		validator.validateMxBlacklist()
-	case ValidationTypeSmtp:
+	case validationTypeSmtp:
 		validator.validateSMTP()
 	}
 	return validatorResult
