@@ -43,7 +43,7 @@ func TestNewSmtpClient(t *testing.T) {
 		assert.Equal(t, smtpRequestConfig.targetEmail, smtpClient.targetEmail)
 		assert.Equal(t, smtpRequestConfig.targetServerAddress, smtpClient.targetServerAddress)
 		assert.Equal(t, smtpRequestConfig.targetServerPortNumber, smtpClient.targetServerPortNumber)
-		assert.Equal(t, TcpTransportLayer, smtpClient.networkProtocol)
+		assert.Equal(t, tcpTransportLayer, smtpClient.networkProtocol)
 		assert.Equal(t, time.Duration(smtpRequestConfig.connectionTimeout)*time.Second, smtpClient.connectionTimeout)
 		assert.Equal(t, time.Duration(smtpRequestConfig.responseTimeout)*time.Second, smtpClient.responseTimeout)
 	})
@@ -56,7 +56,7 @@ func TestSmtpInitConnection(t *testing.T) {
 		defer func() { _ = server.Stop() }()
 
 		smtpClient := &smtpClient{
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumber,
 		}
@@ -69,7 +69,7 @@ func TestSmtpInitConnection(t *testing.T) {
 
 	t.Run("when connection failed", func(t *testing.T) {
 		smtpClient := &smtpClient{
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: 1,
 			connectionTimeout:      0,
@@ -122,7 +122,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            randomEmail(),
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumber,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}
@@ -140,7 +140,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            randomEmail(),
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: invalidPortNumber,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}
@@ -162,7 +162,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            randomEmail(),
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumber,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}
@@ -189,7 +189,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            randomEmail(),
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumberServerWithDelay,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}
@@ -212,7 +212,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            randomEmail(),
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumber,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}
@@ -234,7 +234,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 			targetEmail:            targetEmail,
 			targetServerAddress:    localhostIPv4Address,
 			targetServerPortNumber: portNumber,
-			networkProtocol:        TcpTransportLayer,
+			networkProtocol:        tcpTransportLayer,
 			connectionTimeout:      time.Duration(1) * time.Second,
 			responseTimeout:        time.Duration(1) * time.Second,
 		}

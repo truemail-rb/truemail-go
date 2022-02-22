@@ -12,200 +12,200 @@ func TestConfigurationAttrAssignDefaultValues(t *testing.T) {
 		configurationAttr := new(ConfigurationAttr)
 		configurationAttr.assignDefaultValues()
 
-		assert.Equal(t, ValidationTypeDefault, configurationAttr.validationTypeDefault)
-		assert.Equal(t, RegexEmailPattern, configurationAttr.emailPattern)
-		assert.Equal(t, RegexSMTPErrorBodyPattern, configurationAttr.smtpErrorBodyPattern)
-		assert.Equal(t, DefaultConnectionTimeout, configurationAttr.connectionTimeout)
-		assert.Equal(t, DefaultResponseTimeout, configurationAttr.responseTimeout)
-		assert.Equal(t, DefaultConnectionAttempts, configurationAttr.connectionAttempts)
-		assert.Equal(t, DefaultSmtpPort, configurationAttr.smtpPort)
+		assert.Equal(t, validationTypeDefault, configurationAttr.ValidationTypeDefault)
+		assert.Equal(t, regexEmailPattern, configurationAttr.EmailPattern)
+		assert.Equal(t, regexSMTPErrorBodyPattern, configurationAttr.SmtpErrorBodyPattern)
+		assert.Equal(t, defaultConnectionTimeout, configurationAttr.ConnectionTimeout)
+		assert.Equal(t, defaultResponseTimeout, configurationAttr.ResponseTimeout)
+		assert.Equal(t, defaultConnectionAttempts, configurationAttr.ConnectionAttempts)
+		assert.Equal(t, defaultSmtpPort, configurationAttr.SmtpPort)
 	})
 
 	t.Run("when created ConfigurationAttr structure with custom field values", func(t *testing.T) {
-		validationTypeDefault, emailPattern, smtpErrorBodyPattern := "1", "2", "3"
+		ValidationTypeDefault, emailPattern, smtpErrorBodyPattern := "1", "2", "3"
 		connectionTimeout, responseTimeout, connectionAttempts, smtpPort := 1, 2, 3, 4
 		configurationAttr := ConfigurationAttr{
-			validationTypeDefault: validationTypeDefault,
-			emailPattern:          emailPattern,
-			smtpErrorBodyPattern:  smtpErrorBodyPattern,
-			connectionTimeout:     connectionTimeout,
-			responseTimeout:       responseTimeout,
-			connectionAttempts:    connectionAttempts,
-			smtpPort:              smtpPort,
+			ValidationTypeDefault: ValidationTypeDefault,
+			EmailPattern:          emailPattern,
+			SmtpErrorBodyPattern:  smtpErrorBodyPattern,
+			ConnectionTimeout:     connectionTimeout,
+			ResponseTimeout:       responseTimeout,
+			ConnectionAttempts:    connectionAttempts,
+			SmtpPort:              smtpPort,
 		}
 		configurationAttr.assignDefaultValues()
 
-		assert.Equal(t, validationTypeDefault, configurationAttr.validationTypeDefault)
-		assert.Equal(t, emailPattern, configurationAttr.emailPattern)
-		assert.Equal(t, smtpErrorBodyPattern, configurationAttr.smtpErrorBodyPattern)
-		assert.Equal(t, connectionTimeout, configurationAttr.connectionTimeout)
-		assert.Equal(t, responseTimeout, configurationAttr.responseTimeout)
-		assert.Equal(t, connectionAttempts, configurationAttr.connectionAttempts)
-		assert.Equal(t, smtpPort, configurationAttr.smtpPort)
+		assert.Equal(t, ValidationTypeDefault, configurationAttr.ValidationTypeDefault)
+		assert.Equal(t, emailPattern, configurationAttr.EmailPattern)
+		assert.Equal(t, smtpErrorBodyPattern, configurationAttr.SmtpErrorBodyPattern)
+		assert.Equal(t, connectionTimeout, configurationAttr.ConnectionTimeout)
+		assert.Equal(t, responseTimeout, configurationAttr.ResponseTimeout)
+		assert.Equal(t, connectionAttempts, configurationAttr.ConnectionAttempts)
+		assert.Equal(t, smtpPort, configurationAttr.SmtpPort)
 	})
 }
 
 func TestConfigurationAttrValidate(t *testing.T) {
 	t.Run("invalid verifier email", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: "email@domain"}
-		errorMessage := fmt.Sprintf("%v is invalid verifier email", configurationAttr.verifierEmail)
+		configurationAttr := ConfigurationAttr{VerifierEmail: "email@domain"}
+		errorMessage := fmt.Sprintf("%v is invalid verifier email", configurationAttr.VerifierEmail)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid verifier domain", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:  randomEmail(),
-			verifierDomain: "invalid_domain",
+			VerifierEmail:  randomEmail(),
+			VerifierDomain: "invalid_domain",
 		}
-		errorMessage := fmt.Sprintf("%v is invalid verifier domain", configurationAttr.verifierDomain)
+		errorMessage := fmt.Sprintf("%v is invalid verifier domain", configurationAttr.VerifierDomain)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid default validation type", func(t *testing.T) {
-		configurationAttr := ConfigurationAttr{verifierEmail: randomEmail(), validationTypeDefault: "invalid validation type"}
-		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", configurationAttr.validationTypeDefault)
+		configurationAttr := ConfigurationAttr{VerifierEmail: randomEmail(), ValidationTypeDefault: "invalid validation type"}
+		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", configurationAttr.ValidationTypeDefault)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid connection timeout", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomNegativeNumber(),
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomNegativeNumber(),
 		}
-		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionTimeout)
+		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.ConnectionTimeout)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid response timeout", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomNegativeNumber(),
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomNegativeNumber(),
 		}
-		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.responseTimeout)
+		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.ResponseTimeout)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid connection attempts", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomNegativeNumber(),
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomNegativeNumber(),
 		}
-		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.connectionAttempts)
+		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.ConnectionAttempts)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid SMTP port number", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomNegativeNumber(),
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomNegativeNumber(),
 		}
-		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.smtpPort)
+		errorMessage := fmt.Sprintf("%v should be a positive integer", configurationAttr.SmtpPort)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid whitelisted domains", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			whitelistedDomains:    []string{randomDomain(), "a"},
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			WhitelistedDomains:    []string{randomDomain(), "a"},
 		}
-		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.whitelistedDomains[1])
+		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.WhitelistedDomains[1])
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid blacklisted domains", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			blacklistedDomains:    []string{randomDomain(), "b"},
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			BlacklistedDomains:    []string{randomDomain(), "b"},
 		}
-		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.blacklistedDomains[1])
+		errorMessage := fmt.Sprintf("%v is invalid domain name", configurationAttr.BlacklistedDomains[1])
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid blacklisted mx ip address", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:            randomEmail(),
-			validationTypeDefault:    randomValidationType(),
-			connectionTimeout:        randomPositiveNumber(),
-			responseTimeout:          randomPositiveNumber(),
-			connectionAttempts:       randomPositiveNumber(),
-			smtpPort:                 randomPositiveNumber(),
-			blacklistedMxIpAddresses: []string{randomIpAddress(), "1.1.1.256:65536"},
+			VerifierEmail:            randomEmail(),
+			ValidationTypeDefault:    randomValidationType(),
+			ConnectionTimeout:        randomPositiveNumber(),
+			ResponseTimeout:          randomPositiveNumber(),
+			ConnectionAttempts:       randomPositiveNumber(),
+			SmtpPort:                 randomPositiveNumber(),
+			BlacklistedMxIpAddresses: []string{randomIpAddress(), "1.1.1.256:65536"},
 		}
-		errorMessage := fmt.Sprintf("%v is invalid ip address", configurationAttr.blacklistedMxIpAddresses[1])
+		errorMessage := fmt.Sprintf("%v is invalid ip address", configurationAttr.BlacklistedMxIpAddresses[1])
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid dns, wrong ip address", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			dns:                   "1.1.1.256",
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			Dns:                   "1.1.1.256",
 		}
-		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.Dns)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid dns, wrong port number", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			dns:                   "1.1.1.255:65536",
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			Dns:                   "1.1.1.255:65536",
 		}
-		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.Dns)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid dns, wrong ip address and port number", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			dns:                   "1.1.1.256:65536",
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			Dns:                   "1.1.1.256:65536",
 		}
-		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.dns)
+		errorMessage := fmt.Sprintf("%v is invalid dns server", configurationAttr.Dns)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
@@ -213,13 +213,13 @@ func TestConfigurationAttrValidate(t *testing.T) {
 	t.Run("invalid validation type by domain, wrong domain", func(t *testing.T) {
 		invalidDomain := "inavlid domain"
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:          randomEmail(),
-			validationTypeDefault:  randomValidationType(),
-			connectionTimeout:      randomPositiveNumber(),
-			responseTimeout:        randomPositiveNumber(),
-			connectionAttempts:     randomPositiveNumber(),
-			smtpPort:               randomPositiveNumber(),
-			validationTypeByDomain: map[string]string{randomDomain(): "regex", invalidDomain: "wrong_type"},
+			VerifierEmail:          randomEmail(),
+			ValidationTypeDefault:  randomValidationType(),
+			ConnectionTimeout:      randomPositiveNumber(),
+			ResponseTimeout:        randomPositiveNumber(),
+			ConnectionAttempts:     randomPositiveNumber(),
+			SmtpPort:               randomPositiveNumber(),
+			ValidationTypeByDomain: map[string]string{randomDomain(): "regex", invalidDomain: "wrong_type"},
 		}
 		errorMessage := fmt.Sprintf("%v is invalid domain name", invalidDomain)
 
@@ -229,13 +229,13 @@ func TestConfigurationAttrValidate(t *testing.T) {
 	t.Run("invalid validation type by domain, wrong validation type", func(t *testing.T) {
 		invalidType := "inavlid validation type"
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:          randomEmail(),
-			validationTypeDefault:  randomValidationType(),
-			connectionTimeout:      randomPositiveNumber(),
-			responseTimeout:        randomPositiveNumber(),
-			connectionAttempts:     randomPositiveNumber(),
-			smtpPort:               randomPositiveNumber(),
-			validationTypeByDomain: map[string]string{randomDomain(): "regex", randomDomain(): invalidType},
+			VerifierEmail:          randomEmail(),
+			ValidationTypeDefault:  randomValidationType(),
+			ConnectionTimeout:      randomPositiveNumber(),
+			ResponseTimeout:        randomPositiveNumber(),
+			ConnectionAttempts:     randomPositiveNumber(),
+			SmtpPort:               randomPositiveNumber(),
+			ValidationTypeByDomain: map[string]string{randomDomain(): "regex", randomDomain(): invalidType},
 		}
 		errorMessage := fmt.Sprintf("%v is invalid default validation type, use one of these: [regex mx mx_blacklist smtp]", invalidType)
 
@@ -244,30 +244,30 @@ func TestConfigurationAttrValidate(t *testing.T) {
 
 	t.Run("invalid email pattern", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			emailPattern:          `\K`,
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			EmailPattern:          `\K`,
 		}
-		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.emailPattern)
+		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.EmailPattern)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
 
 	t.Run("invalid smtp error body pattern", func(t *testing.T) {
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			smtpErrorBodyPattern:  `\K`,
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			SmtpErrorBodyPattern:  `\K`,
 		}
-		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.smtpErrorBodyPattern)
+		errorMessage := fmt.Sprintf("error parsing regexp: invalid escape sequence: `%v`", configurationAttr.SmtpErrorBodyPattern)
 
 		assert.EqualError(t, configurationAttr.validate(), errorMessage)
 	})
@@ -276,23 +276,23 @@ func TestConfigurationAttrValidate(t *testing.T) {
 		randomIpAddress, randomIpAddressWithDefaultPortNumber := randomDnsServerWithDefaultPortNumber()
 		regexPatternFirst, regexPatternSecond := "1", "2"
 		configurationAttr := ConfigurationAttr{
-			verifierEmail:         randomEmail(),
-			validationTypeDefault: randomValidationType(),
-			connectionTimeout:     randomPositiveNumber(),
-			responseTimeout:       randomPositiveNumber(),
-			connectionAttempts:    randomPositiveNumber(),
-			smtpPort:              randomPositiveNumber(),
-			dns:                   randomIpAddress,
-			emailPattern:          regexPatternFirst,
-			smtpErrorBodyPattern:  regexPatternSecond,
+			VerifierEmail:         randomEmail(),
+			ValidationTypeDefault: randomValidationType(),
+			ConnectionTimeout:     randomPositiveNumber(),
+			ResponseTimeout:       randomPositiveNumber(),
+			ConnectionAttempts:    randomPositiveNumber(),
+			SmtpPort:              randomPositiveNumber(),
+			Dns:                   randomIpAddress,
+			EmailPattern:          regexPatternFirst,
+			SmtpErrorBodyPattern:  regexPatternSecond,
 		}
 		regexObjectFirst, _ := newRegex(regexPatternFirst)
 		regexObjectSecond, _ := newRegex(regexPatternSecond)
 
 		assert.NoError(t, configurationAttr.validate())
-		assert.Equal(t, randomIpAddressWithDefaultPortNumber, configurationAttr.dns)
-		assert.EqualValues(t, regexObjectFirst, configurationAttr.regexEmail)
-		assert.EqualValues(t, regexObjectSecond, configurationAttr.regexSMTPErrorBody)
+		assert.Equal(t, randomIpAddressWithDefaultPortNumber, configurationAttr.Dns)
+		assert.EqualValues(t, regexObjectFirst, configurationAttr.RegexEmail)
+		assert.EqualValues(t, regexObjectSecond, configurationAttr.RegexSmtpErrorBody)
 	})
 }
 
@@ -340,7 +340,7 @@ func TestConfigurationAttrBuildVerifierDomain(t *testing.T) {
 	})
 
 	t.Run("empty verifier domain", func(t *testing.T) {
-		actualDomain, err := new(ConfigurationAttr).buildVerifierDomain(verifierEmail, EmptyString)
+		actualDomain, err := new(ConfigurationAttr).buildVerifierDomain(verifierEmail, emptyString)
 
 		assert.Equal(t, expectedDomain, actualDomain)
 		assert.NoError(t, err)
@@ -451,32 +451,32 @@ func TestConfigurationAttrValidateIpAddressesContext(t *testing.T) {
 
 func TestConfigurationAttrValidateDNSServerContext(t *testing.T) {
 	t.Run("valid dns server ip without port number", func(t *testing.T) {
-		assert.NoError(t, new(ConfigurationAttr).validateDNSServerContext(randomIpAddress()))
+		assert.NoError(t, new(ConfigurationAttr).validateDnsServerContext(randomIpAddress()))
 	})
 
 	t.Run("valid dns server ip with port number", func(t *testing.T) {
-		assert.NoError(t, new(ConfigurationAttr).validateDNSServerContext(randomIpAddress()+":65507"))
+		assert.NoError(t, new(ConfigurationAttr).validateDnsServerContext(randomIpAddress()+":65507"))
 	})
 
 	t.Run("invalid dns server ip without port number", func(t *testing.T) {
 		invalidDNSServer := "1.1.1.256"
 		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
 
-		assert.EqualError(t, new(ConfigurationAttr).validateDNSServerContext(invalidDNSServer), errorMessage)
+		assert.EqualError(t, new(ConfigurationAttr).validateDnsServerContext(invalidDNSServer), errorMessage)
 	})
 
 	t.Run("valid dns server ip with invalid port number", func(t *testing.T) {
 		invalidDNSServer := "1.1.1.1:65536"
 		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
 
-		assert.EqualError(t, new(ConfigurationAttr).validateDNSServerContext(invalidDNSServer), errorMessage)
+		assert.EqualError(t, new(ConfigurationAttr).validateDnsServerContext(invalidDNSServer), errorMessage)
 	})
 
 	t.Run("invalid dns server ip with invalid port number", func(t *testing.T) {
 		invalidDNSServer := "256.256.256.256:0"
 		errorMessage := fmt.Sprintf("%s is invalid dns server", invalidDNSServer)
 
-		assert.EqualError(t, new(ConfigurationAttr).validateDNSServerContext(invalidDNSServer), errorMessage)
+		assert.EqualError(t, new(ConfigurationAttr).validateDnsServerContext(invalidDNSServer), errorMessage)
 	})
 }
 

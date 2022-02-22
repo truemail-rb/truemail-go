@@ -7,7 +7,7 @@ type validationMxBlacklist struct{}
 func (validation *validationMxBlacklist) check(validatorResult *validatorResult) *validatorResult {
 	if isIntersected(validatorResult.Configuration.BlacklistedMxIpAddresses, validatorResult.MailServers) {
 		validatorResult.Success = false
-		validatorResult.addError(ValidationTypeMxBlacklist, MxBlacklistErrorContext)
+		validatorResult.addError(validationTypeMxBlacklist, mxBlacklistErrorContext)
 	}
 
 	return validatorResult

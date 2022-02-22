@@ -10,8 +10,8 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 
 	// Failure scenario
 	if validation.isBlacklistedDomain() || (validation.isWhitelistValidation() && !validation.isWhitelistedDomain()) {
-		validatorResult.ValidationType = DomainListMatchBlacklist
-		validatorResult.addError(ValidationTypeDomainListMatch, DomainListMatchErrorContext)
+		validatorResult.ValidationType = domainListMatchBlacklist
+		validatorResult.addError(validationTypeDomainListMatch, domainListMatchErrorContext)
 		return validatorResult
 	}
 
@@ -20,7 +20,7 @@ func (validation *validationDomainListMatch) check(validatorResult *validatorRes
 
 	// Handle flow with ValidationType persisting
 	if !validation.isWhitelistValidation() && !(!validation.isBlacklistedDomain() && !validation.isWhitelistedDomain()) {
-		validatorResult.ValidationType = DomainListMatchWhitelist
+		validatorResult.ValidationType = domainListMatchWhitelist
 	}
 
 	// Handle flow for processing validatorResult via next validation level

@@ -28,7 +28,7 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
-		assert.Empty(t, validatorResult.SMTPDebug)
+		assert.Empty(t, validatorResult.SmtpDebug)
 		assert.Empty(t, validatorResult.usedValidations)
 	})
 
@@ -41,7 +41,7 @@ func TestValidationSmtpCheck(t *testing.T) {
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"smtp": "smtp error"}, validatorResult.Errors)
@@ -52,12 +52,12 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 	t.Run("SMTP validation: failed after first attempt on first server, safe check scenario is disabled, fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.VerifierEmail, configuration.SmtpPort, configuration.SMTPFailFast = blacklistedMailfromEmail, portNumber, true
+		configuration.VerifierEmail, configuration.SmtpPort, configuration.SmtpFailFast = blacklistedMailfromEmail, portNumber, true
 		validatorResult := createSuccessfulValidatorResult(randomEmail(), configuration)
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"smtp": "smtp error"}, validatorResult.Errors)
@@ -68,12 +68,12 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 	t.Run("SMTP validation: successful after first attempt on first server, safe check scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.VerifierEmail, configuration.SmtpPort, configuration.SMTPSafeCheck = blacklistedMailfromEmail, portNumber, true
+		configuration.VerifierEmail, configuration.SmtpPort, configuration.SmtpSafeCheck = blacklistedMailfromEmail, portNumber, true
 		validatorResult := createSuccessfulValidatorResult(randomEmail(), configuration)
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
@@ -84,12 +84,12 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 	t.Run("SMTP validation: successful after first attempt on first server, safe check scenario is enabled, fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.VerifierEmail, configuration.SmtpPort, configuration.SMTPSafeCheck, configuration.SMTPFailFast = blacklistedMailfromEmail, portNumber, true, true
+		configuration.VerifierEmail, configuration.SmtpPort, configuration.SmtpSafeCheck, configuration.SmtpFailFast = blacklistedMailfromEmail, portNumber, true, true
 		validatorResult := createSuccessfulValidatorResult(randomEmail(), configuration)
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.True(t, validatorResult.Success)
 		assert.Empty(t, validatorResult.Errors)
@@ -100,12 +100,12 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 	t.Run("SMTP validation: failure after second attempt on second server, safe check scenario is enabled, fail fast is disabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.SmtpPort, configuration.SMTPSafeCheck = portNumber, true
+		configuration.SmtpPort, configuration.SmtpSafeCheck = portNumber, true
 		validatorResult := createSuccessfulValidatorResult(nonExistentEmail, configuration)
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"smtp": "smtp error"}, validatorResult.Errors)
@@ -116,12 +116,12 @@ func TestValidationSmtpCheck(t *testing.T) {
 
 	t.Run("SMTP validation: failure after first attempt on first server, safe check scenario is enabled, fail fast is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.SmtpPort, configuration.SMTPSafeCheck, configuration.SMTPFailFast = portNumber, true, true
+		configuration.SmtpPort, configuration.SmtpSafeCheck, configuration.SmtpFailFast = portNumber, true, true
 		validatorResult := createSuccessfulValidatorResult(nonExistentEmail, configuration)
 		validatorResult.MailServers = append(validatorResult.MailServers, localhostIPv4Address, localhostIPv4Address)
 		validationSmtp := new(validationSmtp)
 		validationSmtp.check(validatorResult)
-		smtpDebug := validatorResult.SMTPDebug
+		smtpDebug := validatorResult.SmtpDebug
 
 		assert.False(t, validatorResult.Success)
 		assert.Equal(t, map[string]string{"smtp": "smtp error"}, validatorResult.Errors)
@@ -342,7 +342,7 @@ func TestValidationSmtpRunSmtpSession(t *testing.T) {
 func TestValidationSmtpIsFailFastScenario(t *testing.T) {
 	t.Run("when SMTP fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.SMTPFailFast = true
+		configuration.SmtpFailFast = true
 		validation := &validationSmtp{result: &validatorResult{Configuration: configuration}}
 
 		assert.True(t, validation.isFailFastScenario())
@@ -360,7 +360,7 @@ func TestValidationSmtpFilteredMailServersByFailFastScenario(t *testing.T) {
 
 	t.Run("when SMTP fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.SMTPFailFast = true
+		configuration.SmtpFailFast = true
 		validation := &validationSmtp{result: &validatorResult{MailServers: mailServers, Configuration: configuration}}
 
 		assert.Equal(t, mailServers[:1], validation.filteredMailServersByFailFastScenario())
@@ -394,7 +394,7 @@ func TestValidationSmtpIsMoreThanOneMailServer(t *testing.T) {
 func TestValidationSmtpAttempts(t *testing.T) {
 	t.Run("when SMTP fail fast scenario enabled", func(t *testing.T) {
 		configuration := createConfiguration()
-		configuration.SMTPFailFast = true
+		configuration.SmtpFailFast = true
 		validation := &validationSmtp{result: createValidatorResult(randomEmail(), configuration)}
 
 		assert.Equal(t, 1, validation.attempts())
@@ -415,8 +415,8 @@ func TestValidationSmtpAttempts(t *testing.T) {
 		connectionAttempts := 42
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				connectionAttempts: connectionAttempts,
+				VerifierEmail:      randomEmail(),
+				ConnectionAttempts: connectionAttempts,
 			},
 		)
 		validation := &validationSmtp{
@@ -470,7 +470,7 @@ func TestValidationSmtpIsSmtpSafeCheckEnabled(t *testing.T) {
 	t.Run("when SMTP safe check is enabled", func(t *testing.T) {
 		validation := &validationSmtp{
 			result: &validatorResult{
-				Configuration: &configuration{SMTPSafeCheck: true},
+				Configuration: &configuration{SmtpSafeCheck: true},
 			},
 		}
 
@@ -515,8 +515,8 @@ func TestValidationSmtpIsNotIncludeUserNotFoundErrors(t *testing.T) {
 	t.Run("when contains recognized UserNotFound errors ", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:        randomEmail(),
-				smtpErrorBodyPattern: `RCPTTO ERROR`,
+				VerifierEmail:        randomEmail(),
+				SmtpErrorBodyPattern: `RCPTTO ERROR`,
 			},
 		)
 		validation := &validationSmtp{

@@ -35,7 +35,7 @@ func TestIsIntersected(t *testing.T) {
 
 func TestNewRegex(t *testing.T) {
 	t.Run("valid regex pattern", func(t *testing.T) {
-		regexPattern := EmptyString
+		regexPattern := emptyString
 		actualRegex, err := newRegex(regexPattern)
 		expectedRegex, _ := regexp.Compile(regexPattern)
 
@@ -53,7 +53,7 @@ func TestNewRegex(t *testing.T) {
 
 func TestMatchRegex(t *testing.T) {
 	t.Run("valid regex pattern, matched string", func(t *testing.T) {
-		assert.True(t, matchRegex(EmptyString, EmptyString))
+		assert.True(t, matchRegex(emptyString, emptyString))
 	})
 
 	t.Run("valid regex pattern, not matched string", func(t *testing.T) {
@@ -61,7 +61,7 @@ func TestMatchRegex(t *testing.T) {
 	})
 
 	t.Run("invalid regex pattern", func(t *testing.T) {
-		assert.False(t, matchRegex(EmptyString, `\K`))
+		assert.False(t, matchRegex(emptyString, `\K`))
 	})
 }
 
@@ -73,15 +73,15 @@ func TestAvailableValidationTypes(t *testing.T) {
 
 func TestVariadicValidationType(t *testing.T) {
 	t.Run("without validation type", func(t *testing.T) {
-		result, err := variadicValidationType([]string{}, ValidationTypeMx)
+		result, err := variadicValidationType([]string{}, validationTypeMx)
 
 		assert.NoError(t, err)
-		assert.Equal(t, ValidationTypeMx, result)
+		assert.Equal(t, validationTypeMx, result)
 	})
 
 	t.Run("valid validation type", func(t *testing.T) {
-		validationType := ValidationTypeRegex
-		result, err := variadicValidationType([]string{validationType}, ValidationTypeMx)
+		validationType := validationTypeRegex
+		result, err := variadicValidationType([]string{validationType}, validationTypeMx)
 
 		assert.NoError(t, err)
 		assert.Equal(t, validationType, result)
@@ -89,7 +89,7 @@ func TestVariadicValidationType(t *testing.T) {
 
 	t.Run("invalid validation type", func(t *testing.T) {
 		invalidValidationType := "invalid type"
-		result, err := variadicValidationType([]string{invalidValidationType}, ValidationTypeMx)
+		result, err := variadicValidationType([]string{invalidValidationType}, validationTypeMx)
 		errorMessage := fmt.Sprintf("%s is invalid validation type, use one of these: [regex mx mx_blacklist smtp]", invalidValidationType)
 
 		assert.EqualError(t, err, errorMessage)
@@ -98,7 +98,7 @@ func TestVariadicValidationType(t *testing.T) {
 }
 
 func TestValidateValidationTypeContext(t *testing.T) {
-	for _, validValidationType := range []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSmtp} {
+	for _, validValidationType := range []string{validationTypeRegex, validationTypeMx, validationTypeSmtp} {
 		t.Run("valid validation type", func(t *testing.T) {
 			assert.NoError(t, validateValidationTypeContext(validValidationType))
 		})

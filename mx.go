@@ -30,7 +30,7 @@ func (validation *validationMx) check(validatorResult *validatorResult) *validat
 
 	if validation.isMailServerNotFound() {
 		validatorResult.Success = false
-		validatorResult.addError(ValidationTypeMx, MxErrorContext)
+		validatorResult.addError(validationTypeMx, mxErrorContext)
 	}
 
 	return validatorResult
@@ -47,8 +47,8 @@ func (validation *validationMx) punycodeDomain(domain string) string {
 // Assigns punycodeEmail, punycodeDomain representations to validatorResult
 func (validation *validationMx) setValidatorResultPunycodeRepresentation() {
 	email := validation.result.Email
-	user := regexCaptureGroup(email, RegexEmailPattern, 2)
-	punycodeDomain := validation.punycodeDomain(regexCaptureGroup(email, RegexEmailPattern, 3))
+	user := regexCaptureGroup(email, regexEmailPattern, 2)
+	punycodeDomain := validation.punycodeDomain(regexCaptureGroup(email, regexEmailPattern, 3))
 
 	validation.result.punycodeEmail = user + "@" + punycodeDomain
 	validation.result.punycodeDomain = punycodeDomain
@@ -132,7 +132,7 @@ func (validation *validationMx) hostsFromMxRecords(hostName string) (resolvedIpA
 	}
 
 	// Checkes null MX record
-	if len(hostNames) == 1 && priorities[0] == 0 && hostNames[0] == EmptyString {
+	if len(hostNames) == 1 && priorities[0] == 0 && hostNames[0] == emptyString {
 		return resolvedIpAddresses, wrapNullMxError(fmt.Errorf("%s includes null MX record", hostName))
 	}
 

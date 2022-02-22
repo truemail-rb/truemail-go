@@ -78,11 +78,11 @@ func randomDnsServer() string {
 
 func randomDnsServerWithDefaultPortNumber() (string, string) {
 	ipAddress := randomIpAddress()
-	return ipAddress, serverWithPortNumber(ipAddress, DefaultDnsPort)
+	return ipAddress, serverWithPortNumber(ipAddress, defaultDnsPort)
 }
 
 func createConfiguration() *configuration {
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail()})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: randomEmail()})
 	return configuration
 }
 
@@ -97,7 +97,7 @@ func createSuccessfulValidatorResult(email string, configuration *configuration)
 
 func randomValidationType() string {
 	gofakeit.Seed(0)
-	availableValidationTypes := []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeSmtp}
+	availableValidationTypes := []string{validationTypeRegex, validationTypeMx, validationTypeSmtp}
 	index := gofakeit.Number(0, len(availableValidationTypes)-1)
 	return availableValidationTypes[index]
 }
@@ -109,10 +109,10 @@ func createValidator(email string, configuration *configuration, options ...stri
 
 func usedValidationsByType(validationType string) []string {
 	return map[string][]string{
-		ValidationTypeRegex:       {ValidationTypeRegex},
-		ValidationTypeMx:          {ValidationTypeRegex, ValidationTypeMx},
-		ValidationTypeMxBlacklist: {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist},
-		ValidationTypeSmtp:        {ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSmtp},
+		validationTypeRegex:       {validationTypeRegex},
+		validationTypeMx:          {validationTypeRegex, validationTypeMx},
+		validationTypeMxBlacklist: {validationTypeRegex, validationTypeMx, validationTypeMxBlacklist},
+		validationTypeSmtp:        {validationTypeRegex, validationTypeMx, validationTypeMxBlacklist, validationTypeSmtp},
 	}[validationType]
 }
 

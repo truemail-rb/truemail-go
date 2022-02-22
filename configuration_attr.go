@@ -9,116 +9,116 @@ import (
 // ConfigurationAttr kwargs structure for configuration builder
 type ConfigurationAttr struct {
 	ctx                                                                                           context.Context
-	verifierEmail, verifierDomain, validationTypeDefault, emailPattern, smtpErrorBodyPattern, dns string
-	connectionTimeout, responseTimeout, connectionAttempts, smtpPort                              int
-	whitelistedDomains, blacklistedDomains, blacklistedMxIpAddresses                              []string
-	validationTypeByDomain                                                                        map[string]string
-	whitelistValidation, notRfcMxLookupFlow, smtpFailFast, smtpSafeCheck                          bool
-	regexEmail, regexSMTPErrorBody                                                                *regexp.Regexp
+	VerifierEmail, VerifierDomain, ValidationTypeDefault, EmailPattern, SmtpErrorBodyPattern, Dns string
+	ConnectionTimeout, ResponseTimeout, ConnectionAttempts, SmtpPort                              int
+	WhitelistedDomains, BlacklistedDomains, BlacklistedMxIpAddresses                              []string
+	ValidationTypeByDomain                                                                        map[string]string
+	WhitelistValidation, NotRfcMxLookupFlow, SmtpFailFast, SmtpSafeCheck                          bool
+	RegexEmail, RegexSmtpErrorBody                                                                *regexp.Regexp
 }
 
 // ConfigurationAttr methods
 
 // assigns default values to ConfigurationAttr fields
 func (config *ConfigurationAttr) assignDefaultValues() {
-	if config.validationTypeDefault == EmptyString {
-		config.validationTypeDefault = ValidationTypeDefault
+	if config.ValidationTypeDefault == emptyString {
+		config.ValidationTypeDefault = validationTypeDefault
 	}
-	if config.emailPattern == EmptyString {
-		config.emailPattern = RegexEmailPattern
+	if config.EmailPattern == emptyString {
+		config.EmailPattern = regexEmailPattern
 	}
-	if config.smtpErrorBodyPattern == EmptyString {
-		config.smtpErrorBodyPattern = RegexSMTPErrorBodyPattern
+	if config.SmtpErrorBodyPattern == emptyString {
+		config.SmtpErrorBodyPattern = regexSMTPErrorBodyPattern
 	}
-	if config.connectionTimeout == 0 {
-		config.connectionTimeout = DefaultConnectionTimeout
+	if config.ConnectionTimeout == 0 {
+		config.ConnectionTimeout = defaultConnectionTimeout
 	}
-	if config.responseTimeout == 0 {
-		config.responseTimeout = DefaultResponseTimeout
+	if config.ResponseTimeout == 0 {
+		config.ResponseTimeout = defaultResponseTimeout
 	}
-	if config.connectionAttempts == 0 {
-		config.connectionAttempts = DefaultConnectionAttempts
+	if config.ConnectionAttempts == 0 {
+		config.ConnectionAttempts = defaultConnectionAttempts
 	}
 
-	if config.smtpPort == 0 {
-		config.smtpPort = DefaultSmtpPort
+	if config.SmtpPort == 0 {
+		config.SmtpPort = defaultSmtpPort
 	}
 }
 
 // validates and coerces ConfigurationAttr fields context
 func (config *ConfigurationAttr) validate() error {
-	err := config.validateVerifierEmail(config.verifierEmail)
+	err := config.validateVerifierEmail(config.VerifierEmail)
 	if err != nil {
 		return err
 	}
 
-	config.verifierDomain, err = config.buildVerifierDomain(config.verifierEmail, config.verifierDomain)
+	config.VerifierDomain, err = config.buildVerifierDomain(config.VerifierEmail, config.VerifierDomain)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateValidationTypeDefaultContext(config.validationTypeDefault)
+	err = config.validateValidationTypeDefaultContext(config.ValidationTypeDefault)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateIntegerPositive(config.connectionTimeout)
+	err = config.validateIntegerPositive(config.ConnectionTimeout)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateIntegerPositive(config.responseTimeout)
+	err = config.validateIntegerPositive(config.ResponseTimeout)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateIntegerPositive(config.connectionAttempts)
+	err = config.validateIntegerPositive(config.ConnectionAttempts)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateIntegerPositive(config.smtpPort)
+	err = config.validateIntegerPositive(config.SmtpPort)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateDomainsContext(config.whitelistedDomains)
+	err = config.validateDomainsContext(config.WhitelistedDomains)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateDomainsContext(config.blacklistedDomains)
+	err = config.validateDomainsContext(config.BlacklistedDomains)
 	if err != nil {
 		return err
 	}
 
-	err = config.validateIpAddressesContext(config.blacklistedMxIpAddresses)
+	err = config.validateIpAddressesContext(config.BlacklistedMxIpAddresses)
 	if err != nil {
 		return err
 	}
 
-	dns := config.dns
+	dns := config.Dns
 
-	if dns != EmptyString {
-		err = config.validateDNSServerContext(dns)
+	if dns != emptyString {
+		err = config.validateDnsServerContext(dns)
 		if err != nil {
 			return err
 		}
 
-		config.dns = config.formatDns(dns)
+		config.Dns = config.formatDns(dns)
 	}
 
-	err = config.validateTypeByDomainContext(config.validationTypeByDomain)
+	err = config.validateTypeByDomainContext(config.ValidationTypeByDomain)
 	if err != nil {
 		return err
 	}
 
-	config.regexEmail, err = newRegex(config.emailPattern)
+	config.RegexEmail, err = newRegex(config.EmailPattern)
 	if err != nil {
 		return err
 	}
 
-	config.regexSMTPErrorBody, err = newRegex(config.smtpErrorBodyPattern)
+	config.RegexSmtpErrorBody, err = newRegex(config.SmtpErrorBodyPattern)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (config *ConfigurationAttr) validate() error {
 
 // Validates verifier email. Returns error if validation fails
 func (config *ConfigurationAttr) validateVerifierEmail(verifierEmail string) error {
-	if matchRegex(verifierEmail, EmailCharsSize) && matchRegex(verifierEmail, RegexEmailPattern) {
+	if matchRegex(verifierEmail, emailCharsSize) && matchRegex(verifierEmail, regexEmailPattern) {
 		return nil
 	}
 	return fmt.Errorf("%s is invalid verifier email", verifierEmail)
@@ -136,7 +136,7 @@ func (config *ConfigurationAttr) validateVerifierEmail(verifierEmail string) err
 
 // Validates verifier domain. Returns error if validation fails
 func (config *ConfigurationAttr) validateVerifierDomain(verifierDomain string) (string, error) {
-	if matchRegex(verifierDomain, DomainCharsSize) && matchRegex(verifierDomain, RegexDomainPattern) {
+	if matchRegex(verifierDomain, domainCharsSize) && matchRegex(verifierDomain, regexDomainPattern) {
 		return verifierDomain, nil
 	}
 	return verifierDomain, fmt.Errorf("%s is invalid verifier domain", verifierDomain)
@@ -144,8 +144,8 @@ func (config *ConfigurationAttr) validateVerifierDomain(verifierDomain string) (
 
 // Returns verifier domain builded from verifier email or validated from function arg
 func (config *ConfigurationAttr) buildVerifierDomain(verifierEmail, verifierDomain string) (string, error) {
-	if verifierDomain == EmptyString {
-		regex, _ := newRegex(RegexEmailPattern)
+	if verifierDomain == emptyString {
+		regex, _ := newRegex(regexEmailPattern)
 		domainCaptureGroup := 3
 		return regex.FindStringSubmatch(verifierEmail)[domainCaptureGroup], nil
 	}
@@ -153,13 +153,13 @@ func (config *ConfigurationAttr) buildVerifierDomain(verifierEmail, verifierDoma
 }
 
 // Validates validation type. Returns error if validation fails
-func (config *ConfigurationAttr) validateValidationTypeDefaultContext(ValidationTypeDefault string) error {
-	if isIncluded(availableValidationTypes(), ValidationTypeDefault) {
+func (config *ConfigurationAttr) validateValidationTypeDefaultContext(validationTypeDefault string) error {
+	if isIncluded(availableValidationTypes(), validationTypeDefault) {
 		return nil
 	}
 	return fmt.Errorf(
 		"%s is invalid default validation type, use one of these: %s",
-		ValidationTypeDefault,
+		validationTypeDefault,
 		availableValidationTypes(),
 	)
 }
@@ -183,7 +183,7 @@ func (config *ConfigurationAttr) validateStringContext(target, regexPattern, msg
 // Validates is domain name matches to regex domain pattern.
 // Returns error if validation fails
 func (config *ConfigurationAttr) validateDomainContext(domainName string) error {
-	return config.validateStringContext(domainName, RegexDomainPattern, "domain name")
+	return config.validateStringContext(domainName, regexDomainPattern, "domain name")
 }
 
 // Validates is each domain name from slice matches to regex domain pattern.
@@ -201,7 +201,7 @@ func (config *ConfigurationAttr) validateDomainsContext(domains []string) error 
 // Validates is ip address matches to regex ip address pattern.
 // Returns error if validation fails
 func (config *ConfigurationAttr) validateIpAddressContext(ipAddress string) error {
-	return config.validateStringContext(ipAddress, RegexIpAddressPattern, "ip address")
+	return config.validateStringContext(ipAddress, regexIpAddressPattern, "ip address")
 }
 
 // Validates is ip address matches to regex ip address pattern.
@@ -218,8 +218,8 @@ func (config *ConfigurationAttr) validateIpAddressesContext(ipAddresses []string
 
 // Validates is DNS server matches to regex DNS server address pattern.
 // Returns error if validation fails
-func (config *ConfigurationAttr) validateDNSServerContext(dnsServer string) error {
-	return config.validateStringContext(dnsServer, RegexDNSServerAddressPattern, "dns server")
+func (config *ConfigurationAttr) validateDnsServerContext(dnsServer string) error {
+	return config.validateStringContext(dnsServer, regexDNSServerAddressPattern, "dns server")
 }
 
 // Validates typesByDomains map key-values. Returns error if validation fails
@@ -241,11 +241,11 @@ func (config *ConfigurationAttr) validateTypeByDomainContext(typesByDomains map[
 // Addes default DNS port to ip address by template {ipAddress}:{portNumber} for cases
 // when port number is not specified
 func (config *ConfigurationAttr) formatDns(dnsGateway string) string {
-	regex, _ := newRegex(RegexDNSServerAddressPattern)
+	regex, _ := newRegex(regexDNSServerAddressPattern)
 	portNumberCaptureGroup := 5
-	if regex.FindStringSubmatch(dnsGateway)[portNumberCaptureGroup] != EmptyString {
+	if regex.FindStringSubmatch(dnsGateway)[portNumberCaptureGroup] != emptyString {
 		return dnsGateway
 	}
 
-	return serverWithPortNumber(dnsGateway, DefaultDnsPort)
+	return serverWithPortNumber(dnsGateway, defaultDnsPort)
 }

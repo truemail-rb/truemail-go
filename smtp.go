@@ -17,14 +17,14 @@ func (validation *validationSmtp) check(validatorResult *validatorResult) *valid
 		return validatorResult
 	}
 
-	validation.result.SMTPDebug = validation.smtpResults
+	validation.result.SmtpDebug = validation.smtpResults
 
 	if validation.isSmtpSafeCheckEnabled() && validation.isNotIncludeUserNotFoundErrors() {
 		return validatorResult
 	}
 
 	validatorResult.Success = false
-	validatorResult.addError(ValidationTypeSmtp, SmtpErrorContext)
+	validatorResult.addError(validationTypeSmtp, smtpErrorContext)
 
 	return validatorResult
 }
@@ -75,7 +75,7 @@ func (validation *validationSmtp) runSmtpSession(targetHostAddress string) bool 
 
 // Returns true if SMTP fail fast scenario is enabled, otherwise returns false
 func (validation *validationSmtp) isFailFastScenario() bool {
-	return validation.result.Configuration.SMTPFailFast
+	return validation.result.Configuration.SmtpFailFast
 }
 
 // Returns first item from validationResult.MailServers if SMTP fail fast scenario is enabled,
@@ -127,7 +127,7 @@ func (validation *validationSmtp) isIncludesSuccessfulSmtpResponse() (successful
 
 // Returns true if SMTP safe check scenario is enabled, otherwise returns false
 func (validation *validationSmtp) isSmtpSafeCheckEnabled() bool {
-	return validation.result.Configuration.SMTPSafeCheck
+	return validation.result.Configuration.SmtpSafeCheck
 }
 
 // Returns true if SMTP results does not contain UserNotFound erros,
@@ -135,7 +135,7 @@ func (validation *validationSmtp) isSmtpSafeCheckEnabled() bool {
 func (validation *validationSmtp) isNotIncludeUserNotFoundErrors() bool {
 	for _, smtpRequest := range validation.smtpResults {
 		for _, err := range smtpRequest.response.errors {
-			if err.isRecptTo && validation.result.Configuration.SMTPErrorBodyPattern.MatchString(err.Error()) {
+			if err.isRecptTo && validation.result.Configuration.SmtpErrorBodyPattern.MatchString(err.Error()) {
 				return false
 			}
 		}

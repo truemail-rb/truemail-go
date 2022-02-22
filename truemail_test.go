@@ -45,9 +45,9 @@ func TestValidate(t *testing.T) {
 		t.Run(validValidationType+" valid validation type", func(t *testing.T) {
 			configuration, _ := NewConfiguration(
 				ConfigurationAttr{
-					verifierEmail: randomEmail(),
-					dns:           dns,
-					smtpPort:      portNumber,
+					VerifierEmail: randomEmail(),
+					Dns:           dns,
+					SmtpPort:      portNumber,
 				},
 			)
 			validatorResult, err := Validate(email, configuration, validValidationType)
@@ -62,11 +62,11 @@ func TestValidate(t *testing.T) {
 	}
 
 	t.Run("succesful validation, default validation type specified in configuration", func(t *testing.T) {
-		email, specifiedValidationTypeByDefault := randomEmail(), ValidationTypeRegex
+		email, specifiedValidationTypeByDefault := randomEmail(), validationTypeRegex
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:         randomEmail(),
-				validationTypeDefault: specifiedValidationTypeByDefault,
+				VerifierEmail:         randomEmail(),
+				ValidationTypeDefault: specifiedValidationTypeByDefault,
 			},
 		)
 		validatorResult, _ := Validate(email, configuration)
@@ -87,8 +87,8 @@ func TestValidate(t *testing.T) {
 		email, domain := pairRandomEmailDomain()
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				whitelistedDomains: []string{domain},
+				VerifierEmail:      randomEmail(),
+				WhitelistedDomains: []string{domain},
 			},
 		)
 		validatorResult, _ := Validate(email, configuration)
@@ -101,25 +101,25 @@ func TestValidate(t *testing.T) {
 	t.Run("Whitelist/Blacklist validation passes to next validation level", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       randomEmail(),
-				whitelistedDomains:  []string{domain},
-				whitelistValidation: true,
-				dns:                 dns,
-				smtpPort:            portNumber,
+				VerifierEmail:       randomEmail(),
+				WhitelistedDomains:  []string{domain},
+				WhitelistValidation: true,
+				Dns:                 dns,
+				SmtpPort:            portNumber,
 			},
 		)
 		validatorResult, _ := Validate(email, configuration)
 
 		assert.True(t, validatorResult.Success)
 		assert.True(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validatorResult.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeSmtp), validatorResult.usedValidations)
 	})
 
 	t.Run("Whitelist/Blacklist validation fails", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				blacklistedDomains: []string{domain},
+				VerifierEmail:      randomEmail(),
+				BlacklistedDomains: []string{domain},
 			},
 		)
 		validatorResult, _ := Validate(email, configuration)
@@ -132,29 +132,29 @@ func TestValidate(t *testing.T) {
 	t.Run("Mx blacklist validation fails", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:            randomEmail(),
-				blacklistedMxIpAddresses: []string{blacklistedMxIpAddress},
-				dns:                      dns,
+				VerifierEmail:            randomEmail(),
+				BlacklistedMxIpAddresses: []string{blacklistedMxIpAddress},
+				Dns:                      dns,
 			},
 		)
 		validatorResult, _ := Validate(blacklistedEmail, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validatorResult.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMxBlacklist), validatorResult.usedValidations)
 	})
 
 	t.Run("SMTP validation fails", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail: blacklistedVerifierEmail,
-				dns:           dns,
-				smtpPort:      portNumber,
+				VerifierEmail: blacklistedVerifierEmail,
+				Dns:           dns,
+				SmtpPort:      portNumber,
 			},
 		)
 		validatorResult, _ := Validate(email, configuration)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validatorResult.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeSmtp), validatorResult.usedValidations)
 	})
 }
 
@@ -191,9 +191,9 @@ func TestIsValid(t *testing.T) {
 
 	configuration, _ := NewConfiguration(
 		ConfigurationAttr{
-			verifierEmail: randomEmail(),
-			dns:           dns,
-			smtpPort:      portNumber,
+			VerifierEmail: randomEmail(),
+			Dns:           dns,
+			SmtpPort:      portNumber,
 		},
 	)
 
@@ -206,11 +206,11 @@ func TestIsValid(t *testing.T) {
 	})
 
 	t.Run("when succesful validation, specified validation type", func(t *testing.T) {
-		assert.True(t, IsValid(randomEmail(), createConfiguration(), ValidationTypeRegex))
+		assert.True(t, IsValid(randomEmail(), createConfiguration(), validationTypeRegex))
 	})
 
 	t.Run("when failed validation", func(t *testing.T) {
-		assert.False(t, IsValid("invalid@email", createConfiguration(), ValidationTypeRegex))
+		assert.False(t, IsValid("invalid@email", createConfiguration(), validationTypeRegex))
 	})
 
 	t.Run("when invalid validation type", func(t *testing.T) {

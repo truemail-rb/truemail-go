@@ -64,7 +64,7 @@ func newSmtpClient(config *smtpRequestConfiguration) *smtpClient {
 		targetEmail:            config.targetEmail,
 		targetServerAddress:    config.targetServerAddress,
 		targetServerPortNumber: config.targetServerPortNumber,
-		networkProtocol:        TcpTransportLayer,
+		networkProtocol:        tcpTransportLayer,
 		connectionTimeout:      time.Duration(config.connectionTimeout) * time.Second,
 		responseTimeout:        time.Duration(config.responseTimeout) * time.Second,
 	}

@@ -12,37 +12,37 @@ func TestValidationDomainListMatchCheck(t *testing.T) {
 	t.Run("whitelist case, email is in whitelist", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				whitelistedDomains: []string{domain},
+				VerifierEmail:      randomEmail(),
+				WhitelistedDomains: []string{domain},
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.True(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchWhitelist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchWhitelist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 
 	t.Run("blacklist case, email is in blacklist", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				blacklistedDomains: []string{domain},
+				VerifierEmail:      randomEmail(),
+				BlacklistedDomains: []string{domain},
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchBlacklist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 
 	t.Run("whitelist/blackist case, email is not in both lists", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail: randomEmail(),
+				VerifierEmail: randomEmail(),
 			},
 		)
 		validationType := randomValidationType()
@@ -57,25 +57,25 @@ func TestValidationDomainListMatchCheck(t *testing.T) {
 	t.Run("whitelist/blackist case, email is in both lists", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:      randomEmail(),
-				whitelistedDomains: []string{domain},
-				blacklistedDomains: []string{domain},
+				VerifierEmail:      randomEmail(),
+				WhitelistedDomains: []string{domain},
+				BlacklistedDomains: []string{domain},
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchBlacklist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 
 	t.Run("whitelist validation case, email is in whitelist", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       randomEmail(),
-				whitelistValidation: true,
-				whitelistedDomains:  []string{domain},
+				VerifierEmail:       randomEmail(),
+				WhitelistValidation: true,
+				WhitelistedDomains:  []string{domain},
 			},
 		)
 		validationType := randomValidationType()
@@ -90,48 +90,48 @@ func TestValidationDomainListMatchCheck(t *testing.T) {
 	t.Run("whitelist validation case, email is not in whitelist/blacklist", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       randomEmail(),
-				whitelistValidation: true,
+				VerifierEmail:       randomEmail(),
+				WhitelistValidation: true,
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchBlacklist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 
 	t.Run("whitelist validation case, email is in blacklist", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       randomEmail(),
-				whitelistValidation: true,
-				blacklistedDomains:  []string{domain},
+				VerifierEmail:       randomEmail(),
+				WhitelistValidation: true,
+				BlacklistedDomains:  []string{domain},
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchBlacklist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 
 	t.Run("whitelist validation case, email is in both lists", func(t *testing.T) {
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
-				verifierEmail:       randomEmail(),
-				whitelistValidation: true,
-				whitelistedDomains:  []string{domain},
-				blacklistedDomains:  []string{domain},
+				VerifierEmail:       randomEmail(),
+				WhitelistValidation: true,
+				WhitelistedDomains:  []string{domain},
+				BlacklistedDomains:  []string{domain},
 			},
 		)
 		validatorResult := runDomainListMatchValidation(email, configuration)
 
 		assert.False(t, validatorResult.Success)
 		assert.False(t, validatorResult.isPassFromDomainListMatch)
-		assert.Equal(t, DomainListMatchBlacklist, validatorResult.ValidationType)
+		assert.Equal(t, domainListMatchBlacklist, validatorResult.ValidationType)
 		assert.Equal(t, domain, validatorResult.Domain)
 	})
 }
@@ -150,7 +150,7 @@ func TestValidationDomainListMatchIsWhitelistedDomain(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
 	t.Run("when whitelisted domain", func(t *testing.T) {
-		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), whitelistedDomains: []string{domain}})
+		configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: randomEmail(), WhitelistedDomains: []string{domain}})
 		validation := &validationDomainListMatch{result: createValidatorResult(email, configuration)}
 		validation.setValidatorResultDomain()
 
@@ -167,7 +167,7 @@ func TestValidationDomainListMatchIsWhitelistedDomain(t *testing.T) {
 
 func TestValidationDomainListMatchIsWhitelistValidation(t *testing.T) {
 	t.Run("when whitelist validation", func(t *testing.T) {
-		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), whitelistValidation: true})
+		configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: randomEmail(), WhitelistValidation: true})
 		validation := &validationDomainListMatch{result: createValidatorResult(randomEmail(), configuration)}
 
 		assert.True(t, validation.isWhitelistValidation())
@@ -184,7 +184,7 @@ func TestValidationDomainListMatchIsBlacklistedDomain(t *testing.T) {
 	email, domain := pairRandomEmailDomain()
 
 	t.Run("when blacklisted domain", func(t *testing.T) {
-		configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: randomEmail(), blacklistedDomains: []string{domain}})
+		configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: randomEmail(), BlacklistedDomains: []string{domain}})
 		validation := &validationDomainListMatch{result: createValidatorResult(email, configuration)}
 		validation.setValidatorResultDomain()
 

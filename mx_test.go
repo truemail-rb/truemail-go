@@ -36,7 +36,7 @@ func TestValidationMxCheck(t *testing.T) {
 				},
 			},
 		}
-		configuration.DNS = runMockDnsServer(dnsRecords)
+		configuration.Dns = runMockDnsServer(dnsRecords)
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
@@ -83,7 +83,7 @@ func TestValidationMxCheck(t *testing.T) {
 				A: []string{resolvedIpAddressSecond},
 			},
 		}
-		configuration.DNS = runMockDnsServer(dnsRecords)
+		configuration.Dns = runMockDnsServer(dnsRecords)
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
@@ -102,7 +102,7 @@ func TestValidationMxCheck(t *testing.T) {
 				A: []string{resolvedIpAddressFirst, randomIpAddress()},
 			},
 		}
-		configuration.DNS = runMockDnsServer(dnsRecords)
+		configuration.Dns = runMockDnsServer(dnsRecords)
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
@@ -115,12 +115,12 @@ func TestValidationMxCheck(t *testing.T) {
 	})
 
 	t.Run("MX validation: failure, servers not found using MX, CNAME and A record resolvers", func(t *testing.T) {
-		configuration.DNS = runMockDnsServer(map[string]mockdns.Zone{})
+		configuration.Dns = runMockDnsServer(map[string]mockdns.Zone{})
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
+		assert.Equal(t, map[string]string{"mx": mxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
@@ -136,12 +136,12 @@ func TestValidationMxCheck(t *testing.T) {
 				A: []string{randomIpAddress()},
 			},
 		}
-		configuration.DNS = runMockDnsServer(dnsRecords)
+		configuration.Dns = runMockDnsServer(dnsRecords)
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
+		assert.Equal(t, map[string]string{"mx": mxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
@@ -154,12 +154,12 @@ func TestValidationMxCheck(t *testing.T) {
 				A: []string{randomIpAddress()},
 			},
 		}
-		configuration.DNS, configuration.NotRfcMxLookupFlow = runMockDnsServer(dnsRecords), true
+		configuration.Dns, configuration.NotRfcMxLookupFlow = runMockDnsServer(dnsRecords), true
 		validatorResult := createSuccessfulValidatorResult(targetEmail, configuration)
 		new(validationMx).check(validatorResult)
 
 		assert.False(t, validatorResult.Success)
-		assert.Equal(t, map[string]string{"mx": MxErrorContext}, validatorResult.Errors)
+		assert.Equal(t, map[string]string{"mx": mxErrorContext}, validatorResult.Errors)
 		assert.Empty(t, validatorResult.usedValidations)
 		assert.Equal(t, punycodeDomain(targetHostName), validatorResult.punycodeDomain)
 		assert.Equal(t, targetUserName+punycodeDomain(targetHostName), validatorResult.punycodeEmail)
@@ -197,7 +197,7 @@ func TestValidationMxInitDnsResolver(t *testing.T) {
 		hostName, hostAddress := randomDomain(), randomIpAddress()
 		dnsRecords := map[string]mockdns.Zone{hostName + ".": {A: []string{hostAddress}}}
 		dns, configuration := runMockDnsServer(dnsRecords), createConfiguration()
-		configuration.DNS = dns
+		configuration.Dns = dns
 		validation := &validationMx{result: &validatorResult{Configuration: configuration}}
 		validation.initDnsResolver()
 		resolvedHostAddress, _ := validation.resolver.aRecord(hostName)
@@ -279,7 +279,7 @@ func TestValidationMxIsNullMxError(t *testing.T) {
 func TestValidationMxARecords(t *testing.T) {
 	method, email, connectionAttempts, ipAddresses := "aRecords", randomEmail(), 2, []string{randomIpAddress()}
 	hostName := emailDomain(email)
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: email, connectionAttempts: connectionAttempts})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: email, ConnectionAttempts: connectionAttempts})
 
 	t.Run("when A records was found during first attempt", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
@@ -319,7 +319,7 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 	email, connectionAttempts := randomEmail(), 2
 	ipAddresses, hostNames, priorities := []string{randomIpAddress()}, []string{randomDomain()}, []uint16{5}
 	hostName := emailDomain(email)
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: email, connectionAttempts: connectionAttempts})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: email, ConnectionAttempts: connectionAttempts})
 
 	t.Run("when MX records was found during first attempt", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
@@ -396,7 +396,7 @@ func TestValidationMxHostsFromMxRecords(t *testing.T) {
 func TestValidationMxHostFromARecord(t *testing.T) {
 	method, email, connectionAttempts, ipAddress := "aRecord", randomEmail(), 2, randomIpAddress()
 	hostName := emailDomain(email)
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: email, connectionAttempts: connectionAttempts})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: email, ConnectionAttempts: connectionAttempts})
 
 	t.Run("when A record was found during first attempt", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
@@ -434,7 +434,7 @@ func TestValidationMxHostFromARecord(t *testing.T) {
 
 func TestValidationMxPtrRecords(t *testing.T) {
 	method, email, connectionAttempts, hostAddress, hostNames := "ptrRecords", randomEmail(), 2, randomDomain(), []string{randomIpAddress()}
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: email, connectionAttempts: connectionAttempts})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: email, ConnectionAttempts: connectionAttempts})
 
 	t.Run("when PTR records was found during first attempt", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)
@@ -480,7 +480,7 @@ func TestValidationMxHostsFromCnameRecord(t *testing.T) {
 	resolvedHostNameByMxRecord := randomDomain()
 	priorities, resolvedHostNamesByMxRecords := []uint16{5}, []string{resolvedHostNameByMxRecord}
 	resolvedIpAddressesByARecords := []string{randomIpAddress()}
-	configuration, _ := NewConfiguration(ConfigurationAttr{verifierEmail: email, connectionAttempts: connectionAttempts})
+	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: email, ConnectionAttempts: connectionAttempts})
 
 	t.Run("when host addresses was found during first attempt", func(t *testing.T) {
 		validatorResult, resolver := createSuccessfulValidatorResult(email, configuration), new(dnsResolverMock)

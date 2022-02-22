@@ -48,7 +48,7 @@ func matchRegex(strContext, regexPattern string) bool {
 
 // Returns slice of available validation types
 func availableValidationTypes() []string {
-	return []string{ValidationTypeRegex, ValidationTypeMx, ValidationTypeMxBlacklist, ValidationTypeSmtp}
+	return []string{validationTypeRegex, validationTypeMx, validationTypeMxBlacklist, validationTypeSmtp}
 }
 
 // Extracts and validates validation type from variadic argument
@@ -84,7 +84,7 @@ func regexCaptureGroup(str string, regexPattern string, captureGroup int) string
 
 // Returns domain from email string
 func emailDomain(email string) string {
-	return regexCaptureGroup(email, RegexDomainFromEmail, 1)
+	return regexCaptureGroup(email, regexDomainFromEmail, 1)
 }
 
 // Returns pointer of copied configuration

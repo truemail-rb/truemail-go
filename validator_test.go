@@ -42,7 +42,7 @@ func TestValidatorValidateRegex(t *testing.T) {
 		validationRegex.On("check", result).Return(result)
 		validator.validateRegex()
 		validationRegex.AssertExpectations(t)
-		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeRegex), validator.result.usedValidations)
 
 	})
 }
@@ -58,7 +58,7 @@ func TestValidatorValidateMx(t *testing.T) {
 		validator.validateMx()
 		validationRegex.AssertExpectations(t)
 		validationMx.AssertExpectations(t)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMx), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMx), validator.result.usedValidations)
 	})
 
 	t.Run("when regex layer fails", func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestValidatorValidateMx(t *testing.T) {
 		validator.validateMx()
 		validationRegex.AssertExpectations(t)
 		validationMx.AssertNotCalled(t, "check", result)
-		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeRegex), validator.result.usedValidations)
 	})
 }
 
@@ -88,7 +88,7 @@ func TestValidatorValidateMxBlacklist(t *testing.T) {
 		validationRegex.AssertExpectations(t)
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertExpectations(t)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMxBlacklist), validator.result.usedValidations)
 	})
 
 	t.Run("when regex layer fails", func(t *testing.T) {
@@ -101,7 +101,7 @@ func TestValidatorValidateMxBlacklist(t *testing.T) {
 		validationRegex.AssertExpectations(t)
 		validationMx.AssertNotCalled(t, "check", result)
 		validationMxBlacklist.AssertNotCalled(t, "check", result)
-		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeRegex), validator.result.usedValidations)
 	})
 
 	t.Run("when mx layer fails", func(t *testing.T) {
@@ -117,7 +117,7 @@ func TestValidatorValidateMxBlacklist(t *testing.T) {
 		validationRegex.AssertExpectations(t)
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertNotCalled(t, "check", failedResult)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMx), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMx), validator.result.usedValidations)
 	})
 }
 
@@ -138,7 +138,7 @@ func TestValidatorValidateSMTP(t *testing.T) {
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertExpectations(t)
 		validationSmtp.AssertExpectations(t)
-		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeSmtp), validator.result.usedValidations)
 	})
 
 	t.Run("when regex layer fails", func(t *testing.T) {
@@ -155,7 +155,7 @@ func TestValidatorValidateSMTP(t *testing.T) {
 		validationMx.AssertNotCalled(t, "check", failedResult)
 		validationMxBlacklist.AssertNotCalled(t, "check", failedResult)
 		validationSmtp.AssertNotCalled(t, "check", failedResult)
-		assert.Equal(t, usedValidationsByType(ValidationTypeRegex), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeRegex), validator.result.usedValidations)
 	})
 
 	t.Run("when mx layer fails", func(t *testing.T) {
@@ -173,7 +173,7 @@ func TestValidatorValidateSMTP(t *testing.T) {
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertNotCalled(t, "check", failedResult)
 		validationSmtp.AssertNotCalled(t, "check", failedResult)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMx), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMx), validator.result.usedValidations)
 	})
 
 	t.Run("when mx blacklist layer fails", func(t *testing.T) {
@@ -192,7 +192,7 @@ func TestValidatorValidateSMTP(t *testing.T) {
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertExpectations(t)
 		validationSmtp.AssertNotCalled(t, "check", failedResult)
-		assert.Equal(t, usedValidationsByType(ValidationTypeMxBlacklist), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeMxBlacklist), validator.result.usedValidations)
 	})
 
 	t.Run("when smtp layer fails", func(t *testing.T) {
@@ -212,13 +212,13 @@ func TestValidatorValidateSMTP(t *testing.T) {
 		validationMx.AssertExpectations(t)
 		validationMxBlacklist.AssertExpectations(t)
 		validationSmtp.AssertExpectations(t)
-		assert.Equal(t, usedValidationsByType(ValidationTypeSmtp), validator.result.usedValidations)
+		assert.Equal(t, usedValidationsByType(validationTypeSmtp), validator.result.usedValidations)
 	})
 }
 
 func TestValidatorRun(t *testing.T) {
 	t.Run("domainListMatchLayer fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeRegex)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeRegex)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -233,7 +233,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("regex validation: domainListMatchLayer succeed", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeRegex)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeRegex)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -250,7 +250,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("mx validation: domainListMatchLayer succeed, regex fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeMx)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeMx)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -268,7 +268,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("mx validation: domainListMatchLayer, regex succeed", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeMx)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeMx)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -285,7 +285,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("mx blacklist validation: domainListMatchLayer succeed, regex fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeMxBlacklist)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeMxBlacklist)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -303,7 +303,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("mx blacklist validation: domainListMatchLayer, regex succeed, mx fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeMxBlacklist)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeMxBlacklist)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -322,7 +322,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("mx blacklist validation: domainListMatchLayer, regex, mx succeed", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeMxBlacklist)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeMxBlacklist)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -341,7 +341,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("smtp validation: domainListMatchLayer succeed, regex fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeSmtp)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeSmtp)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -359,7 +359,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("smtp validation: domainListMatchLayer, regex succeed, mx fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeSmtp)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeSmtp)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -378,7 +378,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("smtp validation: domainListMatchLayer, regex, mx succeed, mx blacklist fails", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeSmtp)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeSmtp)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
@@ -398,7 +398,7 @@ func TestValidatorRun(t *testing.T) {
 	})
 
 	t.Run("smtp validation: domainListMatchLayer, regex, mx, mx blacklist succeed", func(t *testing.T) {
-		validator := createValidator(randomEmail(), createConfiguration(), ValidationTypeSmtp)
+		validator := createValidator(randomEmail(), createConfiguration(), validationTypeSmtp)
 		validationDomainListMatch, result := new(validationDomainListMatchMock), validator.result
 		validationRegex, validationMx, validationMxBlacklist, validationSmtp := new(validationRegexMock), new(validationMxMock), new(validationMxBlacklistMock), new(validationSmtpMock)
 		validator.domainListMatchLayer, validator.regexLayer, validator.mxLayer, validator.mxBlacklistLayer, validator.smtpLayer = validationDomainListMatch, validationRegex, validationMx, validationMxBlacklist, validationSmtp
