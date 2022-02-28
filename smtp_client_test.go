@@ -50,7 +50,7 @@ func TestNewSmtpClient(t *testing.T) {
 }
 
 func TestSmtpInitConnection(t *testing.T) {
-	t.Run("when connection succesful", func(t *testing.T) {
+	t.Run("when connection successful", func(t *testing.T) {
 		server := startSmtpMock(smtpmock.ConfigurationAttr{})
 		portNumber := server.PortNumber
 		defer func() { _ = server.Stop() }()

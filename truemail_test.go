@@ -61,7 +61,7 @@ func TestValidate(t *testing.T) {
 		})
 	}
 
-	t.Run("succesful validation, default validation type specified in configuration", func(t *testing.T) {
+	t.Run("successful validation, default validation type specified in configuration", func(t *testing.T) {
 		email, specifiedValidationTypeByDefault := randomEmail(), validationTypeRegex
 		configuration, _ := NewConfiguration(
 			ConfigurationAttr{
@@ -197,7 +197,7 @@ func TestIsValid(t *testing.T) {
 		},
 	)
 
-	t.Run("when succesful validation, default validation type specified in configuration", func(t *testing.T) {
+	t.Run("when successful validation, default validation type specified in configuration", func(t *testing.T) {
 		assert.True(t, IsValid(email, configuration))
 	})
 
@@ -205,7 +205,7 @@ func TestIsValid(t *testing.T) {
 		assert.False(t, IsValid(nonExistentEmail, configuration))
 	})
 
-	t.Run("when succesful validation, specified validation type", func(t *testing.T) {
+	t.Run("when successful validation, specified validation type", func(t *testing.T) {
 		assert.True(t, IsValid(randomEmail(), createConfiguration(), validationTypeRegex))
 	})
 
