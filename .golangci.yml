@@ -1,0 +1,11 @@
+linters:
+  enable:
+    - gocyclo
+    - misspell
+
+  disable:
+    - revive
+
+linters-settings:
+  gocyclo:
+    min-complexity: 18
