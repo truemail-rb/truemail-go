@@ -523,3 +523,55 @@ func TestConfigurationAttrFormatDns(t *testing.T) {
 		assert.Equal(t, dnsGateway, new(ConfigurationAttr).formatDns(dnsGateway))
 	})
 }
+
+func TestConfigurationAttrValidateWithFormatDnsServerContext(t *testing.T) {
+	t.Run("when DNS gateway not specified", func(t *testing.T) {
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(emptyString)
+
+		assert.Equal(t, emptyString, dnsGateway)
+		assert.NoError(t, err)
+	})
+
+	t.Run("when DNS gateway specified without port", func(t *testing.T) {
+		dns := randomIpAddress()
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(dns)
+
+		assert.Equal(t, serverWithPortNumber(dns, defaultDnsPort), dnsGateway)
+		assert.NoError(t, err)
+	})
+
+	t.Run("when DNS gateway specified with port", func(t *testing.T) {
+		dns := serverWithPortNumber(randomIpAddress(), randomPortNumber())
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(dns)
+
+		assert.Equal(t, dns, dnsGateway)
+		assert.NoError(t, err)
+	})
+
+	t.Run("when DNS gateway specified, wrong ip address", func(t *testing.T) {
+		dns := "1.1.1.256"
+		errorMessage := fmt.Sprintf("%v is invalid dns server", dns)
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(dns)
+
+		assert.Equal(t, dns, dnsGateway)
+		assert.EqualError(t, err, errorMessage)
+	})
+
+	t.Run("when DNS gateway specified, wrong port number", func(t *testing.T) {
+		dns := "1.1.1.255:65536"
+		errorMessage := fmt.Sprintf("%v is invalid dns server", dns)
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(dns)
+
+		assert.Equal(t, dns, dnsGateway)
+		assert.EqualError(t, err, errorMessage)
+	})
+
+	t.Run("when DNS gateway specified, wrong ip address and port number", func(t *testing.T) {
+		dns := "1.1.1.256:65536"
+		errorMessage := fmt.Sprintf("%v is invalid dns server", dns)
+		dnsGateway, err := new(ConfigurationAttr).validateWithFormatDnsServerContext(dns)
+
+		assert.Equal(t, dns, dnsGateway)
+		assert.EqualError(t, err, errorMessage)
+	})
+}
