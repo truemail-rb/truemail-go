@@ -97,16 +97,12 @@ func (config *ConfigurationAttr) validate() error {
 		return err
 	}
 
-	dns := config.Dns
-
-	if dns != emptyString {
-		err = config.validateDnsServerContext(dns)
-		if err != nil {
-			return err
-		}
-
-		config.Dns = config.formatDns(dns)
+	dns, err := config.validateWithFormatDnsServerContext(config.Dns)
+	if err != nil {
+		return err
 	}
+
+	config.Dns = dns
 
 	err = config.validateTypeByDomainContext(config.ValidationTypeByDomain)
 	if err != nil {
@@ -248,4 +244,19 @@ func (config *ConfigurationAttr) formatDns(dnsGateway string) string {
 	}
 
 	return serverWithPortNumber(dnsGateway, defaultDnsPort)
+}
+
+// Validates DNS server context and returns formatted DNS when dns gateway not empty.
+// Otherwise returns empty string
+func (config *ConfigurationAttr) validateWithFormatDnsServerContext(dnsGateway string) (string, error) {
+	if dnsGateway == emptyString {
+		return emptyString, nil
+	}
+
+	err := config.validateDnsServerContext(dnsGateway)
+	if err != nil {
+		return dnsGateway, err
+	}
+
+	return config.formatDns(dnsGateway), nil
 }
