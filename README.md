@@ -5,11 +5,11 @@
 [![CircleCI](https://circleci.com/gh/truemail-rb/truemail-go/tree/master.svg?style=svg)](https://circleci.com/gh/truemail-rb/truemail-go/tree/master)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/truemail-rb/truemail-go)](https://github.com/truemail-rb/truemail-go/releases)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/truemail-rb/truemail-go)](https://pkg.go.dev/github.com/truemail-rb/truemail-go)
-<!-- [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go) -->
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 [![GitHub](https://img.shields.io/github/license/truemail-rb/truemail-go)](LICENSE.txt)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
-Configurable framework agnostic plain Go email validator. Verify email via Regex, DNS, SMTP and even more. Be sure that email address valid and exists. It's Golang port of [`truemail`](https://truemail-rb.org/truemail-gem) gem. Currently ported all validation features only.
+Configurable Golang 📨 email validator. Verify email via Regex, DNS, SMTP and even more. Be sure that email address valid and exists. It's Golang port of [`truemail`](https://truemail-rb.org/truemail-gem) Ruby gem. Currently ported all validation features only.
 
 > Actual and maintainable documentation :books: for developers is living [here](https://truemail-rb.org/truemail-go).
 
