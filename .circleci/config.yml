@@ -3,23 +3,20 @@ version: 2.1
 jobs:
   linters:
     docker:
-      - image: golangci/golangci-lint:v1.43-alpine
+      - image: golangci/golangci-lint:v1.50-alpine
     steps:
       - checkout
       - run: golangci-lint run
 
   test:
     docker:
-      - image: golang:1.15
-    working_directory: /go/src/github.com/truemail-rb/truemail-go
+      - image: cimg/go:1.19.2
+    working_directory: ~/truemail-go
     steps:
       - checkout
-      - run:
-          name: Installing Gotestsum
-          command: go get gotest.tools/gotestsum
 
       - run:
-          name: Running tests
+          name: Running tests with Gotestsum
           command: gotestsum --format standard-verbose -- -coverprofile=coverage_report ./...
 
       - run:
