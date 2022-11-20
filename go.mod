@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/brianvoe/gofakeit/v6 v6.19.0
 	github.com/foxcpp/go-mockdns v1.0.0
-	github.com/mocktools/go-smtp-mock v1.10.0
+	github.com/mocktools/go-smtp-mock/v2 v2.0.1
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/net v0.1.0
 )

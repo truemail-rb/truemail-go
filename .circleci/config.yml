@@ -3,14 +3,14 @@ version: 2.1
 jobs:
   linters:
     docker:
-      - image: golangci/golangci-lint:v1.50-alpine
+      - image: golangci/golangci-lint:v1.50.1-alpine
     steps:
       - checkout
       - run: golangci-lint run
 
   test:
     docker:
-      - image: cimg/go:1.19.2
+      - image: cimg/go:1.19.3
     working_directory: ~/truemail-go
     steps:
       - checkout

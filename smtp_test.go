@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	smtpmock "github.com/mocktools/go-smtp-mock"
+	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ func TestValidationSmtpCheck(t *testing.T) {
 			NotRegisteredEmails:       []string{nonExistentEmail},
 		},
 	)
-	portNumber := server.PortNumber
+	portNumber := server.PortNumber()
 	defer func() { _ = server.Stop() }()
 
 	t.Run("SMTP validation: successful after first attempt on first server", func(t *testing.T) {
