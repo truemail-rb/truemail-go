@@ -7,7 +7,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/foxcpp/go-mockdns"
-	smtpmock "github.com/mocktools/go-smtp-mock"
+	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"golang.org/x/net/idna"
 )
 

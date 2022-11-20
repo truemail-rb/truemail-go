@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/foxcpp/go-mockdns"
-	smtpmock "github.com/mocktools/go-smtp-mock"
+	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +17,7 @@ func TestValidate(t *testing.T) {
 	blacklistedResolvedHostNameByMxReord, blacklistedMxIpAddress, blacklistedVerifierEmail := randomDnsHostName(), randomIpAddress(), randomEmail()
 
 	server := startSmtpMock(smtpmock.ConfigurationAttr{BlacklistedMailfromEmails: []string{blacklistedVerifierEmail}})
-	portNumber := server.PortNumber
+	portNumber := server.PortNumber()
 	defer func() { _ = server.Stop() }()
 
 	dns := runMockDnsServer(
@@ -165,7 +165,7 @@ func TestIsValid(t *testing.T) {
 	nonExistentResolvedHostNameByMxReord := randomDnsHostName()
 
 	server := startSmtpMock(smtpmock.ConfigurationAttr{NotRegisteredEmails: []string{nonExistentEmail}})
-	portNumber := server.PortNumber
+	portNumber := server.PortNumber()
 	defer func() { _ = server.Stop() }()
 
 	dns := runMockDnsServer(

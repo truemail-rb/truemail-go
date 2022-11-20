@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	smtpmock "github.com/mocktools/go-smtp-mock"
+	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,7 +52,7 @@ func TestNewSmtpClient(t *testing.T) {
 func TestSmtpInitConnection(t *testing.T) {
 	t.Run("when connection successful", func(t *testing.T) {
 		server := startSmtpMock(smtpmock.ConfigurationAttr{})
-		portNumber := server.PortNumber
+		portNumber := server.PortNumber()
 		defer func() { _ = server.Stop() }()
 
 		smtpClient := &smtpClient{
@@ -113,7 +113,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 		},
 	)
 	defer func() { _ = server.Stop() }()
-	portNumber := server.PortNumber
+	portNumber := server.PortNumber()
 
 	t.Run("iteracting with external SMTP server, no errors", func(t *testing.T) {
 		client := &smtpClient{
@@ -181,7 +181,7 @@ func TestSmtpClientRunSession(t *testing.T) {
 		serverWithDelay := startSmtpMock(smtpmock.ConfigurationAttr{ResponseDelayHelo: 2})
 		defer func() { _ = serverWithDelay.Stop() }()
 
-		portNumberServerWithDelay := serverWithDelay.PortNumber
+		portNumberServerWithDelay := serverWithDelay.PortNumber()
 		errorMessage := fmt.Sprintf("->%s:%d: use of closed network connection", localhostIPv4Address, portNumberServerWithDelay)
 		client := &smtpClient{
 			verifierDomain:         randomDomain(),
