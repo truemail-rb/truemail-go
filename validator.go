@@ -26,7 +26,7 @@ func (validatorResult *validatorResult) addError(key, value string) {
 	validatorResult.Errors[key] = value
 }
 
-// Structure with behaviour. Responsible for the
+// Structure with behavior. Responsible for the
 // logic of calling the validation layers sequence
 type validator struct {
 	result *validatorResult

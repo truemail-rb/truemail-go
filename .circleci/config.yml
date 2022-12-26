@@ -1,22 +1,39 @@
+---
+
 version: 2.1
+
+defaults: &defaults
+  working_directory: ~/truemail-go
+  docker:
+    - image: cimg/go:1.19
 
 jobs:
   linters:
     docker:
       - image: golangci/golangci-lint:v1.50.1-alpine
-    steps:
-      - checkout
-      - run: golangci-lint run
 
-  test:
-    docker:
-      - image: cimg/go:1.19.3
-    working_directory: ~/truemail-go
     steps:
       - checkout
 
       - run:
-          name: Running tests with Gotestsum
+          name: Installing linters
+          command: |
+                apk add --update npm shellcheck yamllint
+                npm install --global --save-dev git+https://github.com/streetsidesoftware/cspell-cli markdownlint-cli lefthook
+                cp .circleci/linter_configs/.lefthook.yml lefthook.yml
+
+      - run:
+          name: Running linters
+          command: lefthook run linters
+
+  tests:
+    <<: *defaults
+
+    steps:
+      - checkout
+
+      - run:
+          name: Running tests
           command: gotestsum --format standard-verbose -- -coverprofile=coverage_report ./...
 
       - run:
@@ -41,8 +58,25 @@ jobs:
           command: |
             bash <(curl -s https://codecov.io/bash) -f coverage_report
 
+  release:
+    <<: *defaults
+
+    steps:
+      - checkout
+
+      - run:
+          name: Publishing new release to Go Packages
+          command: |
+            ./.circleci/scripts/release.sh
+
 workflows:
   build:
     jobs:
       - linters
-      - test
+      - tests
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
