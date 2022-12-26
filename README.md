@@ -49,7 +49,6 @@ Configurable Golang 📨 email validator. Verify email via Regex, DNS, SMTP and 
 - [Versioning](#versioning)
 - [Changelog](CHANGELOG.md)
 
-
 ## Synopsis
 
 Email validation is a tricky thing. There are a number of different ways to validate an email address and all mechanisms must conform with the best practices and provide proper validation. The `truemail-go` package helps you validate emails via regex pattern, presence of DNS records, and real existence of email account on a current email server.
@@ -202,7 +201,7 @@ configuration := truemail.NewConfiguration(
     // This parameter uses for SMTP session in SMTP validation layer.
     SmtpPort: 2525,
 
-    // Optional parameter. This option will provide to use smtp fail fast behaviour. When
+    // Optional parameter. This option will provide to use smtp fail fast behavior. When
     // smtpFailFast = true it means that Truemail ends smtp validation session after first
     // attempt on the first mx server in any fail cases (network connection/timeout error,
     // smtp validation error). This feature helps to reduce total time of SMTP validation
@@ -381,6 +380,7 @@ configuration := truemail.NewConfiguration(
 truemail.Validate("email@example.com", configuration, "regex") // returns pointer to validatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "regex") // returns true
 ```
+
 ##### With custom regex pattern
 
 You should define your custom regex pattern in a gem configuration before.
@@ -487,7 +487,7 @@ By default, you don't need pass with-parameter to use it. Example of usage is sp
 
 ##### SMTP fail fast enabled
 
-Truemail can use fail fast behaviour for SMTP validation layer. When `SmtpFailFast = true` it means that `truemail` ends smtp validation session after first attempt on the first mx server in any fail cases (network connection/timeout error, smtp validation error). This feature helps to reduce total time of SMTP validation session up to 1 second.
+Truemail can use fail fast behavior for SMTP validation layer. When `SmtpFailFast = true` it means that `truemail` ends smtp validation session after first attempt on the first mx server in any fail cases (network connection/timeout error, smtp validation error). This feature helps to reduce total time of SMTP validation session up to 1 second.
 
 ```go
 import "github.com/truemail-rb/truemail-go"
@@ -550,7 +550,7 @@ truemail.IsValid("email@example.com", configuration)
 
 ## Truemail family
 
-All Truemail solutions: https://truemail-rb.org
+All Truemail solutions: <https://truemail-rb.org>
 
 | Name | Type | Description |
 | --- | --- | --- |
@@ -564,7 +564,7 @@ All Truemail solutions: https://truemail-rb.org
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/truemail-rb/truemail-go. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. Please check the [open tickets](https://github.com/truemail-rb/truemail-go/issues). Be sure to follow Contributor Code of Conduct below and our [Contributing Guidelines](CONTRIBUTING.md).
+Bug reports and pull requests are welcome on GitHub at <https://github.com/truemail-rb/truemail-go>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. Please check the [open tickets](https://github.com/truemail-rb/truemail-go/issues). Be sure to follow Contributor Code of Conduct below and our [Contributing Guidelines](CONTRIBUTING.md).
 
 ## License
 
