@@ -123,7 +123,7 @@ func TestDnsResolverCnameRecord(t *testing.T) {
 
 	t.Run("when target CNAME record found", func(t *testing.T) {
 		otherDomain := randomDomain()
-		dnsRecords := map[string]mockdns.Zone{domain: {CNAME: toDnsHostName(otherDomain)}} // TODO: different go-mockdns behaviour for domain key, should be with dot
+		dnsRecords := map[string]mockdns.Zone{domain: {CNAME: toDnsHostName(otherDomain)}} // TODO: different go-mockdns behavior for domain key, should be with dot
 		dnsResolver := createDnsResolver(dnsRecords)
 		resolvedHostName, err := dnsResolver.cnameRecord(domain)
 

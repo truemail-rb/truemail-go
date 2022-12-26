@@ -2,6 +2,25 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2022-12-26
+
+### Added
+
+- Added [`cspell`](https://cspell.org) linter
+- Added [`markdownlint`](https://github.com/DavidAnson/markdownlint) linter
+- Added [`shellcheck`](https://www.shellcheck.net) linter
+- Added [`yamllint`](https://yamllint.readthedocs.io) linter
+- Added [`lefthook`](https://github.com/evilmartians/lefthook) linters aggregator
+
+### Fixed
+
+- Fixed typos in project's codebase
+- Fixed new project's linter issues
+
+### Updated
+
+- Updated `CircleCI` config
+
 ## [1.0.2] - 2022-11-20
 
 - Updated dependencies
@@ -32,7 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Updated
 
 - Updated `ConfigurationAttr#validate`, tests
-- Updated golangci config
+- Updated `golangci` config
 - Updated package documentation
 
 ## [0.1.2] - 2022-02-28
