@@ -5,12 +5,12 @@ version: 2.1
 defaults: &defaults
   working_directory: ~/truemail-go
   docker:
-    - image: cimg/go:1.19
+    - image: cimg/go:1.20.1
 
 jobs:
   linters:
     docker:
-      - image: golangci/golangci-lint:v1.50.1-alpine
+      - image: golangci/golangci-lint:v1.51.1-alpine
 
     steps:
       - checkout
@@ -24,7 +24,8 @@ jobs:
 
       - run:
           name: Running linters
-          command: lefthook run linters
+          command: |
+            lefthook run linters
 
   tests:
     <<: *defaults
@@ -34,7 +35,8 @@ jobs:
 
       - run:
           name: Running tests
-          command: gotestsum --format standard-verbose -- -coverprofile=coverage_report ./...
+          command: |
+            gotestsum --format standard-verbose -- -coverprofile=coverage_report ./...
 
       - run:
           name: Creating coverage reports
