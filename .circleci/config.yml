@@ -60,22 +60,48 @@ jobs:
           command: |
             bash <(curl -s https://codecov.io/bash) -f coverage_report
 
+  tag:
+    <<: *defaults
+
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "f6:1c:3f:c6:bd:08:21:0b:2c:a9:0a:1f:7b:92:1d:00"
+
+      - run:
+          name: Publishing new tag to GitHub
+          command: |
+            ./.circleci/scripts/tag.sh
+
   release:
     <<: *defaults
 
     steps:
       - checkout
 
+      - add_ssh_keys:
+          fingerprints:
+            - "f6:1c:3f:c6:bd:08:21:0b:2c:a9:0a:1f:7b:92:1d:00"
+
       - run:
-          name: Publishing new release to Go Packages
+          name: Publishing new release to GitHub, Go Packages
           command: |
-            ./.circleci/scripts/release.sh
+            ./.circleci/scripts/release.sh truemail-rb truemail-go
 
 workflows:
   build:
     jobs:
       - linters
       - tests
+      - tag:
+          requires:
+            - linters
+            - tests
+          filters:
+            branches:
+              only: master
       - release:
           filters:
             branches:
