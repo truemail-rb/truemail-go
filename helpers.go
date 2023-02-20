@@ -88,7 +88,7 @@ func emailDomain(email string) string {
 }
 
 // Returns pointer of copied configuration
-func copyConfigurationByPointer(configuration *configuration) *configuration {
+func copyConfigurationByPointer(configuration *Configuration) *Configuration {
 	config := *configuration
 	return &config
 }

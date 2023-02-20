@@ -81,18 +81,18 @@ func randomDnsServerWithDefaultPortNumber() (string, string) {
 	return ipAddress, serverWithPortNumber(ipAddress, defaultDnsPort)
 }
 
-func createConfiguration() *configuration {
+func createConfiguration() *Configuration {
 	configuration, _ := NewConfiguration(ConfigurationAttr{VerifierEmail: randomEmail()})
 	return configuration
 }
 
-func createValidatorResult(email string, configuration *configuration, options ...string) *validatorResult {
+func createValidatorResult(email string, configuration *Configuration, options ...string) *ValidatorResult {
 	validationType, _ := variadicValidationType(options, configuration.ValidationTypeDefault)
-	return &validatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
+	return &ValidatorResult{Email: email, Configuration: configuration, ValidationType: validationType}
 }
 
-func createSuccessfulValidatorResult(email string, configuration *configuration) *validatorResult {
-	return &validatorResult{Email: email, Domain: emailDomain(email), Configuration: copyConfigurationByPointer(configuration), Success: true}
+func createSuccessfulValidatorResult(email string, configuration *Configuration) *ValidatorResult {
+	return &ValidatorResult{Email: email, Domain: emailDomain(email), Configuration: copyConfigurationByPointer(configuration), Success: true}
 }
 
 func randomValidationType() string {
@@ -102,7 +102,7 @@ func randomValidationType() string {
 	return availableValidationTypes[index]
 }
 
-func createValidator(email string, configuration *configuration, options ...string) *validator {
+func createValidator(email string, configuration *Configuration, options ...string) *validator {
 	validationType, _ := variadicValidationType(options, configuration.ValidationTypeDefault)
 	return newValidator(email, validationType, configuration)
 }
@@ -116,18 +116,18 @@ func usedValidationsByType(validationType string) []string {
 	}[validationType]
 }
 
-func runDomainListMatchValidation(email string, configuration *configuration, options ...string) *validatorResult {
+func runDomainListMatchValidation(email string, configuration *Configuration, options ...string) *ValidatorResult {
 	validator := createValidator(email, configuration, options...)
 	validatorResult := validator.result
 	return validator.domainListMatchLayer.check(validatorResult)
 }
 
-func doPassedFromDomainListMatch(validatorResult *validatorResult) {
+func doPassedFromDomainListMatch(validatorResult *ValidatorResult) {
 	validatorResult.Success, validatorResult.isPassFromDomainListMatch = true, true
 }
 
-func failedValidatorResult() *validatorResult {
-	return new(validatorResult)
+func failedValidatorResult() *ValidatorResult {
+	return new(ValidatorResult)
 }
 
 // Returns dnsResolver with mocked DNS records

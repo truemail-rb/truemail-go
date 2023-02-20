@@ -180,7 +180,7 @@ func TestValidationMxSetValidatorResultPunycodeRepresentation(t *testing.T) {
 	t.Run("returns domain punycode representation", func(t *testing.T) {
 		internationalizedUser, internationalizedDomain := "niña", "mañana.cøm"
 		internationalizedEmail := internationalizedUser + "@" + internationalizedDomain
-		validatorResult := &validatorResult{Email: internationalizedEmail}
+		validatorResult := &ValidatorResult{Email: internationalizedEmail}
 		validation := &validationMx{result: validatorResult}
 		validation.setValidatorResultPunycodeRepresentation()
 		asciiDomain := "xn--maana-pta.xn--cm-lka"
@@ -198,7 +198,7 @@ func TestValidationMxInitDnsResolver(t *testing.T) {
 		dnsRecords := map[string]mockdns.Zone{hostName + ".": {A: []string{hostAddress}}}
 		dns, configuration := runMockDnsServer(dnsRecords), createConfiguration()
 		configuration.Dns = dns
-		validation := &validationMx{result: &validatorResult{Configuration: configuration}}
+		validation := &validationMx{result: &ValidatorResult{Configuration: configuration}}
 		validation.initDnsResolver()
 		resolvedHostAddress, _ := validation.resolver.aRecord(hostName)
 
@@ -208,13 +208,13 @@ func TestValidationMxInitDnsResolver(t *testing.T) {
 
 func TestValidationMxIsMailServerNotFound(t *testing.T) {
 	t.Run("when mail servers none", func(t *testing.T) {
-		validation := &validationMx{result: &validatorResult{}}
+		validation := &validationMx{result: &ValidatorResult{}}
 
 		assert.True(t, validation.isMailServerNotFound())
 	})
 
 	t.Run("when mail servers exist", func(t *testing.T) {
-		validation := &validationMx{result: &validatorResult{MailServers: []string{randomIp6Address()}}}
+		validation := &validationMx{result: &ValidatorResult{MailServers: []string{randomIp6Address()}}}
 
 		assert.False(t, validation.isMailServerNotFound())
 	})
@@ -222,13 +222,13 @@ func TestValidationMxIsMailServerNotFound(t *testing.T) {
 
 func TestValidationMxIsMailServerFound(t *testing.T) {
 	t.Run("when mail servers exist", func(t *testing.T) {
-		validation := &validationMx{result: &validatorResult{MailServers: []string{randomIp6Address()}}}
+		validation := &validationMx{result: &ValidatorResult{MailServers: []string{randomIp6Address()}}}
 
 		assert.True(t, validation.isMailServerFound())
 	})
 
 	t.Run("when mail servers none", func(t *testing.T) {
-		validation := &validationMx{result: &validatorResult{}}
+		validation := &validationMx{result: &ValidatorResult{}}
 
 		assert.False(t, validation.isMailServerFound())
 	})
@@ -237,7 +237,7 @@ func TestValidationMxIsMailServerFound(t *testing.T) {
 func TestValidationMxFetchTargetHosts(t *testing.T) {
 	t.Run("addes only uniques hosts with keeping sequence of grabbed hosts", func(t *testing.T) {
 		hostFirst, hostSecond, hostThird := randomIpAddress(), randomIpAddress(), randomIpAddress()
-		validatorResult := &validatorResult{MailServers: []string{hostFirst}}
+		validatorResult := &ValidatorResult{MailServers: []string{hostFirst}}
 		hosts := []string{hostSecond, hostFirst, hostThird, hostSecond}
 		validation := &validationMx{result: validatorResult}
 		validation.fetchTargetHosts(hosts...)

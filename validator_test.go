@@ -421,7 +421,7 @@ func TestValidatorRun(t *testing.T) {
 func TestValidatorResultAddUsedValidationType(t *testing.T) {
 	t.Run("validatorResult#addUsedValidationType", func(t *testing.T) {
 		validationType := randomValidationType()
-		result := new(validatorResult)
+		result := new(ValidatorResult)
 		result.addUsedValidationType(validationType)
 
 		assert.Equal(t, []string{validationType}, result.usedValidations)
@@ -431,7 +431,7 @@ func TestValidatorResultAddUsedValidationType(t *testing.T) {
 func TestValidatorResultAddError(t *testing.T) {
 	t.Run("validatorResult#addError", func(t *testing.T) {
 		key, value := "some_error_key", "some_error_value"
-		result := new(validatorResult)
+		result := new(ValidatorResult)
 		result.addError(key, value)
 
 		assert.Equal(t, value, result.Errors[key])
