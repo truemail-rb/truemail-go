@@ -2,6 +2,19 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2023-02-20
+
+### Updated
+
+- Updated `x/crypto` dependency
+
+### Fixed
+
+- Fixed `x/crypto` issue. Vulnerable to panic via SSH server, [CVE-2021-43565](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-43565)
+- Fixed `x/crypto` issue. Use of a Broken or Risky Cryptographic Algorithm in golang.org/x/crypto/ssh, [CVE-2022-27191](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-27191)
+- Fixed `x/crypto` issue. Panic in malformed certificate, [CVE-2020-7919](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7919)
+- Fixed `x/crypto` issue. Improper Verification of Cryptographic Signature, [CVE-2020-9283](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-9283)
+
 ## [1.0.4] - 2023-02-19
 
 ### Added
@@ -11,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Updated
 
 - Updated `go` to `1.20.1`
+- Updated `x/net` dependency
 - Updated releasing script (auto deploy to `GitHub`/`Go Packages`)
 - Updated `CircleCI` config
 - Updated project license
