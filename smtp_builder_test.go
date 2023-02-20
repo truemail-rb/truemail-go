@@ -12,11 +12,11 @@ func TestSmtpBuilderNewSmtpRequest(t *testing.T) {
 		smtpRequestConfiguration := newSmtpRequestConfiguration(configuration, targetEmail, targetHostAddress)
 		smtpRequest := new(smtpBuilder).newSmtpRequest(attempts, targetEmail, targetHostAddress, configuration)
 
-		assert.Equal(t, attempts, smtpRequest.attempts)
-		assert.Equal(t, targetEmail, smtpRequest.email)
-		assert.Equal(t, targetHostAddress, smtpRequest.host)
-		assert.Equal(t, smtpRequestConfiguration, smtpRequest.configuration)
-		assert.Equal(t, new(smtpResponse), smtpRequest.response)
+		assert.Equal(t, attempts, smtpRequest.Attempts)
+		assert.Equal(t, targetEmail, smtpRequest.Email)
+		assert.Equal(t, targetHostAddress, smtpRequest.Host)
+		assert.Equal(t, smtpRequestConfiguration, smtpRequest.Configuration)
+		assert.Equal(t, new(SmtpResponse), smtpRequest.Response)
 	})
 }
 

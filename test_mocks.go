@@ -9,9 +9,9 @@ type validationDomainListMatchMock struct {
 	mock.Mock
 }
 
-func (validation *validationDomainListMatchMock) check(result *validatorResult) *validatorResult {
+func (validation *validationDomainListMatchMock) check(result *ValidatorResult) *ValidatorResult {
 	args := validation.Called(result)
-	return args.Get(0).(*validatorResult)
+	return args.Get(0).(*ValidatorResult)
 }
 
 // validationRegex structure mock
@@ -19,9 +19,9 @@ type validationRegexMock struct {
 	mock.Mock
 }
 
-func (validation *validationRegexMock) check(result *validatorResult) *validatorResult {
+func (validation *validationRegexMock) check(result *ValidatorResult) *ValidatorResult {
 	args := validation.Called(result)
-	return args.Get(0).(*validatorResult)
+	return args.Get(0).(*ValidatorResult)
 }
 
 // validationMx structure mock
@@ -29,9 +29,9 @@ type validationMxMock struct {
 	mock.Mock
 }
 
-func (validation *validationMxMock) check(result *validatorResult) *validatorResult {
+func (validation *validationMxMock) check(result *ValidatorResult) *ValidatorResult {
 	args := validation.Called(result)
-	return args.Get(0).(*validatorResult)
+	return args.Get(0).(*ValidatorResult)
 }
 
 // validationMxBlacklistMock structure mock
@@ -39,9 +39,9 @@ type validationMxBlacklistMock struct {
 	mock.Mock
 }
 
-func (validation *validationMxBlacklistMock) check(result *validatorResult) *validatorResult {
+func (validation *validationMxBlacklistMock) check(result *ValidatorResult) *ValidatorResult {
 	args := validation.Called(result)
-	return args.Get(0).(*validatorResult)
+	return args.Get(0).(*ValidatorResult)
 }
 
 // validationSmtpMock structure mock
@@ -49,9 +49,9 @@ type validationSmtpMock struct {
 	mock.Mock
 }
 
-func (validation *validationSmtpMock) check(result *validatorResult) *validatorResult {
+func (validation *validationSmtpMock) check(result *ValidatorResult) *ValidatorResult {
 	args := validation.Called(result)
-	return args.Get(0).(*validatorResult)
+	return args.Get(0).(*ValidatorResult)
 }
 
 // dnsResolverMock structure mock
@@ -89,8 +89,8 @@ type smtpClientMock struct {
 	mock.Mock
 }
 
-func (client *smtpClientMock) sessionError() *smtpClientError {
-	return client.Called().Get(0).(*smtpClientError)
+func (client *smtpClientMock) sessionError() *SmtpClientError {
+	return client.Called().Get(0).(*SmtpClientError)
 }
 
 func (client *smtpClientMock) runSession() bool {
@@ -102,12 +102,12 @@ type smtpBuilderMock struct {
 	mock.Mock
 }
 
-func (builder *smtpBuilderMock) newSmtpRequest(attempts int, targetEmail, targetHostAddress string, configuration *configuration) *smtpRequest {
+func (builder *smtpBuilderMock) newSmtpRequest(attempts int, targetEmail, targetHostAddress string, configuration *Configuration) *SmtpRequest {
 	args := builder.Called(attempts, targetEmail, targetHostAddress, configuration)
-	return args.Get(0).(*smtpRequest)
+	return args.Get(0).(*SmtpRequest)
 }
 
-func (builder *smtpBuilderMock) newSmtpClient(configuration *smtpRequestConfiguration) client {
+func (builder *smtpBuilderMock) newSmtpClient(configuration *SmtpRequestConfiguration) client {
 	args := builder.Called(configuration)
 	return args.Get(0).(client)
 }

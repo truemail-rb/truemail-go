@@ -25,7 +25,7 @@ type dnsResolver struct {
 
 // dnsResolver builder. Creates custom resolver with
 // connection timeout and DNS gateway from configuration
-func newDnsResolver(configuration *configuration) *dnsResolver {
+func newDnsResolver(configuration *Configuration) *dnsResolver {
 	connectionTimeout, dnsServer := configuration.ConnectionTimeout, configuration.Dns
 
 	return &dnsResolver{

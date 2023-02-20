@@ -1,10 +1,10 @@
 package truemail
 
 // Whitelist/Blacklist validation, zero validation level
-type validationDomainListMatch struct{ result *validatorResult }
+type validationDomainListMatch struct{ result *ValidatorResult }
 
 // interface implementation
-func (validation *validationDomainListMatch) check(validatorResult *validatorResult) *validatorResult {
+func (validation *validationDomainListMatch) check(validatorResult *ValidatorResult) *ValidatorResult {
 	validation.result = validatorResult
 	validation.setValidatorResultDomain()
 

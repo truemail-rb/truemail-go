@@ -5,8 +5,8 @@ import (
 	"regexp"
 )
 
-// configuration structure
-type configuration struct {
+// Configuration structure
+type Configuration struct {
 	ctx                                                                  context.Context
 	VerifierEmail, VerifierDomain, ValidationTypeDefault, Dns            string
 	ConnectionTimeout, ResponseTimeout, ConnectionAttempts, SmtpPort     int
@@ -17,7 +17,7 @@ type configuration struct {
 }
 
 // NewConfiguration returns new valid newConfiguration structure
-func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
+func NewConfiguration(config ConfigurationAttr) (*Configuration, error) {
 	config.assignDefaultValues()
 	err := config.validate()
 
@@ -25,7 +25,7 @@ func NewConfiguration(config ConfigurationAttr) (*configuration, error) {
 		return nil, err
 	}
 
-	newConfiguration := configuration{
+	newConfiguration := Configuration{
 		ctx:                      config.ctx,
 		VerifierEmail:            config.VerifierEmail,
 		VerifierDomain:           config.VerifierDomain,

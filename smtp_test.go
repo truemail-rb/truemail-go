@@ -152,16 +152,16 @@ func TestValidationSmtpRun(t *testing.T) {
 		validation := &validationSmtp{result: validatorResult, builder: builder}
 		attempts := validation.attempts()
 
-		smtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          targetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, targetHostAddress),
-			response:      new(smtpResponse),
+		smtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          targetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, targetHostAddress),
+			Response:      new(SmtpResponse),
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, targetHostAddress, configuration).Once().Return(smtpReq)
-		builder.On("newSmtpClient", smtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", smtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(true)
 		validation.run()
 
@@ -173,48 +173,48 @@ func TestValidationSmtpRun(t *testing.T) {
 		firstTargetHostAddress, secondTargetHostAddress, thirdTargetHostAddress := randomIpAddress(), randomIpAddress(), randomIpAddress()
 		validatorResult.MailServers = append(validatorResult.MailServers, firstTargetHostAddress, secondTargetHostAddress, thirdTargetHostAddress)
 
-		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(smtpClientError)
+		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(SmtpClientError)
 		validation := &validationSmtp{result: validatorResult, builder: builder}
 		attempts := validation.attempts()
 
-		firstSmtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          firstTargetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, firstTargetHostAddress),
-			response:      new(smtpResponse),
+		firstSmtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          firstTargetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, firstTargetHostAddress),
+			Response:      new(SmtpResponse),
 		}
-		secondSmtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          secondTargetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, secondTargetHostAddress),
-			response:      new(smtpResponse),
+		secondSmtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          secondTargetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, secondTargetHostAddress),
+			Response:      new(SmtpResponse),
 		}
-		thirdSmtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          thirdTargetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, thirdTargetHostAddress),
-			response:      new(smtpResponse),
+		thirdSmtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          thirdTargetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, thirdTargetHostAddress),
+			Response:      new(SmtpResponse),
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, firstTargetHostAddress, configuration).Once().Return(firstSmtpReq)
-		builder.On("newSmtpClient", firstSmtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", firstSmtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(false)
 		smtpClient.On("sessionError").Once().Return(sessionError)
 
 		builder.On("newSmtpRequest", attempts, targetEmail, secondTargetHostAddress, configuration).Once().Return(secondSmtpReq)
-		builder.On("newSmtpClient", secondSmtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", secondSmtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(false)
 		smtpClient.On("sessionError").Once().Return(sessionError)
 
 		builder.On("newSmtpRequest", attempts, targetEmail, thirdTargetHostAddress, configuration).Once().Return(thirdSmtpReq)
-		builder.On("newSmtpClient", thirdSmtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", thirdSmtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(true)
 		validation.run()
 
-		assert.Equal(t, []*smtpRequest{firstSmtpReq, secondSmtpReq, thirdSmtpReq}, validation.smtpResults)
+		assert.Equal(t, []*SmtpRequest{firstSmtpReq, secondSmtpReq, thirdSmtpReq}, validation.smtpResults)
 		assert.True(t, validation.isIncludesSuccessfulSmtpResponse())
 	})
 
@@ -223,37 +223,37 @@ func TestValidationSmtpRun(t *testing.T) {
 		firstTargetHostAddress, secondTargetHostAddress := randomIpAddress(), randomIpAddress()
 		validatorResult.MailServers = append(validatorResult.MailServers, firstTargetHostAddress, secondTargetHostAddress)
 
-		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(smtpClientError)
+		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(SmtpClientError)
 		validation := &validationSmtp{result: validatorResult, builder: builder}
 		attempts := validation.attempts()
 
-		firstSmtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          firstTargetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, firstTargetHostAddress),
-			response:      new(smtpResponse),
+		firstSmtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          firstTargetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, firstTargetHostAddress),
+			Response:      new(SmtpResponse),
 		}
-		secondSmtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          secondTargetHostAddress,
-			configuration: newSmtpRequestConfiguration(configuration, targetEmail, secondTargetHostAddress),
-			response:      new(smtpResponse),
+		secondSmtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          secondTargetHostAddress,
+			Configuration: newSmtpRequestConfiguration(configuration, targetEmail, secondTargetHostAddress),
+			Response:      new(SmtpResponse),
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, firstTargetHostAddress, configuration).Once().Return(firstSmtpReq)
-		builder.On("newSmtpClient", firstSmtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", firstSmtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(false)
 		smtpClient.On("sessionError").Once().Return(sessionError)
 
 		builder.On("newSmtpRequest", attempts, targetEmail, secondTargetHostAddress, configuration).Once().Return(secondSmtpReq)
-		builder.On("newSmtpClient", secondSmtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", secondSmtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(false)
 		smtpClient.On("sessionError").Once().Return(sessionError)
 		validation.run()
 
-		assert.Equal(t, []*smtpRequest{firstSmtpReq, secondSmtpReq}, validation.smtpResults)
+		assert.Equal(t, []*SmtpRequest{firstSmtpReq, secondSmtpReq}, validation.smtpResults)
 		assert.False(t, validation.isIncludesSuccessfulSmtpResponse())
 	})
 }
@@ -266,76 +266,76 @@ func TestValidationSmtpRunSmtpSession(t *testing.T) {
 	t.Run("when successful session during first attempt", func(t *testing.T) {
 		builder, smtpClient := new(smtpBuilderMock), new(smtpClientMock)
 		validation := &validationSmtp{result: validatorResult, builder: builder}
-		attempts, smtpResponse := validation.attempts(), new(smtpResponse)
+		attempts, smtpResponse := validation.attempts(), new(SmtpResponse)
 
-		smtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          targetHostAddress,
-			configuration: smtpRequestConfiguration,
-			response:      smtpResponse,
+		smtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          targetHostAddress,
+			Configuration: smtpRequestConfiguration,
+			Response:      smtpResponse,
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, targetHostAddress, configuration).Once().Return(smtpReq)
-		builder.On("newSmtpClient", smtpReq.configuration).Once().Return(smtpClient)
+		builder.On("newSmtpClient", smtpReq.Configuration).Once().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(true)
 
 		assert.True(t, validation.runSmtpSession(targetHostAddress))
-		assert.Equal(t, attempts-1, smtpReq.attempts)
-		assert.True(t, smtpResponse.rcptto)
-		assert.Empty(t, smtpResponse.errors)
-		assert.Equal(t, []*smtpRequest{smtpReq}, validation.smtpResults)
+		assert.Equal(t, attempts-1, smtpReq.Attempts)
+		assert.True(t, smtpResponse.Rcptto)
+		assert.Empty(t, smtpResponse.Errors)
+		assert.Equal(t, []*SmtpRequest{smtpReq}, validation.smtpResults)
 	})
 
 	t.Run("when successful session during second attempt", func(t *testing.T) {
-		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(smtpClientError)
+		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(SmtpClientError)
 		validation := &validationSmtp{result: validatorResult, builder: builder}
-		attempts, smtpResponse := validation.attempts(), new(smtpResponse)
+		attempts, smtpResponse := validation.attempts(), new(SmtpResponse)
 
-		smtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          targetHostAddress,
-			configuration: smtpRequestConfiguration,
-			response:      smtpResponse,
+		smtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          targetHostAddress,
+			Configuration: smtpRequestConfiguration,
+			Response:      smtpResponse,
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, targetHostAddress, configuration).Twice().Return(smtpReq)
-		builder.On("newSmtpClient", smtpReq.configuration).Twice().Return(smtpClient)
+		builder.On("newSmtpClient", smtpReq.Configuration).Twice().Return(smtpClient)
 		smtpClient.On("runSession").Once().Return(false)
 		smtpClient.On("sessionError").Once().Return(sessionError)
 		smtpClient.On("runSession").Once().Return(true)
 
 		assert.True(t, validation.runSmtpSession(targetHostAddress))
-		assert.Equal(t, attempts-2, smtpReq.attempts)
-		assert.True(t, smtpResponse.rcptto)
-		assert.Equal(t, []*smtpClientError{sessionError}, smtpResponse.errors)
-		assert.Equal(t, []*smtpRequest{smtpReq}, validation.smtpResults)
+		assert.Equal(t, attempts-2, smtpReq.Attempts)
+		assert.True(t, smtpResponse.Rcptto)
+		assert.Equal(t, []*SmtpClientError{sessionError}, smtpResponse.Errors)
+		assert.Equal(t, []*SmtpRequest{smtpReq}, validation.smtpResults)
 	})
 
 	t.Run("when failed session during all attempts", func(t *testing.T) {
-		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(smtpClientError)
+		builder, smtpClient, sessionError := new(smtpBuilderMock), new(smtpClientMock), new(SmtpClientError)
 		validation := &validationSmtp{result: validatorResult, builder: builder}
-		attempts, smtpResponse := validation.attempts(), new(smtpResponse)
+		attempts, smtpResponse := validation.attempts(), new(SmtpResponse)
 
-		smtpReq := &smtpRequest{
-			attempts:      attempts,
-			email:         targetEmail,
-			host:          targetHostAddress,
-			configuration: smtpRequestConfiguration,
-			response:      smtpResponse,
+		smtpReq := &SmtpRequest{
+			Attempts:      attempts,
+			Email:         targetEmail,
+			Host:          targetHostAddress,
+			Configuration: smtpRequestConfiguration,
+			Response:      smtpResponse,
 		}
 
 		builder.On("newSmtpRequest", attempts, targetEmail, targetHostAddress, configuration).Twice().Return(smtpReq)
-		builder.On("newSmtpClient", smtpReq.configuration).Twice().Return(smtpClient)
+		builder.On("newSmtpClient", smtpReq.Configuration).Twice().Return(smtpClient)
 		smtpClient.On("runSession").Twice().Return(false)
 		smtpClient.On("sessionError").Twice().Return(sessionError)
 
 		assert.False(t, validation.runSmtpSession(targetHostAddress))
-		assert.Equal(t, attempts-2, smtpReq.attempts)
-		assert.False(t, smtpResponse.rcptto)
-		assert.Equal(t, []*smtpClientError{sessionError, sessionError}, smtpResponse.errors)
-		assert.Equal(t, []*smtpRequest{smtpReq}, validation.smtpResults)
+		assert.Equal(t, attempts-2, smtpReq.Attempts)
+		assert.False(t, smtpResponse.Rcptto)
+		assert.Equal(t, []*SmtpClientError{sessionError, sessionError}, smtpResponse.Errors)
+		assert.Equal(t, []*SmtpRequest{smtpReq}, validation.smtpResults)
 	})
 }
 
@@ -343,13 +343,13 @@ func TestValidationSmtpIsFailFastScenario(t *testing.T) {
 	t.Run("when SMTP fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
 		configuration.SmtpFailFast = true
-		validation := &validationSmtp{result: &validatorResult{Configuration: configuration}}
+		validation := &validationSmtp{result: &ValidatorResult{Configuration: configuration}}
 
 		assert.True(t, validation.isFailFastScenario())
 	})
 
 	t.Run("when SMTP fail fast scenario is disabled", func(t *testing.T) {
-		validation := &validationSmtp{result: &validatorResult{Configuration: createConfiguration()}}
+		validation := &validationSmtp{result: &ValidatorResult{Configuration: createConfiguration()}}
 
 		assert.False(t, validation.isFailFastScenario())
 	})
@@ -361,13 +361,13 @@ func TestValidationSmtpFilteredMailServersByFailFastScenario(t *testing.T) {
 	t.Run("when SMTP fail fast scenario is enabled", func(t *testing.T) {
 		configuration := createConfiguration()
 		configuration.SmtpFailFast = true
-		validation := &validationSmtp{result: &validatorResult{MailServers: mailServers, Configuration: configuration}}
+		validation := &validationSmtp{result: &ValidatorResult{MailServers: mailServers, Configuration: configuration}}
 
 		assert.Equal(t, mailServers[:1], validation.filteredMailServersByFailFastScenario())
 	})
 
 	t.Run("when SMTP fail fast scenario is disabled", func(t *testing.T) {
-		validation := &validationSmtp{result: &validatorResult{MailServers: mailServers, Configuration: createConfiguration()}}
+		validation := &validationSmtp{result: &ValidatorResult{MailServers: mailServers, Configuration: createConfiguration()}}
 
 		assert.Equal(t, mailServers, validation.filteredMailServersByFailFastScenario())
 	})
@@ -376,7 +376,7 @@ func TestValidationSmtpFilteredMailServersByFailFastScenario(t *testing.T) {
 func TestValidationSmtpIsMoreThanOneMailServer(t *testing.T) {
 	t.Run("when more than one mail server", func(t *testing.T) {
 		validation := &validationSmtp{
-			result: &validatorResult{
+			result: &ValidatorResult{
 				MailServers: []string{randomIpAddress(), randomIpAddress()},
 			},
 		}
@@ -385,7 +385,7 @@ func TestValidationSmtpIsMoreThanOneMailServer(t *testing.T) {
 	})
 
 	t.Run("when less than two mail servers", func(t *testing.T) {
-		validation := &validationSmtp{result: &validatorResult{}}
+		validation := &validationSmtp{result: &ValidatorResult{}}
 
 		assert.False(t, validation.isMoreThanOneMailServer())
 	})
@@ -402,7 +402,7 @@ func TestValidationSmtpAttempts(t *testing.T) {
 
 	t.Run("when more than one mail server", func(t *testing.T) {
 		validation := &validationSmtp{
-			result: &validatorResult{
+			result: &ValidatorResult{
 				MailServers:   []string{randomIpAddress(), randomIpAddress()},
 				Configuration: createConfiguration(),
 			},
@@ -420,7 +420,7 @@ func TestValidationSmtpAttempts(t *testing.T) {
 			},
 		)
 		validation := &validationSmtp{
-			result: &validatorResult{
+			result: &ValidatorResult{
 				MailServers:   []string{randomIpAddress()},
 				Configuration: configuration,
 			},
@@ -431,18 +431,18 @@ func TestValidationSmtpAttempts(t *testing.T) {
 }
 
 func TestValidationSmtpIsIncludesSuccessfulSmtpResponse(t *testing.T) {
-	failedSmtpRequest, successfulSmtpRequest := &smtpRequest{response: new(smtpResponse)}, &smtpRequest{response: &smtpResponse{rcptto: true}}
+	failedSmtpRequest, successfulSmtpRequest := &SmtpRequest{Response: new(SmtpResponse)}, &SmtpRequest{Response: &SmtpResponse{Rcptto: true}}
 
 	t.Run("when smtpResults is empty", func(t *testing.T) {
-		validation := &validationSmtp{result: &validatorResult{}}
+		validation := &validationSmtp{result: &ValidatorResult{}}
 
 		assert.True(t, validation.isIncludesSuccessfulSmtpResponse())
 	})
 
 	t.Run("when first successful SMTP response found", func(t *testing.T) {
 		validation := &validationSmtp{
-			result:      &validatorResult{},
-			smtpResults: []*smtpRequest{failedSmtpRequest, failedSmtpRequest, successfulSmtpRequest},
+			result:      &ValidatorResult{},
+			smtpResults: []*SmtpRequest{failedSmtpRequest, failedSmtpRequest, successfulSmtpRequest},
 		}
 
 		assert.True(t, validation.isIncludesSuccessfulSmtpResponse())
@@ -450,8 +450,8 @@ func TestValidationSmtpIsIncludesSuccessfulSmtpResponse(t *testing.T) {
 
 	t.Run("when successful SMTP response not found", func(t *testing.T) {
 		validation := &validationSmtp{
-			result:      &validatorResult{},
-			smtpResults: []*smtpRequest{failedSmtpRequest},
+			result:      &ValidatorResult{},
+			smtpResults: []*SmtpRequest{failedSmtpRequest},
 		}
 
 		assert.False(t, validation.isIncludesSuccessfulSmtpResponse())
@@ -461,7 +461,7 @@ func TestValidationSmtpIsIncludesSuccessfulSmtpResponse(t *testing.T) {
 func TestValidationSmtpIsSmtpSafeCheckEnabled(t *testing.T) {
 	t.Run("when SMTP safe check is disabled", func(t *testing.T) {
 		validation := &validationSmtp{
-			result: &validatorResult{Configuration: createConfiguration()},
+			result: &ValidatorResult{Configuration: createConfiguration()},
 		}
 
 		assert.False(t, validation.isSmtpSafeCheckEnabled())
@@ -469,8 +469,8 @@ func TestValidationSmtpIsSmtpSafeCheckEnabled(t *testing.T) {
 
 	t.Run("when SMTP safe check is enabled", func(t *testing.T) {
 		validation := &validationSmtp{
-			result: &validatorResult{
-				Configuration: &configuration{SmtpSafeCheck: true},
+			result: &ValidatorResult{
+				Configuration: &Configuration{SmtpSafeCheck: true},
 			},
 		}
 
@@ -486,11 +486,11 @@ func TestValidationSmtpIsNotIncludeUserNotFoundErrors(t *testing.T) {
 	t.Run("when does not contain recognized UserNotFound errors ", func(t *testing.T) {
 		validation := &validationSmtp{
 			result: createValidatorResult(randomEmail(), createConfiguration()),
-			smtpResults: []*smtpRequest{
+			smtpResults: []*SmtpRequest{
 				{
-					response: &smtpResponse{
-						rcptto: true,
-						errors: []*smtpClientError{
+					Response: &SmtpResponse{
+						Rcptto: true,
+						Errors: []*SmtpClientError{
 							{
 								isConnection: true,
 								err:          errors.New("Some connection error"),
@@ -521,11 +521,11 @@ func TestValidationSmtpIsNotIncludeUserNotFoundErrors(t *testing.T) {
 		)
 		validation := &validationSmtp{
 			result: createValidatorResult(randomEmail(), configuration),
-			smtpResults: []*smtpRequest{
+			smtpResults: []*SmtpRequest{
 				{
-					response: &smtpResponse{
-						rcptto: true,
-						errors: []*smtpClientError{
+					Response: &SmtpResponse{
+						Rcptto: true,
+						Errors: []*SmtpClientError{
 							{
 								isConnection: true,
 								err:          errors.New("Some connection error"),

@@ -272,7 +272,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@white-domain.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@white-domain.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@white-domain.com", configuration) // returns true
 ```
 
@@ -293,7 +293,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@white-domain.com", configuration, "regex") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@white-domain.com", configuration, "regex") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@white-domain.com", configuration, "regex") // returns true
 ```
 
@@ -310,7 +310,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@domain.com", configuration, "regex") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@domain.com", configuration, "regex") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@domain.com", configuration, "regex") // returns false
 ```
 
@@ -330,13 +330,13 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@black-domain.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@black-domain.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@domain.com", configuration) // returns false
 ```
 
 ##### Duplication case
 
-Validation result for this email returns `true`, because it was found in whitelisted domains list first. Also `validatorResult.ValidationType` for this case will be redefined.
+Validation result for this email returns `true`, because it was found in whitelisted domains list first. Also `ValidatorResult.ValidationType` for this case will be redefined.
 
 ```go
 import "github.com/truemail-rb/truemail-go"
@@ -350,7 +350,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@somedomain.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@somedomain.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@somedomain.com", configuration) // returns true
 ```
 
@@ -377,7 +377,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration, "regex") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration, "regex") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "regex") // returns true
 ```
 
@@ -395,7 +395,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration, "regex") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration, "regex") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "regex") // returns true
 truemail.IsValid("not_email", configuration, "regex") // returns false
 ```
@@ -425,7 +425,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration, "mx") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration, "mx") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "mx") // returns bool
 ```
 
@@ -445,7 +445,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration, "mx") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration, "mx") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "mx") // returns bool
 ```
 
@@ -469,7 +469,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration, "mx_blacklist") // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration, "mx_blacklist") // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration, "mx_blacklist") // returns bool
 ```
 
@@ -499,7 +499,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration) // returns bool
 ```
 
@@ -516,7 +516,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration) // returns bool
 ```
 
@@ -534,7 +534,7 @@ configuration := truemail.NewConfiguration(
   },
 )
 
-truemail.Validate("email@example.com", configuration) // returns pointer to validatorResult with validation details and error
+truemail.Validate("email@example.com", configuration) // returns pointer to ValidatorResult with validation details and error
 truemail.IsValid("email@example.com", configuration) // returns bool
 ```
 

@@ -48,7 +48,7 @@ func TestWrapDnsError(t *testing.T) {
 func TestSmtpClientErrorError(t *testing.T) {
 	t.Run("returns wrapped error message", func(t *testing.T) {
 		errorMessage := "error message"
-		customError := &smtpClientError{err: fmt.Errorf(errorMessage)}
+		customError := &SmtpClientError{err: fmt.Errorf(errorMessage)}
 
 		assert.Equal(t, errorMessage, customError.Error())
 	})

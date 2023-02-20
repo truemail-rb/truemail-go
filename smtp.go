@@ -2,13 +2,13 @@ package truemail
 
 // SMTP validation, fourth validation level
 type validationSmtp struct {
-	result      *validatorResult
-	smtpResults []*smtpRequest
+	result      *ValidatorResult
+	smtpResults []*SmtpRequest
 	builder
 }
 
 // interface implementation
-func (validation *validationSmtp) check(validatorResult *validatorResult) *validatorResult {
+func (validation *validationSmtp) check(validatorResult *ValidatorResult) *ValidatorResult {
 	validation.result = validatorResult
 	validation.initSmtpBuilder()
 	validation.run()
@@ -55,19 +55,19 @@ func (validation *validationSmtp) runSmtpSession(targetHostAddress string) bool 
 		targetHostAddress,
 		validatorResult.Configuration,
 	)
-	smtpResponse := smtpRequest.response
+	smtpResponse := smtpRequest.Response
 	validation.smtpResults = append(validation.smtpResults, smtpRequest)
 
-	for smtpRequest.attempts > 0 {
-		smtpClient := validatorBuilder.newSmtpClient(smtpRequest.configuration)
-		smtpRequest.attempts -= 1
+	for smtpRequest.Attempts > 0 {
+		smtpClient := validatorBuilder.newSmtpClient(smtpRequest.Configuration)
+		smtpRequest.Attempts -= 1
 
 		if smtpClient.runSession() {
-			smtpResponse.rcptto = true
+			smtpResponse.Rcptto = true
 			return true
 		}
 
-		smtpResponse.errors = append(smtpResponse.errors, smtpClient.sessionError())
+		smtpResponse.Errors = append(smtpResponse.Errors, smtpClient.sessionError())
 	}
 
 	return false
@@ -115,7 +115,7 @@ func (validation *validationSmtp) isIncludesSuccessfulSmtpResponse() (successful
 	}
 
 	for _, smtpRequest := range smtpResults {
-		if !smtpRequest.response.rcptto {
+		if !smtpRequest.Response.Rcptto {
 			continue
 		}
 		successfulSmtpResponse = true
@@ -134,7 +134,7 @@ func (validation *validationSmtp) isSmtpSafeCheckEnabled() bool {
 // otherwise terminates iteration and returns false
 func (validation *validationSmtp) isNotIncludeUserNotFoundErrors() bool {
 	for _, smtpRequest := range validation.smtpResults {
-		for _, err := range smtpRequest.response.errors {
+		for _, err := range smtpRequest.Response.Errors {
 			if err.isRecptTo && validation.result.Configuration.SmtpErrorBodyPattern.MatchString(err.Error()) {
 				return false
 			}
