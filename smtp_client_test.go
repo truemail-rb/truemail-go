@@ -15,37 +15,37 @@ func TestNewSmtpRequestConfiguration(t *testing.T) {
 		configuration.SmtpPort, configuration.ConnectionTimeout, configuration.ResponseTimeout = randomPortNumber(), randomPositiveNumber(), randomPositiveNumber()
 		smtpRequestConfiguration := newSmtpRequestConfiguration(configuration, email, server)
 
-		assert.Equal(t, configuration.VerifierDomain, smtpRequestConfiguration.verifierDomain)
-		assert.Equal(t, configuration.VerifierEmail, smtpRequestConfiguration.verifierEmail)
-		assert.Equal(t, email, smtpRequestConfiguration.targetEmail)
-		assert.Equal(t, server, smtpRequestConfiguration.targetServerAddress)
-		assert.Equal(t, configuration.SmtpPort, smtpRequestConfiguration.targetServerPortNumber)
-		assert.Equal(t, configuration.ConnectionTimeout, smtpRequestConfiguration.connectionTimeout)
-		assert.Equal(t, configuration.ResponseTimeout, smtpRequestConfiguration.responseTimeout)
+		assert.Equal(t, configuration.VerifierDomain, smtpRequestConfiguration.VerifierDomain)
+		assert.Equal(t, configuration.VerifierEmail, smtpRequestConfiguration.VerifierEmail)
+		assert.Equal(t, email, smtpRequestConfiguration.TargetEmail)
+		assert.Equal(t, server, smtpRequestConfiguration.TargetServerAddress)
+		assert.Equal(t, configuration.SmtpPort, smtpRequestConfiguration.TargetServerPortNumber)
+		assert.Equal(t, configuration.ConnectionTimeout, smtpRequestConfiguration.ConnectionTimeout)
+		assert.Equal(t, configuration.ResponseTimeout, smtpRequestConfiguration.ResponseTimeout)
 	})
 }
 
 func TestNewSmtpClient(t *testing.T) {
 	t.Run("creates new smtp client with settings specified in smtpRequestConfiguration", func(t *testing.T) {
-		smtpRequestConfig := &smtpRequestConfiguration{
-			verifierDomain:         randomDomain(),
-			verifierEmail:          randomEmail(),
-			targetEmail:            randomEmail(),
-			targetServerAddress:    randomIpAddress(),
-			targetServerPortNumber: randomPortNumber(),
-			connectionTimeout:      randomPositiveNumber(),
-			responseTimeout:        randomPositiveNumber(),
+		smtpRequestConfig := &SmtpRequestConfiguration{
+			VerifierDomain:         randomDomain(),
+			VerifierEmail:          randomEmail(),
+			TargetEmail:            randomEmail(),
+			TargetServerAddress:    randomIpAddress(),
+			TargetServerPortNumber: randomPortNumber(),
+			ConnectionTimeout:      randomPositiveNumber(),
+			ResponseTimeout:        randomPositiveNumber(),
 		}
 		smtpClient := newSmtpClient(smtpRequestConfig)
 
-		assert.Equal(t, smtpRequestConfig.verifierDomain, smtpClient.verifierDomain)
-		assert.Equal(t, smtpRequestConfig.verifierEmail, smtpClient.verifierEmail)
-		assert.Equal(t, smtpRequestConfig.targetEmail, smtpClient.targetEmail)
-		assert.Equal(t, smtpRequestConfig.targetServerAddress, smtpClient.targetServerAddress)
-		assert.Equal(t, smtpRequestConfig.targetServerPortNumber, smtpClient.targetServerPortNumber)
+		assert.Equal(t, smtpRequestConfig.VerifierDomain, smtpClient.verifierDomain)
+		assert.Equal(t, smtpRequestConfig.VerifierEmail, smtpClient.verifierEmail)
+		assert.Equal(t, smtpRequestConfig.TargetEmail, smtpClient.targetEmail)
+		assert.Equal(t, smtpRequestConfig.TargetServerAddress, smtpClient.targetServerAddress)
+		assert.Equal(t, smtpRequestConfig.TargetServerPortNumber, smtpClient.targetServerPortNumber)
 		assert.Equal(t, tcpTransportLayer, smtpClient.networkProtocol)
-		assert.Equal(t, time.Duration(smtpRequestConfig.connectionTimeout)*time.Second, smtpClient.connectionTimeout)
-		assert.Equal(t, time.Duration(smtpRequestConfig.responseTimeout)*time.Second, smtpClient.responseTimeout)
+		assert.Equal(t, time.Duration(smtpRequestConfig.ConnectionTimeout)*time.Second, smtpClient.connectionTimeout)
+		assert.Equal(t, time.Duration(smtpRequestConfig.ResponseTimeout)*time.Second, smtpClient.responseTimeout)
 	})
 }
 
@@ -89,7 +89,7 @@ func TestSmtpClientSessionError(t *testing.T) {
 	})
 
 	t.Run("when error exists", func(t *testing.T) {
-		err := new(smtpClientError)
+		err := new(SmtpClientError)
 		smtpClient := &smtpClient{err: err}
 
 		assert.Equal(t, err, smtpClient.sessionError())

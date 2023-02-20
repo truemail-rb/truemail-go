@@ -30,12 +30,12 @@ func wrapDnsError(err error) *validationError {
 }
 
 // SMTP client custom error wrapper
-type smtpClientError struct {
+type SmtpClientError struct {
 	isConnection, isResponseTimeout, isHello, isMailFrom, isRecptTo bool
 	err                                                             error
 }
 
 // error interface implementation
-func (smtpClientError *smtpClientError) Error() string {
+func (smtpClientError *SmtpClientError) Error() string {
 	return smtpClientError.err.Error()
 }

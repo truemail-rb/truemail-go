@@ -1,25 +1,25 @@
 package truemail
 
 // Validator result mutable structure. Each validation
-// layer write something into validatorResult
-type validatorResult struct {
+// layer write something into ValidatorResult
+type ValidatorResult struct {
 	Success, isPassFromDomainListMatch                           bool
 	Email, Domain, ValidationType, punycodeEmail, punycodeDomain string
 	MailServers, usedValidations                                 []string
 	Errors                                                       map[string]string
-	Configuration                                                *configuration
-	SmtpDebug                                                    []*smtpRequest
+	Configuration                                                *Configuration
+	SmtpDebug                                                    []*SmtpRequest
 }
 
-// validatorResult methods
+// ValidatorResult methods
 
 // Addes current validation type to validator result used validations slice
-func (validatorResult *validatorResult) addUsedValidationType(validationType string) {
+func (validatorResult *ValidatorResult) addUsedValidationType(validationType string) {
 	validatorResult.usedValidations = append(validatorResult.usedValidations, validationType)
 }
 
 // Addes error to validator result errors dictionary
-func (validatorResult *validatorResult) addError(key, value string) {
+func (validatorResult *ValidatorResult) addError(key, value string) {
 	if validatorResult.Errors == nil {
 		validatorResult.Errors = map[string]string{}
 	}
@@ -29,7 +29,7 @@ func (validatorResult *validatorResult) addError(key, value string) {
 // Structure with behavior. Responsible for the
 // logic of calling the validation layers sequence
 type validator struct {
-	result *validatorResult
+	result *ValidatorResult
 	domainListMatchLayer
 	regexLayer
 	mxLayer
@@ -38,9 +38,9 @@ type validator struct {
 }
 
 // New validator builder. Returns consistent validator structure
-func newValidator(email, validationType string, configuration *configuration) *validator {
+func newValidator(email, validationType string, configuration *Configuration) *validator {
 	validator := &validator{
-		result: &validatorResult{
+		result: &ValidatorResult{
 			Email:          email,
 			Configuration:  copyConfigurationByPointer(configuration),
 			ValidationType: validationType,
@@ -58,23 +58,23 @@ func newValidator(email, validationType string, configuration *configuration) *v
 // validation layers interfaces
 
 type domainListMatchLayer interface {
-	check(validatorResult *validatorResult) *validatorResult
+	check(validatorResult *ValidatorResult) *ValidatorResult
 }
 
 type regexLayer interface {
-	check(validatorResult *validatorResult) *validatorResult
+	check(validatorResult *ValidatorResult) *ValidatorResult
 }
 
 type mxLayer interface {
-	check(validatorResult *validatorResult) *validatorResult
+	check(validatorResult *ValidatorResult) *ValidatorResult
 }
 
 type mxBlacklistLayer interface {
-	check(validatorResult *validatorResult) *validatorResult
+	check(validatorResult *ValidatorResult) *ValidatorResult
 }
 
 type smtpLayer interface {
-	check(validatorResult *validatorResult) *validatorResult
+	check(validatorResult *ValidatorResult) *ValidatorResult
 }
 
 // validator methods
@@ -146,7 +146,7 @@ func (validator *validator) validateSMTP() {
 }
 
 // validator entrypoint. This method triggers chain of validation layers
-func (validator *validator) run() *validatorResult {
+func (validator *validator) run() *ValidatorResult {
 	// TODO: add painc if run will called more then one time
 	// or check len(validatorResult.usedValidations) == 0
 

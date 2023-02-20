@@ -17,12 +17,12 @@ type resolver interface {
 
 // DNS (MX) validation, second validation level
 type validationMx struct {
-	result *validatorResult
+	result *ValidatorResult
 	resolver
 }
 
 // interface implementation
-func (validation *validationMx) check(validatorResult *validatorResult) *validatorResult {
+func (validation *validationMx) check(validatorResult *ValidatorResult) *ValidatorResult {
 	validation.result = validatorResult
 	validation.setValidatorResultPunycodeRepresentation()
 	validation.initDnsResolver()
