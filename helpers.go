@@ -75,11 +75,17 @@ func validateValidationTypeContext(validationType string) error {
 	)
 }
 
-// Returns string by regex pattern capture group index
+// Returns string by regex pattern capture group index for case when capture group found,
+// otherwise returns empty string
 func regexCaptureGroup(str string, regexPattern string, captureGroup int) string {
 	regex, _ := newRegex(regexPattern)
+	matchedStringsSlice := regex.FindStringSubmatch(str)
 
-	return regex.FindStringSubmatch(str)[captureGroup]
+	if captureGroup > (len(matchedStringsSlice) - 1) {
+		return emptyString
+	} else {
+		return matchedStringsSlice[captureGroup]
+	}
 }
 
 // Returns domain from email string
