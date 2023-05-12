@@ -46,7 +46,7 @@ func (validation *validationDomainListMatch) isWhitelistedDomain() bool {
 	return isIncluded(validatorResult.Configuration.WhitelistedDomains, validatorResult.Domain)
 }
 
-// Returns true if whitelist validation enebled, otherwise returns false
+// Returns true if whitelist validation enabled, otherwise returns false
 func (validation *validationDomainListMatch) isWhitelistValidation() bool {
 	validatorResult := validation.result
 	return validatorResult.Configuration.WhitelistValidation
