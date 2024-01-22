@@ -103,9 +103,10 @@ func (smtpClient *smtpClient) runSession() bool {
 	}
 
 	client, err := smtp.NewClient(connection, smtpClient.targetServerAddress)
-	// Handle connection to MX failed
+	// Handle error case when SMTP server responded with non 220 status
 	if err != nil {
 		closeConnection()
+		smtpClient.err = &SmtpClientError{isSmtpServiceReady: true, err: err}
 		return false
 	}
 
