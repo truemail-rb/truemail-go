@@ -70,7 +70,7 @@ Email validation is a tricky thing. There are a number of different ways to vali
 
 ## Requirements
 
-Golang 1.19+
+Golang 1.21+
 
 ## Installation
 

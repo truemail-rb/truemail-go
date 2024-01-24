@@ -248,4 +248,24 @@ func TestSmtpClientRunSession(t *testing.T) {
 		assert.False(t, err.isMailFrom)
 		assert.True(t, err.isRecptTo)
 	})
+
+	t.Run("iteracting with external SMTP server, wrong SMTP service ready status", func(t *testing.T) {
+		msgGreeting := "200 msgGreeting"
+		serverWithWrongServiceReadyStatus := startSmtpMock(smtpmock.ConfigurationAttr{MsgGreeting: msgGreeting})
+		defer func() { _ = serverWithWrongServiceReadyStatus.Stop() }()
+
+		client := &smtpClient{
+			verifierDomain:         randomDomain(),
+			verifierEmail:          randomEmail(),
+			targetEmail:            randomEmail(),
+			targetServerAddress:    localhostIPv4Address,
+			targetServerPortNumber: serverWithWrongServiceReadyStatus.PortNumber(),
+			networkProtocol:        tcpTransportLayer,
+			connectionTimeout:      time.Duration(1) * time.Second,
+			responseTimeout:        time.Duration(1) * time.Second,
+		}
+
+		assert.False(t, client.runSession())
+		assert.EqualError(t, client.err, msgGreeting)
+	})
 }
