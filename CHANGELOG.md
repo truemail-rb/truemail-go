@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2024-01-24
+
+### Fixed
+
+- Fixed `x-net` vulnerability issues
+- Fixed [issue](https://github.com/truemail-rb/truemail-go/issues/80) with handling wrong SMTP service ready status. Thanks [@rahultyagidev](https://github.com/rahultyagidev), [@RichiMaulana](https://github.com/RichiMaulana) for the bug report.
+
 ## [1.1.2] - 2023-05-12
 
 ### Fixed
