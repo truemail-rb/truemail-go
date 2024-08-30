@@ -1,0 +1,35 @@
+---
+
+enableGlobDot: true
+
+patterns:
+  - name: GithubUser
+    pattern: /\[@.+\]/gmx
+
+languageSettings:
+  - languageId: markdown
+    ignoreRegExpList:
+      - Email
+      - GithubUser
+
+words:
+  - bestwebua
+  - codecov
+  - commitspell
+  - consts
+  - crtypto
+  - funcs
+  - golangci
+  - gomod
+  - gotestsum
+  - lefthook
+  - markdownlint
+  - multihomed
+  - punycode
+  - rubocop
+  - shellcheck
+  - shortcuting
+  - struct
+  - structs
+  - truemail
+  - yamlint
